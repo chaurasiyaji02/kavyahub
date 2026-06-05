@@ -1,0 +1,176 @@
+/* =========================
+   TABLETS
+========================= */
+
+@media (max-width: 992px) {
+
+  section {
+    padding: 70px 6%;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* =========================
+   MOBILE MENU
+========================= */
+
+@media (max-width: 768px) {
+
+  .menu-icon {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 80px;
+    right: -100%;
+    width: 280px;
+    height: calc(100vh - 80px);
+
+    background: #0f172a;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding-top: 40px;
+
+    transition: 0.4s ease;
+    gap: 25px;
+  }
+
+  .nav-links.active {
+    right: 0;
+  }
+
+  .hero-section {
+    min-height: auto;
+    padding-top: 50px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.1rem;
+  }
+
+  .hero-bio {
+    font-size: 0.95rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+  }
+
+  .section-heading h2 {
+    font-size: 1.8rem;
+  }
+
+  .account-card {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .popup-buttons {
+    flex-direction: column;
+  }
+
+  .popup-social-btn {
+    width: 100%;
+  }
+
+  .continue-btn {
+    width: 100%;
+  }
+
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 576px) {
+
+  section {
+    padding: 60px 5%;
+  }
+
+  .navbar {
+    padding: 18px 5%;
+  }
+
+  .logo a {
+    font-size: 1.5rem;
+  }
+
+  .profile-image {
+    width: 140px;
+    height: 140px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .section-heading h2 {
+    font-size: 1.6rem;
+  }
+
+  .social-card,
+  .category-card,
+  .resource-card {
+    padding: 20px;
+  }
+
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .video-card iframe {
+    height: 220px;
+  }
+
+  .popup-box {
+    padding: 25px;
+  }
+
+}
+
+/* =========================
+   EXTRA SMALL DEVICES
+========================= */
+
+@media (max-width: 380px) {
+
+  .hero-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-bio {
+    font-size: 0.9rem;
+  }
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .section-heading h2 {
+    font-size: 1.4rem;
+  }
+
+}

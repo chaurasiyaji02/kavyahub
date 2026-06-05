@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | KavyaHub</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <!-- Sidebar -->
+
+    <aside class="admin-sidebar">
+
+        <div class="admin-logo">
+            <h2>Kavya<span>Hub</span></h2>
+        </div>
+
+        <ul class="admin-menu">
+
+            <li class="menu-item active"
+                data-section="dashboard">
+
+                <i class="fa-solid fa-chart-line"></i>
+                Dashboard
+
+            </li>
+
+            <li class="menu-item"
+                data-section="resources">
+
+                <i class="fa-solid fa-folder"></i>
+                Resources
+
+            </li>
+
+            <li class="menu-item"
+                data-section="videos">
+
+                <i class="fa-solid fa-video"></i>
+                Videos
+
+            </li>
+
+            <li class="menu-item"
+                data-section="profile">
+
+                <i class="fa-solid fa-user"></i>
+                Profile
+
+            </li>
+
+            <li class="menu-item"
+                data-section="settings">
+
+                <i class="fa-solid fa-gear"></i>
+                Settings
+
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="admin-main">
+
+        <!-- Dashboard -->
+
+        <section
+        class="admin-section active-section"
+        id="dashboard">
+
+            <h1>Dashboard</h1>
+
+            <div class="dashboard-cards">
+
+                <div class="dashboard-card">
+
+                    <h3>Total Resources</h3>
+
+                    <p id="totalResources">
+                        0
+                    </p>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <h3>Total Videos</h3>
+
+                    <p id="totalVideos">
+                        0
+                    </p>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <h3>Featured Resource</h3>
+
+                    <p id="featuredResource">
+                        None
+                    </p>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <h3>Latest Upload</h3>
+
+                    <p id="latestUpload">
+                        None
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Resources Section -->
+
+        <section
+        class="admin-section"
+        id="resources">
+
+            <h1>Add Resource</h1>
+
+            <form id="resourceForm">
+
+                <input
+                type="text"
+                id="resourceTitle"
+                placeholder="Resource Title"
+                required>
+
+                <textarea
+                id="resourceDescription"
+                placeholder="Description"
+                required></textarea>
+
+                <select id="resourceCategory">
+
+                    <option value="certificate">
+                        Certificate
+                    </option>
+
+                    <option value="course">
+                        Course
+                    </option>
+
+                    <option value="notes">
+                        Notes
+                    </option>
+
+                    <option value="internship">
+                        Internship
+                    </option>
+
+                    <option value="roadmap">
+                        Roadmap
+                    </option>
+
+                </select>
+
+                <input
+                type="url"
+                id="resourceLink"
+                placeholder="Resource Link">
+
+                <input
+                type="date"
+                id="resourceDate">
+
+                <label>
+
+                    <input
+                    type="checkbox"
+                    id="resourceFeatured">
+
+                    Featured Resource
+
+                </label>
+
+                <button type="submit">
+                    Save Resource
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- Videos Section -->
+
+        <section
+        class="admin-section"
+        id="videos">
+
+            <h1>Add Video</h1>
+
+            <form id="videoForm">
+
+                <input
+                type="text"
+                id="videoTitle"
+                placeholder="Video Title"
+                required>
+
+                <textarea
+                id="videoDescription"
+                placeholder="Description"
+                required></textarea>
+
+                <select id="videoCategory">
+
+                    <option value="certificate">
+                        Certificate
+                    </option>
+
+                    <option value="course">
+                        Course
+                    </option>
+
+                    <option value="career">
+                        Career
+                    </option>
+
+                    <option value="ai">
+                        AI
+                    </option>
+
+                    <option value="roadmap">
+                        Roadmap
+                    </option>
+
+                </select>
+
+                <input
+                type="url"
+                id="youtubeLink"
+                placeholder="YouTube Link">
+
+                <input
+                type="url"
+                id="videoResourceLink"
+                placeholder="Resource Link">
+
+                <label>
+
+                    <input
+                    type="checkbox"
+                    id="videoFeatured">
+
+                    Featured Video
+
+                </label>
+
+                <button type="submit">
+                    Save Video
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- Profile -->
+
+        <section
+        class="admin-section"
+        id="profile">
+
+            <h1>Profile Settings</h1>
+
+            <form id="profileForm">
+
+                <input
+                type="text"
+                id="profileName"
+                placeholder="Your Name">
+
+                <textarea
+                id="profileBio"
+                placeholder="Your Bio"></textarea>
+
+                <input
+                type="url"
+                id="youtubeUrl"
+                placeholder="YouTube URL">
+
+                <input
+                type="url"
+                id="instagramUrl"
+                placeholder="Instagram URL">
+
+                <input
+                type="url"
+                id="telegramUrl"
+                placeholder="Telegram URL">
+
+                <input
+                type="url"
+                id="linkedinUrl"
+                placeholder="LinkedIn URL">
+
+                <button type="submit">
+                    Save Profile
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- Settings -->
+
+        <section
+        class="admin-section"
+        id="settings">
+
+            <h1>Website Settings</h1>
+
+            <form id="settingsForm">
+
+                <input
+                type="text"
+                id="websiteName"
+                placeholder="Website Name">
+
+                <textarea
+                id="popupMessage"
+                placeholder="Popup Message"></textarea>
+
+                <textarea
+                id="footerText"
+                placeholder="Footer Text"></textarea>
+
+                <button type="submit">
+                    Save Settings
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/admin.js"></script>
+
+</body>
+</html>
