@@ -14,6 +14,12 @@ async function checkAdminLogin() {
 
   loginBox.style.display = "none";
   adminContainer.style.display = "flex";
+
+  loadDashboardData();
+  loadProfile();
+  loadResourcesList();
+  loadVideosList();
+  loadAccountsList();
 }
 
 async function adminLogin(e) {
@@ -51,7 +57,7 @@ document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 
 checkAdminLogin();
 
-/* Sidebar switching */
+/* SIDEBAR */
 document.querySelectorAll(".menu-item").forEach(item => {
   item.addEventListener("click", () => {
     document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
@@ -62,7 +68,37 @@ document.querySelectorAll(".menu-item").forEach(item => {
   });
 });
 
-/* Save Resource */
+/* DASHBOARD */
+async function loadDashboardData() {
+  const { count: resourcesCount } = await supabaseClient
+    .from("resources")
+    .select("*", { count: "exact", head: true });
+
+  const { count: videosCount } = await supabaseClient
+    .from("videos")
+    .select("*", { count: "exact", head: true });
+
+  const { data: featured } = await supabaseClient
+    .from("resources")
+    .select("title")
+    .eq("featured", true)
+    .limit(1)
+    .maybeSingle();
+
+  const { data: latestResource } = await supabaseClient
+    .from("resources")
+    .select("title, created_at")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  document.getElementById("totalResources").textContent = resourcesCount || 0;
+  document.getElementById("totalVideos").textContent = videosCount || 0;
+  document.getElementById("featuredResource").textContent = featured?.title || "None";
+  document.getElementById("latestUpload").textContent = latestResource?.title || "None";
+}
+
+/* SAVE RESOURCE */
 document.getElementById("resourceForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -82,11 +118,14 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
     return;
   }
 
-  alert("Resource saved to Supabase ✅");
+  alert("Resource saved ✅");
   e.target.reset();
+
+  loadResourcesList();
+  loadDashboardData();
 });
 
-/* Save Video */
+/* SAVE VIDEO */
 document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -96,22 +135,297 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
     category: document.getElementById("videoCategory").value,
     youtube_link: document.getElementById("youtubeLink").value,
     resource_link: document.getElementById("videoResourceLink").value,
-
     upload_date: document.getElementById("videoDate").value,
-
     featured: document.getElementById("videoFeatured").checked
   };
 
-  const { error } = await supabaseClient
-    .from("videos")
-    .insert([video]);
+  const { error } = await supabaseClient.from("videos").insert([video]);
 
   if (error) {
     alert("Error: " + error.message);
     return;
   }
 
-  alert("Video saved to Supabase ✅");
-
+  alert("Video saved ✅");
   e.target.reset();
+
+  loadVideosList();
+  loadDashboardData();
+});
+
+/* PROFILE LOAD */
+async function loadProfile() {
+  const { data, error } = await supabaseClient
+    .from("profile")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data) return;
+
+  document.getElementById("profileName").value = data.name || "";
+  document.getElementById("profileBio").value = data.bio || "";
+  document.getElementById("profileImage").value = data.profile_image || "";
+  document.getElementById("youtubeUrl").value = data.youtube || "";
+  document.getElementById("instagramUrl").value = data.instagram || "";
+  document.getElementById("telegramUrl").value = data.telegram || "";
+  document.getElementById("linkedinUrl").value = data.linkedin || "";
+  document.getElementById("whatsappUrl").value = data.whatsapp || "";
+}
+
+/* PROFILE SAVE */
+document.getElementById("profileForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const profile = {
+    name: document.getElementById("profileName").value,
+    bio: document.getElementById("profileBio").value,
+    profile_image: document.getElementById("profileImage").value,
+    youtube: document.getElementById("youtubeUrl").value,
+    instagram: document.getElementById("instagramUrl").value,
+    telegram: document.getElementById("telegramUrl").value,
+    linkedin: document.getElementById("linkedinUrl").value,
+    whatsapp: document.getElementById("whatsappUrl").value,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data: existing } = await supabaseClient
+    .from("profile")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+
+  let error;
+
+  if (existing) {
+    const result = await supabaseClient
+      .from("profile")
+      .update(profile)
+      .eq("id", existing.id);
+
+    error = result.error;
+  } else {
+    const result = await supabaseClient
+      .from("profile")
+      .insert([profile]);
+
+    error = result.error;
+  }
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  alert("Profile saved ✅");
+});
+
+/* RESOURCES LIST */
+async function loadResourcesList() {
+  const list = document.getElementById("resourcesList");
+  if (!list) return;
+
+  const { data, error } = await supabaseClient
+    .from("resources")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = `<p class="admin-empty">No resources added yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = data.map(item => `
+    <div class="admin-list-card">
+      <div>
+        <h3>${item.title}</h3>
+        <p>${item.category || "Resource"} • ${item.upload_date || ""}</p>
+      </div>
+
+      <button class="delete-btn" onclick="deleteResource(${item.id})">
+        Delete
+      </button>
+    </div>
+  `).join("");
+}
+
+async function deleteResource(id) {
+  if (!confirm("Delete this resource?")) return;
+
+  const { error } = await supabaseClient
+    .from("resources")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  loadResourcesList();
+  loadDashboardData();
+}
+
+/* VIDEOS LIST */
+async function loadVideosList() {
+  const list = document.getElementById("videosList");
+  if (!list) return;
+
+  const { data, error } = await supabaseClient
+    .from("videos")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = `<p class="admin-empty">No videos added yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = data.map(item => `
+    <div class="admin-list-card">
+      <div>
+        <h3>${item.title}</h3>
+        <p>${item.category || "Video"} • ${item.upload_date || ""}</p>
+      </div>
+
+      <button class="delete-btn" onclick="deleteVideo(${item.id})">
+        Delete
+      </button>
+    </div>
+  `).join("");
+}
+
+async function deleteVideo(id) {
+  if (!confirm("Delete this video?")) return;
+
+  const { error } = await supabaseClient
+    .from("videos")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  loadVideosList();
+  loadDashboardData();
+}
+
+/* OTHER ACCOUNTS SAVE */
+document.getElementById("accountForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const account = {
+    account_name: document.getElementById("accountName").value,
+    platform: document.getElementById("accountPlatform").value,
+    description: document.getElementById("accountDescription").value,
+    url: document.getElementById("accountUrl").value,
+    is_active: document.getElementById("accountActive").checked
+  };
+
+  const { error } = await supabaseClient
+    .from("other_accounts")
+    .insert([account]);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  alert("Account saved ✅");
+  e.target.reset();
+
+  loadAccountsList();
+});
+
+/* OTHER ACCOUNTS LIST */
+async function loadAccountsList() {
+  const list = document.getElementById("accountsList");
+  if (!list) return;
+
+  const { data, error } = await supabaseClient
+    .from("other_accounts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = `<p class="admin-empty">No other accounts added yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = data.map(item => `
+    <div class="admin-list-card">
+      <div>
+        <h3>${item.account_name}</h3>
+        <p>${item.platform || "Account"} • ${item.is_active ? "Visible" : "Hidden"}</p>
+      </div>
+
+      <div class="admin-actions">
+        <button class="toggle-btn" onclick="toggleAccount(${item.id}, ${item.is_active})">
+          ${item.is_active ? "Hide" : "Show"}
+        </button>
+
+        <button class="delete-btn" onclick="deleteAccount(${item.id})">
+          Delete
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function toggleAccount(id, currentStatus) {
+  const { error } = await supabaseClient
+    .from("other_accounts")
+    .update({ is_active: !currentStatus })
+    .eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  loadAccountsList();
+}
+
+async function deleteAccount(id) {
+  if (!confirm("Delete this account?")) return;
+
+  const { error } = await supabaseClient
+    .from("other_accounts")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  loadAccountsList();
+}
+
+/* SETTINGS */
+document.getElementById("settingsForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  alert("Settings system next phase me connect karenge ✅");
 });
