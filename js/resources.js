@@ -69,12 +69,10 @@ return `
     </small>
 
     <button
-    class="unlock-btn"
-    data-link="${resource.link}">
-    
-    Open Resource
-
-    </button>
+  class="unlock-btn"
+  data-link="${resource.link}">
+  Open Resource
+</button>
 
 </div>
 

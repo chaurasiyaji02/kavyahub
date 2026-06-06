@@ -14,49 +14,27 @@ const featuredVideoResourceButton = document.getElementById("featuredVideoResour
 let currentCategory = "all";
 
 function getYouTubeId(url) {
-
   if (!url) return null;
 
   try {
-
     const parsedUrl = new URL(url);
 
-    if (
-      parsedUrl.hostname.includes("youtu.be")
-    ) {
-
+    if (parsedUrl.hostname.includes("youtu.be")) {
       return parsedUrl.pathname.slice(1);
-
     }
 
-    if (
-      parsedUrl.pathname.includes("/shorts/")
-    ) {
-
-      return parsedUrl.pathname
-      .split("/shorts/")[1]
-      .split("/")[0];
-
+    if (parsedUrl.pathname.includes("/shorts/")) {
+      return parsedUrl.pathname.split("/shorts/")[1].split("/")[0];
     }
 
-    if (
-      parsedUrl.searchParams.get("v")
-    ) {
-
+    if (parsedUrl.searchParams.get("v")) {
       return parsedUrl.searchParams.get("v");
-
     }
 
     return null;
-
-  }
-
-  catch(error) {
-
+  } catch (error) {
     return null;
-
   }
-
 }
 
 function getYouTubeThumbnail(url) {
@@ -94,7 +72,7 @@ function createVideoCard(video) {
 
         ${
           video.resource_link
-            ? `<button class="unlock-btn" data-link="${video.resource_link}">
+            ? `<button type="button" class="unlock-btn" data-link="${video.resource_link}">
                 Open Resource
               </button>`
             : ""
@@ -179,6 +157,23 @@ featuredVideoButton?.addEventListener("click", () => {
 
   if (link && link !== "#") {
     window.open(link, "_blank");
+  }
+});
+
+featuredVideoResourceButton?.addEventListener("click", () => {
+  const link = featuredVideoResourceButton.dataset.link;
+
+  if (!link || link === "#") {
+    alert("Resource link not added yet.");
+    return;
+  }
+
+  const popupOverlay = document.getElementById("popupOverlay");
+
+  window.currentLink = link;
+
+  if (popupOverlay) {
+    popupOverlay.style.display = "flex";
   }
 });
 

@@ -1,7 +1,4 @@
-/* =====================================
-   MOBILE NAVIGATION
-===================================== */
-
+/* MOBILE MENU */
 const menuIcon = document.getElementById("menuIcon");
 const navLinks = document.getElementById("navLinks");
 
@@ -11,24 +8,20 @@ if (menuIcon && navLinks) {
   });
 }
 
-/* =====================================
-   POPUP LINK UNLOCK SYSTEM
-===================================== */
-
+/* POPUP SYSTEM */
 const popupOverlay = document.getElementById("popupOverlay");
 const popupClose = document.getElementById("popupClose");
 const continueBtn = document.getElementById("continueBtn");
 
-let currentLink = "";
+window.currentLink = "";
 
-/* Resource Buttons */
-
+/* Unlock Button Click */
 document.addEventListener("click", (e) => {
   const unlockButton = e.target.closest(".unlock-btn");
 
   if (!unlockButton) return;
 
-  currentLink = unlockButton.dataset.link;
+  currentLink = unlockButton.getAttribute("data-link");
 
   console.log("Resource Link:", currentLink);
 
@@ -42,111 +35,46 @@ document.addEventListener("click", (e) => {
   }
 });
 
-unlockButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-
-    currentLink = button.dataset.link;
-
+/* Continue Button */
+if (continueBtn) {
+  continueBtn.addEventListener("click", () => {
     if (popupOverlay) {
-      popupOverlay.style.display = "flex";
-    }
-
-  });
-});
-
-/* Close Popup */
-
-if (popupClose) {
-  popupClose.addEventListener("click", () => {
-    popupOverlay.style.display = "none";
-  });
-}
-
-/* Click Outside Popup */
-
-if (popupOverlay) {
-  popupOverlay.addEventListener("click", (e) => {
-
-    if (e.target === popupOverlay) {
       popupOverlay.style.display = "none";
     }
 
-  });
-}
-
-/* Continue Button */
-
-if (continueBtn) {
-
-  continueBtn.addEventListener("click", () => {
-
-    popupOverlay.style.display = "none";
-
-    if (
-      currentLink &&
-      currentLink !== "#" &&
-      currentLink !== ""
-    ) {
+    if (currentLink && currentLink !== "#") {
       window.open(currentLink, "_blank");
     }
-
   });
-
 }
 
-/* =====================================
-   SMOOTH SCROLLING
-===================================== */
-
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-
-  anchor.addEventListener("click", function (e) {
-
-    const target = document.querySelector(
-      this.getAttribute("href")
-    );
-
-    if (target) {
-      e.preventDefault();
-
-      target.scrollIntoView({
-        behavior: "smooth"
-      });
+/* Close Popup */
+if (popupClose) {
+  popupClose.addEventListener("click", () => {
+    if (popupOverlay) {
+      popupOverlay.style.display = "none";
     }
-
   });
+}
 
-});
+/* Close Popup on Outside Click */
+if (popupOverlay) {
+  popupOverlay.addEventListener("click", (e) => {
+    if (e.target === popupOverlay) {
+      popupOverlay.style.display = "none";
+    }
+  });
+}
 
-/* =====================================
-   ACTIVE NAVIGATION LINK
-===================================== */
+/* ACTIVE NAV LINK */
+const currentPage = window.location.pathname.split("/").pop();
 
-const currentPage =
-  window.location.pathname.split("/").pop();
-
-const navItems =
-  document.querySelectorAll(".nav-links a");
-
-navItems.forEach(link => {
-
+document.querySelectorAll(".nav-links a").forEach(link => {
   const href = link.getAttribute("href");
 
   if (href === currentPage) {
     link.classList.add("active");
   }
-
 });
 
-/* =====================================
-   FUTURE FEATURES PLACEHOLDER
-===================================== */
-
-// Supabase Connection
-// User Analytics
-// Download Counter
-// Resource Search
-// Calendar Integration
-// Admin Panel Controls
-
-console.log("KavyaHub Loaded Successfully");
+console.log("Main JS Loaded");
