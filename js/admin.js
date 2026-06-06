@@ -96,10 +96,15 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
     category: document.getElementById("videoCategory").value,
     youtube_link: document.getElementById("youtubeLink").value,
     resource_link: document.getElementById("videoResourceLink").value,
+
+    upload_date: document.getElementById("videoDate").value,
+
     featured: document.getElementById("videoFeatured").checked
   };
 
-  const { error } = await supabaseClient.from("videos").insert([video]);
+  const { error } = await supabaseClient
+    .from("videos")
+    .insert([video]);
 
   if (error) {
     alert("Error: " + error.message);
@@ -107,5 +112,6 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   }
 
   alert("Video saved to Supabase ✅");
+
   e.target.reset();
 });
