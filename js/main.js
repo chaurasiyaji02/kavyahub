@@ -23,7 +23,29 @@ let currentLink = "";
 
 /* Resource Buttons */
 
-const unlockButtons = document.querySelectorAll(".unlock-btn");
+document.addEventListener(
+"click",
+(e)=>{
+
+if(
+e.target.classList.contains(
+"unlock-btn"
+)
+){
+
+currentLink =
+e.target.dataset.link;
+
+if(popupOverlay){
+
+popupOverlay.style.display =
+"flex";
+
+}
+
+}
+
+});
 
 unlockButtons.forEach((button) => {
   button.addEventListener("click", () => {
