@@ -13,9 +13,69 @@ const featuredVideoResourceButton = document.getElementById("featuredVideoResour
 
 let currentCategory = "all";
 
+function getYouTubeId(url) {
+
+  if (!url) return null;
+
+  try {
+
+    const parsedUrl = new URL(url);
+
+    if (
+      parsedUrl.hostname.includes("youtu.be")
+    ) {
+
+      return parsedUrl.pathname.slice(1);
+
+    }
+
+    if (
+      parsedUrl.pathname.includes("/shorts/")
+    ) {
+
+      return parsedUrl.pathname
+      .split("/shorts/")[1]
+      .split("/")[0];
+
+    }
+
+    if (
+      parsedUrl.searchParams.get("v")
+    ) {
+
+      return parsedUrl.searchParams.get("v");
+
+    }
+
+    return null;
+
+  }
+
+  catch(error) {
+
+    return null;
+
+  }
+
+}
+
+function getYouTubeThumbnail(url) {
+  const videoId = getYouTubeId(url);
+
+  if (!videoId) {
+    return "assets/images/default-thumbnail.jpg";
+  }
+
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
+
 function createVideoCard(video) {
+  const thumbnail = getYouTubeThumbnail(video.youtube_link);
+
   return `
     <div class="resource-card">
+
+      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail">
 
       <span class="tag">${video.category || "Video"}</span>
 
@@ -23,7 +83,9 @@ function createVideoCard(video) {
 
       <p>${video.description || ""}</p>
 
-      <small>${video.created_at ? new Date(video.created_at).toLocaleDateString() : ""}</small>
+      <small>
+        ${video.created_at ? new Date(video.created_at).toLocaleDateString() : ""}
+      </small>
 
       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
         <a href="${video.youtube_link}" target="_blank" class="small-btn">
@@ -62,18 +124,24 @@ function renderVideos(data) {
 }
 
 function loadFeaturedVideo() {
-  const featured = videos.find(video => video.featured);
+  let featured = videos.find(video => video.featured);
+
+  if (!featured && videos.length > 0) {
+    featured = videos[0];
+  }
 
   if (!featured) {
-    featuredVideoTitle.textContent = "No Featured Video";
-    featuredVideoDescription.textContent = "Admin panel se featured video add karo.";
+    featuredVideoTitle.textContent = "No Video Added Yet";
+    featuredVideoDescription.textContent = "Admin panel se video add karo.";
+    featuredVideoButton.dataset.link = "#";
+    featuredVideoResourceButton.dataset.link = "#";
     return;
   }
 
   featuredVideoTitle.textContent = featured.title;
   featuredVideoDescription.textContent = featured.description || "";
 
-  featuredVideoButton.dataset.link = featured.youtube_link;
+  featuredVideoButton.dataset.link = featured.youtube_link || "#";
   featuredVideoResourceButton.dataset.link = featured.resource_link || "#";
 }
 
