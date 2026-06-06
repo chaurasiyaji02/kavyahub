@@ -1,344 +1,134 @@
-/* =====================================
-   VIDEO DATA
-   (Later Supabase se load hoga)
-===================================== */
+let videos = [];
 
-let videos = [
+const videosContainer = document.getElementById("videosContainer");
+const videoSearch = document.getElementById("videoSearch");
+const videoCount = document.getElementById("videoCount");
+const videoEmptyState = document.getElementById("videoEmptyState");
+const filterButtons = document.querySelectorAll(".video-filter-btn");
 
-  {
-    id: 1,
-    title: "Google Cybersecurity Certificate",
-    description: "Free Google cybersecurity certificate for beginners.",
-    category: "certificate",
-    youtubeLink: "https://youtube.com/",
-    resourceLink: "https://example.com",
-    thumbnail: "assets/thumbnails/cybersecurity.jpg",
-    uploadDate: "2026-06-05",
-    featured: true
-  },
-
-  {
-    id: 2,
-    title: "IBM Data Analytics Course",
-    description: "Free data analytics course and certificate.",
-    category: "course",
-    youtubeLink: "https://youtube.com/",
-    resourceLink: "https://example.com",
-    thumbnail: "assets/thumbnails/data-analytics.jpg",
-    uploadDate: "2026-06-04",
-    featured: false
-  },
-
-  {
-    id: 3,
-    title: "AI Tools Every Student Should Know",
-    description: "Useful AI tools for students and creators.",
-    category: "ai",
-    youtubeLink: "https://youtube.com/",
-    resourceLink: "https://example.com",
-    thumbnail: "assets/thumbnails/ai-tools.jpg",
-    uploadDate: "2026-06-03",
-    featured: false
-  },
-
-  {
-    id: 4,
-    title: "Cloud Engineer Roadmap 2026",
-    description: "Step by step roadmap to become cloud engineer.",
-    category: "roadmap",
-    youtubeLink: "https://youtube.com/",
-    resourceLink: "https://example.com",
-    thumbnail: "assets/thumbnails/cloud-roadmap.jpg",
-    uploadDate: "2026-06-02",
-    featured: false
-  }
-
-];
-
-/* =====================================
-   ELEMENTS
-===================================== */
-
-const videosContainer =
-  document.getElementById("videosContainer");
-
-const videoSearch =
-  document.getElementById("videoSearch");
-
-const videoCount =
-  document.getElementById("videoCount");
-
-const videoEmptyState =
-  document.getElementById("videoEmptyState");
-
-const filterButtons =
-  document.querySelectorAll(".video-filter-btn");
-
-const featuredVideoTitle =
-  document.getElementById("featuredVideoTitle");
-
-const featuredVideoDescription =
-  document.getElementById("featuredVideoDescription");
-
-const featuredVideoButton =
-  document.getElementById("featuredVideoButton");
-
-const featuredVideoResourceButton =
-  document.getElementById("featuredVideoResourceButton");
-
-/* =====================================
-   CURRENT FILTER
-===================================== */
+const featuredVideoTitle = document.getElementById("featuredVideoTitle");
+const featuredVideoDescription = document.getElementById("featuredVideoDescription");
+const featuredVideoButton = document.getElementById("featuredVideoButton");
+const featuredVideoResourceButton = document.getElementById("featuredVideoResourceButton");
 
 let currentCategory = "all";
 
-/* =====================================
-   FEATURED VIDEO
-===================================== */
-
-function loadFeaturedVideo() {
-
-  const featuredVideo =
-    videos.find(video => video.featured);
-
-  if (!featuredVideo) return;
-
-  featuredVideoTitle.textContent =
-    featuredVideo.title;
-
-  featuredVideoDescription.textContent =
-    featuredVideo.description;
-
-  featuredVideoButton.dataset.link =
-    featuredVideo.youtubeLink;
-
-  featuredVideoResourceButton.dataset.link =
-    featuredVideo.resourceLink;
-
-}
-
-loadFeaturedVideo();
-
-/* =====================================
-   VIDEO CARD
-===================================== */
-
 function createVideoCard(video) {
-
   return `
-
     <div class="resource-card">
 
-      <img
-        src="${video.thumbnail}"
-        alt="${video.title}"
-        class="video-thumbnail"
-      >
+      <span class="tag">${video.category || "Video"}</span>
 
-      <span class="tag">
-        ${video.category}
-      </span>
+      <h3>${video.title}</h3>
 
-      <h3>
-        ${video.title}
-      </h3>
+      <p>${video.description || ""}</p>
 
-      <p>
-        ${video.description}
-      </p>
+      <small>${video.created_at ? new Date(video.created_at).toLocaleDateString() : ""}</small>
 
-      <small>
-        ${video.uploadDate}
-      </small>
-
-      <div
-        style="
-        display:flex;
-        gap:10px;
-        margin-top:15px;
-        flex-wrap:wrap;
-        "
-      >
-
-        <a
-          href="${video.youtubeLink}"
-          target="_blank"
-          class="small-btn"
-        >
+      <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+        <a href="${video.youtube_link}" target="_blank" class="small-btn">
           Watch Video
         </a>
 
-        <button
-          class="unlock-btn"
-          data-link="${video.resourceLink}"
-        >
-          Open Resource
-        </button>
-
+        ${
+          video.resource_link
+            ? `<button class="unlock-btn" data-link="${video.resource_link}">
+                Open Resource
+              </button>`
+            : ""
+        }
       </div>
 
     </div>
-
   `;
 }
 
-/* =====================================
-   RENDER VIDEOS
-===================================== */
-
 function renderVideos(data) {
-
   videosContainer.innerHTML = "";
 
   if (data.length === 0) {
-
-    videoEmptyState.style.display =
-      "block";
-
+    videoEmptyState.style.display = "block";
     videoCount.textContent = "0";
-
     return;
   }
 
-  videoEmptyState.style.display =
-    "none";
+  videoEmptyState.style.display = "none";
 
   data.forEach(video => {
-
-    videosContainer.innerHTML +=
-      createVideoCard(video);
-
+    videosContainer.innerHTML += createVideoCard(video);
   });
 
-  videoCount.textContent =
-    data.length;
+  videoCount.textContent = data.length;
 }
 
-/* =====================================
-   FILTER FUNCTION
-===================================== */
+function loadFeaturedVideo() {
+  const featured = videos.find(video => video.featured);
+
+  if (!featured) {
+    featuredVideoTitle.textContent = "No Featured Video";
+    featuredVideoDescription.textContent = "Admin panel se featured video add karo.";
+    return;
+  }
+
+  featuredVideoTitle.textContent = featured.title;
+  featuredVideoDescription.textContent = featured.description || "";
+
+  featuredVideoButton.dataset.link = featured.youtube_link;
+  featuredVideoResourceButton.dataset.link = featured.resource_link || "#";
+}
 
 function applyFilters() {
+  const term = videoSearch.value.toLowerCase().trim();
 
-  const searchTerm =
-    videoSearch.value
-    .toLowerCase()
-    .trim();
+  const filtered = videos.filter(video => {
+    const matchCategory =
+      currentCategory === "all" || video.category === currentCategory;
 
-  let filteredVideos =
-    videos.filter(video => {
+    const matchSearch =
+      (video.title || "").toLowerCase().includes(term) ||
+      (video.description || "").toLowerCase().includes(term);
 
-      const matchCategory =
-        currentCategory === "all"
-        ||
-        video.category === currentCategory;
+    return matchCategory && matchSearch;
+  });
 
-      const matchSearch =
-        video.title
-        .toLowerCase()
-        .includes(searchTerm)
-        ||
-        video.description
-        .toLowerCase()
-        .includes(searchTerm);
-
-      return (
-        matchCategory &&
-        matchSearch
-      );
-
-    });
-
-  renderVideos(filteredVideos);
-
+  renderVideos(filtered);
 }
-
-/* =====================================
-   SEARCH
-===================================== */
-
-if (videoSearch) {
-
-  videoSearch.addEventListener(
-    "input",
-    applyFilters
-  );
-
-}
-
-/* =====================================
-   FILTER BUTTONS
-===================================== */
 
 filterButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    filterButtons.forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
 
-  button.addEventListener(
-    "click",
-    () => {
-
-      filterButtons.forEach(btn =>
-        btn.classList.remove("active")
-      );
-
-      button.classList.add("active");
-
-      currentCategory =
-        button.dataset.category;
-
-      applyFilters();
-
-    }
-  );
-
+    currentCategory = button.dataset.category;
+    applyFilters();
+  });
 });
 
-/* =====================================
-   FEATURED VIDEO BUTTON
-===================================== */
+videoSearch?.addEventListener("input", applyFilters);
 
-featuredVideoButton?.addEventListener(
-  "click",
-  () => {
+featuredVideoButton?.addEventListener("click", () => {
+  const link = featuredVideoButton.dataset.link;
 
-    const link =
-      featuredVideoButton.dataset.link;
-
-    if (
-      link &&
-      link !== "#"
-    ) {
-      window.open(
-        link,
-        "_blank"
-      );
-    }
-
+  if (link && link !== "#") {
+    window.open(link, "_blank");
   }
-);
+});
 
-/* =====================================
-   INITIAL LOAD
-===================================== */
+async function loadVideos() {
+  const { data, error } = await supabaseClient
+    .from("videos")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-renderVideos(videos);
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-console.log(
-  "Videos Loaded Successfully"
-);
+  videos = data || [];
 
-/* =====================================
-   FUTURE SUPABASE CODE
-===================================== */
+  renderVideos(videos);
+  loadFeaturedVideo();
+}
 
-// async function loadVideos() {
-//
-// const { data, error } =
-// await supabase
-// .from("videos")
-// .select("*");
-//
-// videos = data;
-//
-// renderVideos(videos);
-//
-// }
+loadVideos();
