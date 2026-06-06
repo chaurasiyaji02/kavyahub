@@ -34,6 +34,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {
@@ -651,3 +652,4 @@ section {
   margin-top: 20px;
   font-size: 0.9rem;
 }
+
