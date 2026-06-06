@@ -2,24 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Kavya Resource Hub</title>
+  <title>KavyaHub | Free Resources & Videos</title>
 
-  <!-- CSS Files -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
-  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
 
-  <!-- Font Awesome Icons -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -28,7 +25,6 @@
 
 <body>
 
-  <!-- Header / Navbar -->
   <header class="main-header">
     <nav class="navbar">
 
@@ -41,7 +37,6 @@
         <li><a href="resources.html">Resources</a></li>
         <li><a href="videos.html">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
-        
       </ul>
 
       <div class="menu-icon" id="menuIcon">
@@ -51,13 +46,11 @@
     </nav>
   </header>
 
-  <!-- Hero Section -->
   <section class="hero-section">
-
     <div class="hero-content">
 
       <div class="profile-image-box">
-        <img src="assets/images/profile.jpg" alt="Profile Image" class="profile-image" />
+        <img src="assets/images/profile.jpg" alt="Kavya Profile Image" class="profile-image" />
       </div>
 
       <h1>Hi, I am <span>Kavya</span></h1>
@@ -78,12 +71,9 @@
       </div>
 
     </div>
-
   </section>
 
-  <!-- Social Media Section -->
   <section class="social-section">
-
     <div class="section-heading">
       <h2>Connect With Me</h2>
       <p>Mere social media handles yahan se follow kar sakte ho.</p>
@@ -91,13 +81,21 @@
 
     <div class="social-cards">
 
-      <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" target="_blank" class="popup-social-btn youtube-btn">
+      <a
+        href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
+        target="_blank"
+        class="social-card youtube">
+
         <i class="fa-brands fa-youtube"></i>
         <h3>YouTube</h3>
         <p>Main Channel</p>
       </a>
 
-      <a href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx" target="_blank" class="popup-social-btn insta-btn">
+      <a
+        href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
+        target="_blank"
+        class="social-card instagram">
+
         <i class="fa-brands fa-instagram"></i>
         <h3>Instagram</h3>
         <p>Daily Updates</p>
@@ -116,12 +114,9 @@
       </a>
 
     </div>
-
   </section>
 
-  <!-- Multiple Accounts Section -->
   <section class="accounts-section">
-
     <div class="section-heading">
       <h2>My Other Accounts</h2>
       <p>Agar mere multiple YouTube ya Instagram accounts honge, wo yahan show honge.</p>
@@ -131,29 +126,30 @@
 
       <div class="account-card">
         <i class="fa-brands fa-youtube"></i>
+
         <div>
           <h3>Gaming Channel</h3>
           <p>YouTube gaming content aur walkthroughs.</p>
         </div>
+
         <a href="#" target="_blank" class="small-btn">Open</a>
       </div>
 
       <div class="account-card">
         <i class="fa-brands fa-instagram"></i>
+
         <div>
           <h3>Tech Instagram</h3>
           <p>Free courses aur certificate updates.</p>
         </div>
+
         <a href="#" target="_blank" class="small-btn">Open</a>
       </div>
 
     </div>
-
   </section>
 
-  <!-- Category Section -->
   <section class="category-section">
-
     <div class="section-heading">
       <h2>Explore Categories</h2>
       <p>Jo bhi useful resources hain, wo category-wise milenge.</p>
@@ -198,56 +194,43 @@
       </a>
 
     </div>
-
   </section>
 
-  <!-- Latest Resources Section -->
   <section class="latest-section">
-
     <div class="section-heading">
       <h2>Latest Resources</h2>
       <p>Recently added free courses, certificates aur useful links.</p>
     </div>
 
-    <div class="latest-grid">
-
-      <div class="resource-card">
-        <span class="tag">Certificate</span>
-        <h3>Google Cybersecurity Foundation</h3>
-        <p>Beginner-friendly free cybersecurity course by Google.</p>
-        <button class="unlock-btn" data-link="#">
-          Unlock Link
-        </button>
-      </div>
-
-      <div class="resource-card">
-        <span class="tag">Course</span>
-        <h3>IBM Data Analytics Course</h3>
-        <p>Data analytics basics seekhne ke liye useful free resource.</p>
-        <button class="unlock-btn" data-link="#">
-          Unlock Link
-        </button>
-      </div>
-
-      <div class="resource-card">
-        <span class="tag">Internship</span>
-        <h3>Free Virtual Internship</h3>
-        <p>Students ke liye beginner-friendly internship opportunity.</p>
-        <button class="unlock-btn" data-link="#">
-          Unlock Link
-        </button>
-      </div>
-
+    <div class="latest-grid" id="homeLatestResources">
+      <!-- Latest resources JS se aayenge -->
     </div>
 
+    <div class="center-btn">
+      <a href="resources.html" class="btn primary-btn">
+        View All Resources
+      </a>
+    </div>
   </section>
 
-  <!-- YouTube Preview Section -->
- 
+  <section class="latest-section">
+    <div class="section-heading">
+      <h2>Latest Videos</h2>
+      <p>Recently added YouTube videos yahan show honge.</p>
+    </div>
 
-  <!-- Popup Section -->
+    <div class="latest-grid" id="homeLatestVideos">
+      <!-- Latest videos JS se aayenge -->
+    </div>
+
+    <div class="center-btn">
+      <a href="videos.html" class="btn primary-btn">
+        View All Videos
+      </a>
+    </div>
+  </section>
+
   <div class="popup-overlay" id="popupOverlay">
-
     <div class="popup-box">
 
       <button class="popup-close" id="popupClose">
@@ -261,42 +244,38 @@
         Uske baad tum resource link access kar sakte ho.
       </p>
 
-      
-        <div class="popup-buttons">
+      <div class="popup-buttons">
 
-            <a
-                href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
-                class="popup-social-btn youtube-btn"
-                target="_blank">
+        <a
+          href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
+          class="popup-social-btn youtube-btn"
+          target="_blank">
 
-                <i class="fa-brands fa-youtube"></i>
-                Subscribe
+          <i class="fa-brands fa-youtube"></i>
+          Subscribe
+        </a>
 
-            </a>
+        <a
+          href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
+          class="popup-social-btn insta-btn"
+          target="_blank">
 
-            <a
-                href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
-                class="popup-social-btn insta-btn"
-                target="_blank">
+          <i class="fa-brands fa-instagram"></i>
+          Follow
+        </a>
 
-                <i class="fa-brands fa-instagram"></i>
-                Follow
+      </div>
 
-            </a>
-
-        </div>
       <button class="continue-btn" id="continueBtn">
         I Followed, Continue
       </button>
 
     </div>
-
   </div>
 
-  <!-- Footer -->
   <footer class="footer">
-
     <div class="footer-content">
+
       <h2>Kavya<span>Hub</span></h2>
 
       <p>
@@ -313,12 +292,14 @@
       <p class="copyright">
         © 2026 KavyaHub. All Rights Reserved.
       </p>
-    </div>
 
+    </div>
   </footer>
 
-  <!-- JavaScript Files -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase/config.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/home.js"></script>
 
 </body>
 </html>
