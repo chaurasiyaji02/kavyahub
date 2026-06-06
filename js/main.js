@@ -23,28 +23,23 @@ let currentLink = "";
 
 /* Resource Buttons */
 
-document.addEventListener(
-"click",
-(e)=>{
+document.addEventListener("click", (e) => {
+  const unlockButton = e.target.closest(".unlock-btn");
 
-if(
-e.target.classList.contains(
-"unlock-btn"
-)
-){
+  if (!unlockButton) return;
 
-currentLink =
-e.target.dataset.link;
+  currentLink = unlockButton.dataset.link;
 
-if(popupOverlay){
+  console.log("Resource Link:", currentLink);
 
-popupOverlay.style.display =
-"flex";
+  if (!currentLink || currentLink === "#") {
+    alert("Resource link not added yet.");
+    return;
+  }
 
-}
-
-}
-
+  if (popupOverlay) {
+    popupOverlay.style.display = "flex";
+  }
 });
 
 unlockButtons.forEach((button) => {
