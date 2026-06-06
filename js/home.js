@@ -1,6 +1,16 @@
 const homeLatestResources = document.getElementById("homeLatestResources");
 const homeLatestVideos = document.getElementById("homeLatestVideos");
 
+const homeProfileImage = document.getElementById("homeProfileImage");
+const homeProfileName = document.getElementById("homeProfileName");
+const homeProfileBio = document.getElementById("homeProfileBio");
+
+const socialSection = document.getElementById("socialSection");
+const socialCardsContainer = document.getElementById("socialCardsContainer");
+
+const otherAccountsSection = document.getElementById("otherAccountsSection");
+const otherAccountsContainer = document.getElementById("otherAccountsContainer");
+
 function getYouTubeId(url) {
   if (!url) return null;
 
@@ -33,6 +43,50 @@ function getYouTubeThumbnail(url) {
   }
 
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+function getPlatformIcon(platform) {
+  const icons = {
+    youtube: "fa-brands fa-youtube",
+    instagram: "fa-brands fa-instagram",
+    telegram: "fa-brands fa-telegram",
+    linkedin: "fa-brands fa-linkedin",
+    whatsapp: "fa-brands fa-whatsapp",
+    website: "fa-solid fa-globe"
+  };
+
+  return icons[platform] || "fa-solid fa-link";
+}
+
+function createSocialCard(platform, url, title, subtitle) {
+  if (!url || url.trim() === "") return "";
+
+  return `
+    <a href="${url}" target="_blank" class="social-card ${platform}">
+      <i class="${getPlatformIcon(platform)}"></i>
+      <h3>${title}</h3>
+      <p>${subtitle}</p>
+    </a>
+  `;
+}
+
+function createOtherAccountCard(account) {
+  if (!account.url || !account.is_active) return "";
+
+  return `
+    <div class="account-card">
+      <i class="${getPlatformIcon(account.platform)}"></i>
+
+      <div>
+        <h3>${account.account_name}</h3>
+        <p>${account.description || account.platform || "Account"}</p>
+      </div>
+
+      <a href="${account.url}" target="_blank" class="small-btn">
+        Open
+      </a>
+    </div>
+  `;
 }
 
 function createHomeResourceCard(resource) {
@@ -83,6 +137,79 @@ function createHomeVideoCard(video) {
       </div>
     </div>
   `;
+}
+
+async function loadProfileAndSocials() {
+  const { data, error } = await supabaseClient
+    .from("profile")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data) return;
+
+  if (data.name) {
+    homeProfileName.textContent = data.name;
+    document.title = `${data.name} | Resource Hub`;
+  }
+
+  if (data.bio) {
+    homeProfileBio.textContent = data.bio;
+  }
+
+  if (data.profile_image) {
+    homeProfileImage.src = data.profile_image;
+  }
+
+  const socialCards = [
+    createSocialCard("youtube", data.youtube, "YouTube", "Main Channel"),
+    createSocialCard("instagram", data.instagram, "Instagram", "Daily Updates"),
+    createSocialCard("telegram", data.telegram, "Telegram", "Free Resources"),
+    createSocialCard("linkedin", data.linkedin, "LinkedIn", "Professional Updates"),
+    createSocialCard("whatsapp", data.whatsapp, "WhatsApp", "Direct Updates")
+  ].join("");
+
+  if (socialCards.trim() !== "") {
+    socialCardsContainer.innerHTML = socialCards;
+    socialSection.style.display = "block";
+  } else {
+    socialSection.style.display = "none";
+  }
+}
+
+async function loadOtherAccounts() {
+  const { data, error } = await supabaseClient
+    .from("other_accounts")
+    .select("*")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    otherAccountsSection.style.display = "none";
+    return;
+  }
+
+  const accountsHTML = data
+    .map(account => createOtherAccountCard(account))
+    .join("");
+
+  if (accountsHTML.trim() === "") {
+    otherAccountsSection.style.display = "none";
+    return;
+  }
+
+  otherAccountsContainer.innerHTML = accountsHTML;
+  otherAccountsSection.style.display = "block";
 }
 
 async function loadHomeData() {
@@ -137,4 +264,6 @@ async function loadHomeData() {
   }
 }
 
+loadProfileAndSocials();
+loadOtherAccounts();
 loadHomeData();

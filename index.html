@@ -50,12 +50,19 @@
     <div class="hero-content">
 
       <div class="profile-image-box">
-        <img src="assets/images/profile.jpg" alt="Kavya Profile Image" class="profile-image" />
+        <img
+          src="assets/images/profile.jpg"
+          alt="Kavya Profile Image"
+          class="profile-image"
+          id="homeProfileImage"
+        />
       </div>
 
-      <h1>Hi, I am <span>Kavya</span></h1>
+      <h1>
+        Hi, I am <span id="homeProfileName">Kavya</span>
+      </h1>
 
-      <p class="hero-bio">
+      <p class="hero-bio" id="homeProfileBio">
         Main free courses, certificates, internships, notes aur useful tech resources share karta hu.
         Yahan tumhe mere YouTube videos, Instagram updates aur saare important links ek jagah milenge.
       </p>
@@ -73,79 +80,25 @@
     </div>
   </section>
 
-  <section class="social-section">
+  <section class="social-section" id="socialSection" style="display:none;">
     <div class="section-heading">
       <h2>Connect With Me</h2>
       <p>Mere social media handles yahan se follow kar sakte ho.</p>
     </div>
 
-    <div class="social-cards">
-
-      <a
-        href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
-        target="_blank"
-        class="social-card youtube">
-
-        <i class="fa-brands fa-youtube"></i>
-        <h3>YouTube</h3>
-        <p>Main Channel</p>
-      </a>
-
-      <a
-        href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
-        target="_blank"
-        class="social-card instagram">
-
-        <i class="fa-brands fa-instagram"></i>
-        <h3>Instagram</h3>
-        <p>Daily Updates</p>
-      </a>
-
-      <a href="#" target="_blank" class="social-card telegram">
-        <i class="fa-brands fa-telegram"></i>
-        <h3>Telegram</h3>
-        <p>Free Resources</p>
-      </a>
-
-      <a href="#" target="_blank" class="social-card linkedin">
-        <i class="fa-brands fa-linkedin"></i>
-        <h3>LinkedIn</h3>
-        <p>Professional Updates</p>
-      </a>
-
+    <div class="social-cards" id="socialCardsContainer">
+      <!-- Social cards JS se aayenge -->
     </div>
   </section>
 
-  <section class="accounts-section">
+  <section class="accounts-section" id="otherAccountsSection" style="display:none;">
     <div class="section-heading">
       <h2>My Other Accounts</h2>
-      <p>Agar mere multiple YouTube ya Instagram accounts honge, wo yahan show honge.</p>
+      <p>Mere active accounts yahan show honge.</p>
     </div>
 
-    <div class="account-list">
-
-      <div class="account-card">
-        <i class="fa-brands fa-youtube"></i>
-
-        <div>
-          <h3>Gaming Channel</h3>
-          <p>YouTube gaming content aur walkthroughs.</p>
-        </div>
-
-        <a href="#" target="_blank" class="small-btn">Open</a>
-      </div>
-
-      <div class="account-card">
-        <i class="fa-brands fa-instagram"></i>
-
-        <div>
-          <h3>Tech Instagram</h3>
-          <p>Free courses aur certificate updates.</p>
-        </div>
-
-        <a href="#" target="_blank" class="small-btn">Open</a>
-      </div>
-
+    <div class="account-list" id="otherAccountsContainer">
+      <!-- Other accounts JS se aayenge -->
     </div>
   </section>
 
