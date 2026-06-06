@@ -1,220 +1,111 @@
-/* =========================
-   SIDEBAR NAVIGATION
-========================= */
+const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
 
-const menuItems =
-document.querySelectorAll(".menu-item");
+const loginBox = document.getElementById("loginBox");
+const adminContainer = document.querySelector(".admin-container");
 
-const sections =
-document.querySelectorAll(".admin-section");
+async function checkAdminLogin() {
+  const { data } = await supabaseClient.auth.getUser();
 
-menuItems.forEach(item => {
+  if (!data.user || data.user.email !== ADMIN_EMAIL) {
+    adminContainer.style.display = "none";
+    loginBox.style.display = "flex";
+    return;
+  }
 
-    item.addEventListener("click", () => {
+  loginBox.style.display = "none";
+  adminContainer.style.display = "flex";
+}
 
-        menuItems.forEach(menu =>
-            menu.classList.remove("active")
-        );
+async function adminLogin(e) {
+  e.preventDefault();
 
-        item.classList.add("active");
+  const email = document.getElementById("adminEmail").value;
+  const password = document.getElementById("adminPassword").value;
 
-        const target =
-        item.dataset.section;
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-        sections.forEach(section => {
+  if (error) {
+    alert("Login failed: " + error.message);
+    return;
+  }
 
-            section.classList.remove(
-                "active-section"
-            );
+  if (data.user.email !== ADMIN_EMAIL) {
+    await supabaseClient.auth.signOut();
+    alert("You are not allowed to access admin panel.");
+    return;
+  }
 
-        });
+  checkAdminLogin();
+}
 
-        document
-        .getElementById(target)
-        .classList.add(
-            "active-section"
-        );
+async function adminLogout() {
+  await supabaseClient.auth.signOut();
+  checkAdminLogin();
+}
 
-    });
+document.getElementById("loginForm")?.addEventListener("submit", adminLogin);
+document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 
+checkAdminLogin();
+
+/* Sidebar switching */
+document.querySelectorAll(".menu-item").forEach(item => {
+  item.addEventListener("click", () => {
+    document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
+    document.querySelectorAll(".admin-section").forEach(s => s.classList.remove("active-section"));
+
+    item.classList.add("active");
+    document.getElementById(item.dataset.section).classList.add("active-section");
+  });
 });
 
-/* =========================
-   RESOURCE FORM
-========================= */
+/* Save Resource */
+document.getElementById("resourceForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-const resourceForm =
-document.getElementById(
-    "resourceForm"
-);
+  const resource = {
+    title: document.getElementById("resourceTitle").value,
+    description: document.getElementById("resourceDescription").value,
+    category: document.getElementById("resourceCategory").value,
+    link: document.getElementById("resourceLink").value,
+    upload_date: document.getElementById("resourceDate").value,
+    featured: document.getElementById("resourceFeatured").checked
+  };
 
-resourceForm?.addEventListener(
-"submit",
-(e) => {
+  const { error } = await supabaseClient.from("resources").insert([resource]);
 
-    e.preventDefault();
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
 
-    const resource = {
-
-        title:
-        document.getElementById(
-        "resourceTitle"
-        ).value,
-
-        description:
-        document.getElementById(
-        "resourceDescription"
-        ).value,
-
-        category:
-        document.getElementById(
-        "resourceCategory"
-        ).value,
-
-        link:
-        document.getElementById(
-        "resourceLink"
-        ).value,
-
-        date:
-        document.getElementById(
-        "resourceDate"
-        ).value,
-
-        featured:
-        document.getElementById(
-        "resourceFeatured"
-        ).checked
-
-    };
-
-    console.log(
-        "Resource Saved:",
-        resource
-    );
-
-    alert(
-        "Resource Saved Successfully"
-    );
-
-    resourceForm.reset();
-
+  alert("Resource saved to Supabase ✅");
+  e.target.reset();
 });
 
-/* =========================
-   VIDEO FORM
-========================= */
+/* Save Video */
+document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-const videoForm =
-document.getElementById(
-    "videoForm"
-);
+  const video = {
+    title: document.getElementById("videoTitle").value,
+    description: document.getElementById("videoDescription").value,
+    category: document.getElementById("videoCategory").value,
+    youtube_link: document.getElementById("youtubeLink").value,
+    resource_link: document.getElementById("videoResourceLink").value,
+    featured: document.getElementById("videoFeatured").checked
+  };
 
-videoForm?.addEventListener(
-"submit",
-(e)=>{
+  const { error } = await supabaseClient.from("videos").insert([video]);
 
-    e.preventDefault();
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
 
-    const video = {
-
-        title:
-        document.getElementById(
-        "videoTitle"
-        ).value,
-
-        description:
-        document.getElementById(
-        "videoDescription"
-        ).value,
-
-        category:
-        document.getElementById(
-        "videoCategory"
-        ).value,
-
-        youtube:
-        document.getElementById(
-        "youtubeLink"
-        ).value,
-
-        resource:
-        document.getElementById(
-        "videoResourceLink"
-        ).value,
-
-        featured:
-        document.getElementById(
-        "videoFeatured"
-        ).checked
-
-    };
-
-    console.log(
-        "Video Saved:",
-        video
-    );
-
-    alert(
-        "Video Saved Successfully"
-    );
-
-    videoForm.reset();
-
+  alert("Video saved to Supabase ✅");
+  e.target.reset();
 });
-
-/* =========================
-   PROFILE FORM
-========================= */
-
-const profileForm =
-document.getElementById(
-"profileForm"
-);
-
-profileForm?.addEventListener(
-"submit",
-(e)=>{
-
-    e.preventDefault();
-
-    alert(
-    "Profile Saved Successfully"
-    );
-
-});
-
-/* =========================
-   SETTINGS FORM
-========================= */
-
-const settingsForm =
-document.getElementById(
-"settingsForm"
-);
-
-settingsForm?.addEventListener(
-"submit",
-(e)=>{
-
-    e.preventDefault();
-
-    alert(
-    "Settings Saved Successfully"
-    );
-
-});
-
-/* =========================
-   FUTURE SUPABASE
-========================= */
-
-// saveResource()
-// saveVideo()
-// updateProfile()
-// updateSettings()
-// loadDashboardData()
-
-console.log(
-"Admin Dashboard Loaded"
-);

@@ -237,3 +237,45 @@
     }
 
 }
+
+.login-box{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0f172a;
+}
+
+.login-form{
+  width:90%;
+  max-width:400px;
+  background:#1e293b;
+  padding:30px;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.login-form input{
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #334155;
+  background:#0f172a;
+  color:white;
+}
+
+.login-form button,
+.logout-btn{
+  background:#3b82f6;
+  color:white;
+  border:none;
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.logout-btn{
+  width:100%;
+  margin-bottom:25px;
+}
