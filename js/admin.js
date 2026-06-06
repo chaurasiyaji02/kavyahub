@@ -57,6 +57,26 @@ document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 
 checkAdminLogin();
 
+async function uploadProfileImage(file) {
+
+  const fileName = `${Date.now()}-${file.name}`;
+
+  const { error } = await supabaseClient.storage
+    .from("profile-images")
+    .upload(fileName, file);
+
+  if (error) {
+    alert("Image Upload Error: " + error.message);
+    return null;
+  }
+
+  const { data } = supabaseClient.storage
+    .from("profile-images")
+    .getPublicUrl(fileName);
+
+  return data.publicUrl;
+}
+
 /* SIDEBAR */
 document.querySelectorAll(".menu-item").forEach(item => {
   item.addEventListener("click", () => {
@@ -182,10 +202,22 @@ async function loadProfile() {
 document.getElementById("profileForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  let imageUrl = document.getElementById("profileImage").value;
+
+  const imageFile = document.getElementById("profileImageFile").files[0];
+
+  if (imageFile) {
+    imageUrl = await uploadProfileImage(imageFile);
+
+    if (!imageUrl) {
+      return;
+    }
+  }
+
   const profile = {
     name: document.getElementById("profileName").value,
     bio: document.getElementById("profileBio").value,
-    profile_image: document.getElementById("profileImage").value,
+    profile_image: imageUrl,
     youtube: document.getElementById("youtubeUrl").value,
     instagram: document.getElementById("instagramUrl").value,
     telegram: document.getElementById("telegramUrl").value,
@@ -223,6 +255,8 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   }
 
   alert("Profile saved ✅");
+
+  document.getElementById("profileImageFile").value = "";
 });
 
 /* RESOURCES LIST */
