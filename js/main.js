@@ -15,17 +15,17 @@ const continueBtn = document.getElementById("continueBtn");
 
 window.currentLink = "";
 
-/* Unlock Button Click */
+/* Any Resource Button Click */
 document.addEventListener("click", (e) => {
   const unlockButton = e.target.closest(".unlock-btn");
 
   if (!unlockButton) return;
 
-  currentLink = unlockButton.getAttribute("data-link");
+  window.currentLink = unlockButton.getAttribute("data-link");
 
-  console.log("Resource Link:", currentLink);
+  console.log("Resource Link:", window.currentLink);
 
-  if (!currentLink || currentLink === "#") {
+  if (!window.currentLink || window.currentLink === "#") {
     alert("Resource link not added yet.");
     return;
   }
@@ -42,8 +42,8 @@ if (continueBtn) {
       popupOverlay.style.display = "none";
     }
 
-    if (currentLink && currentLink !== "#") {
-      window.open(currentLink, "_blank");
+    if (window.currentLink && window.currentLink !== "#") {
+      window.open(window.currentLink, "_blank");
     }
   });
 }
@@ -51,13 +51,11 @@ if (continueBtn) {
 /* Close Popup */
 if (popupClose) {
   popupClose.addEventListener("click", () => {
-    if (popupOverlay) {
-      popupOverlay.style.display = "none";
-    }
+    popupOverlay.style.display = "none";
   });
 }
 
-/* Close Popup on Outside Click */
+/* Close Popup Outside */
 if (popupOverlay) {
   popupOverlay.addEventListener("click", (e) => {
     if (e.target === popupOverlay) {
@@ -66,13 +64,11 @@ if (popupOverlay) {
   });
 }
 
-/* ACTIVE NAV LINK */
+/* ACTIVE NAV */
 const currentPage = window.location.pathname.split("/").pop();
 
 document.querySelectorAll(".nav-links a").forEach(link => {
-  const href = link.getAttribute("href");
-
-  if (href === currentPage) {
+  if (link.getAttribute("href") === currentPage) {
     link.classList.add("active");
   }
 });
