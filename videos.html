@@ -25,7 +25,6 @@
 
 <body>
 
-  <!-- Header -->
   <header class="main-header">
     <nav class="navbar">
 
@@ -38,7 +37,6 @@
         <li><a href="resources.html">Resources</a></li>
         <li><a href="videos.html" class="active">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
-       
       </ul>
 
       <div class="menu-icon" id="menuIcon">
@@ -48,17 +46,15 @@
     </nav>
   </header>
 
-  <!-- Hero -->
   <section class="resources-hero">
     <div class="section-heading">
-      <h1>My YouTube Videos</h1>
+      <h1>Learning Videos</h1>
       <p>
-        Free certificates, courses, career roadmaps, AI tools aur coding related videos ek jagah.
+        Watch videos about free courses, certificates, career roadmaps, AI tools, coding, and tech opportunities.
       </p>
     </div>
   </section>
 
-  <!-- Search -->
   <section class="search-section">
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -71,7 +67,6 @@
     </div>
   </section>
 
-  <!-- Filters -->
   <section class="filter-section">
     <div class="filter-container">
 
@@ -106,7 +101,6 @@
     </div>
   </section>
 
-  <!-- Featured Video -->
   <section class="featured-resource">
     <div class="featured-card">
 
@@ -119,7 +113,7 @@
       </h2>
 
       <p id="featuredVideoDescription">
-        Featured video description...
+        Discover this featured video.
       </p>
 
       <div class="featured-actions">
@@ -141,19 +135,17 @@
     </div>
   </section>
 
-  <!-- Video Count -->
   <section class="resource-count-section">
     <h3>
-      Total Videos:
+      Available Videos:
       <span id="videoCount">0</span>
     </h3>
   </section>
 
-  <!-- Videos Grid -->
   <section class="resources-grid-section">
 
     <div class="resources-grid" id="videosContainer">
-      <!-- Videos JS se generate honge -->
+      <!-- Videos will be loaded by JavaScript -->
     </div>
 
     <div id="videoEmptyState" class="empty-state" style="display: none;">
@@ -161,63 +153,60 @@
 
       <h3>No Videos Found</h3>
 
-      <p>Try another search keyword or category.</p>
+      <p>Try a different keyword or category.</p>
     </div>
 
   </section>
 
-  <!-- Popup -->
-<!-- Popup -->
-<div class="popup-overlay" id="popupOverlay">
+  <div class="popup-overlay" id="popupOverlay">
 
-  <div class="popup-box">
+    <div class="popup-box">
 
-    <button class="popup-close" id="popupClose">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+      <button class="popup-close" id="popupClose">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
 
-    <h2>Before Accessing Resource</h2>
+      <h2>Unlock Resource</h2>
 
-    <p>
-      Please pehle YouTube subscribe aur Instagram follow karo.
-      Uske baad resource link open hoga.
-    </p>
+      <p>
+        Please support by subscribing on YouTube and following on Instagram before accessing this resource.
+      </p>
 
-    <div class="popup-buttons">
+      <div class="popup-buttons">
 
-      <a
-        href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
-        class="popup-social-btn youtube-btn"
-        target="_blank">
-        <i class="fa-brands fa-youtube"></i>
-        Subscribe
-      </a>
+        <a
+          href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
+          class="popup-social-btn youtube-btn"
+          target="_blank">
+          <i class="fa-brands fa-youtube"></i>
+          Subscribe
+        </a>
 
-      <a
-        href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
-        class="popup-social-btn insta-btn"
-        target="_blank">
-        <i class="fa-brands fa-instagram"></i>
-        Follow
-      </a>
+        <a
+          href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
+          class="popup-social-btn insta-btn"
+          target="_blank">
+          <i class="fa-brands fa-instagram"></i>
+          Follow
+        </a>
+
+      </div>
+
+      <button class="continue-btn" id="continueBtn">
+        Continue to Resource
+      </button>
 
     </div>
 
-    <button class="continue-btn" id="continueBtn">
-      I Followed, Continue
-    </button>
-
   </div>
 
-</div>
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
 
       <h2>Kavya<span>Hub</span></h2>
 
       <p>
-        Free resources, certificates, internships aur tech videos ke liye ek simple hub.
+        A simple hub for free resources, certificates, internships, and learning videos.
       </p>
 
       <div class="footer-links">
@@ -235,9 +224,9 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase/config.js"></script>
-<script src="js/main.js"></script>
-<script src="js/videos.js"></script>
+  <script src="supabase/config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/videos.js"></script>
 
 </body>
 </html>
