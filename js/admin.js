@@ -19,6 +19,25 @@ function tagsToText(tags) {
   return Array.isArray(tags) ? tags.join(", ") : "";
 }
 
+function getCheckedTags(className) {
+  return Array.from(document.querySelectorAll(`.${className}:checked`))
+    .map(input => input.value);
+}
+
+function setCheckedTags(className, tags) {
+  const selectedTags = Array.isArray(tags) ? tags : [];
+
+  document.querySelectorAll(`.${className}`).forEach(input => {
+    input.checked = selectedTags.includes(input.value);
+  });
+}
+
+function clearCheckedTags(className) {
+  document.querySelectorAll(`.${className}`).forEach(input => {
+    input.checked = false;
+  });
+}
+
 function setActiveSection(sectionId) {
   document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(s => s.classList.remove("active-section"));
@@ -145,7 +164,7 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
     title: document.getElementById("resourceTitle").value,
     description: document.getElementById("resourceDescription").value,
     category: document.getElementById("resourceCategory").value,
-    tags: parseTags(document.getElementById("resourceTags").value),
+    tags: getCheckedTags("resource-tag-check"),
     link: document.getElementById("resourceLink").value,
     upload_date: document.getElementById("resourceDate").value,
     featured: document.getElementById("resourceFeatured").checked
@@ -177,6 +196,7 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
 
   editingResourceId = null;
   e.target.reset();
+  clearCheckedTags("resource-tag-check");
   updateResourceButtonText();
 
   loadResourcesList();
@@ -207,7 +227,7 @@ async function editResource(id) {
   document.getElementById("resourceTitle").value = data.title || "";
   document.getElementById("resourceDescription").value = data.description || "";
   document.getElementById("resourceCategory").value = data.category || "certificate";
-  document.getElementById("resourceTags").value = tagsToText(data.tags);
+  setCheckedTags("resource-tag-check", data.tags);
   document.getElementById("resourceLink").value = data.link || "";
   document.getElementById("resourceDate").value = data.upload_date || "";
   document.getElementById("resourceFeatured").checked = data.featured || false;
@@ -220,6 +240,7 @@ async function editResource(id) {
 function cancelResourceEdit() {
   editingResourceId = null;
   document.getElementById("resourceForm")?.reset();
+  clearCheckedTags("resource-tag-check");
   updateResourceButtonText();
 }
 
@@ -231,7 +252,7 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
     title: document.getElementById("videoTitle").value,
     description: document.getElementById("videoDescription").value,
     category: document.getElementById("videoCategory").value,
-    tags: parseTags(document.getElementById("videoTags").value),
+    tags: getCheckedTags("video-tag-check"),
     youtube_link: document.getElementById("youtubeLink").value,
     resource_link: document.getElementById("videoResourceLink").value,
     upload_date: document.getElementById("videoDate").value,
@@ -264,6 +285,7 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
 
   editingVideoId = null;
   e.target.reset();
+  clearCheckedTags("video-tag-check");
   updateVideoButtonText();
 
   loadVideosList();
@@ -294,7 +316,7 @@ async function editVideo(id) {
   document.getElementById("videoTitle").value = data.title || "";
   document.getElementById("videoDescription").value = data.description || "";
   document.getElementById("videoCategory").value = data.category || "certificate";
-  document.getElementById("videoTags").value = tagsToText(data.tags);
+  setCheckedTags("video-tag-check", data.tags);
   document.getElementById("youtubeLink").value = data.youtube_link || "";
   document.getElementById("videoResourceLink").value = data.resource_link || "";
   document.getElementById("videoDate").value = data.upload_date || "";
@@ -308,6 +330,7 @@ async function editVideo(id) {
 function cancelVideoEdit() {
   editingVideoId = null;
   document.getElementById("videoForm")?.reset();
+  clearCheckedTags("video-tag-check");
   updateVideoButtonText();
 }
 

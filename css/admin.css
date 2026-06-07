@@ -355,3 +355,27 @@
   display: block;
   margin-top: 4px;
 }
+
+.tag-select-box {
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  padding: 15px;
+}
+
+.tag-select-box p {
+  color: white;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.tag-select-box label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 10px 6px 0;
+  background: rgba(30, 41, 59, 0.9);
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
