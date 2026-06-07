@@ -1,249 +1,217 @@
 let resources = [];
 
-const resourcesContainer =
-document.getElementById(
-"resourcesContainer"
-);
+const resourcesContainer = document.getElementById("resourcesContainer");
+const searchInput = document.getElementById("resourceSearch");
+const resourceCount = document.getElementById("resourceCount");
+const emptyState = document.getElementById("emptyState");
 
-const searchInput =
-document.getElementById(
-"resourceSearch"
-);
+const featuredTitle = document.getElementById("featuredTitle");
+const featuredDescription = document.getElementById("featuredDescription");
+const featuredButton = document.getElementById("featuredButton");
 
-const resourceCount =
-document.getElementById(
-"resourceCount"
-);
+const filterToggleBtn = document.getElementById("filterToggleBtn");
+const filterPanel = document.getElementById("filterPanel");
+const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+const tagFilters = document.querySelectorAll(".tag-filter");
+const activeFilters = document.getElementById("activeFilters");
 
-const emptyState =
-document.getElementById(
-"emptyState"
-);
+let selectedTags = [];
 
-const featuredTitle =
-document.getElementById(
-"featuredTitle"
-);
+/* TAG HELPERS */
 
-const featuredDescription =
-document.getElementById(
-"featuredDescription"
-);
-
-const featuredButton =
-document.getElementById(
-"featuredButton"
-);
-
-const filterButtons =
-document.querySelectorAll(
-".filter-btn"
-);
-
-let currentCategory = "all";
-
-/* =======================
-   CARD TEMPLATE
-======================= */
-
-function createCard(resource){
-
-return `
-
-<div class="resource-card">
-
-    <span class="tag">
-        ${resource.category || "Resource"}
-    </span>
-
-    <h3>
-        ${resource.title}
-    </h3>
-
-    <p>
-        ${resource.description || ""}
-    </p>
-
-    <small>
-        ${resource.upload_date || ""}
-    </small>
-
-    <button
-  class="unlock-btn"
-  data-link="${resource.link}">
-  Open Resource
-</button>
-
-</div>
-
-`;
-
+function normalizeTag(tag) {
+  return String(tag || "")
+    .trim()
+    .toLowerCase();
 }
 
-/* =======================
-   RENDER
-======================= */
+function getResourceTags(resource) {
+  const tags = Array.isArray(resource.tags)
+    ? resource.tags
+    : [];
 
-function renderResources(data){
+  const category = resource.category
+    ? [resource.category]
+    : [];
 
-resourcesContainer.innerHTML = "";
-
-if(data.length === 0){
-
-emptyState.style.display =
-"block";
-
-resourceCount.textContent = 0;
-
-return;
-
+  return [...new Set([...category, ...tags].map(normalizeTag))];
 }
 
-emptyState.style.display =
-"none";
+function formatTag(tag) {
+  return String(tag || "")
+    .replaceAll("-", " ")
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
 
-data.forEach(resource=>{
+function createTagHTML(resource) {
+  const tags = getResourceTags(resource);
 
-resourcesContainer.innerHTML +=
-createCard(resource);
+  if (tags.length === 0) {
+    return `<span class="tag">Resource</span>`;
+  }
 
+  return tags
+    .map(tag => `<span class="tag">${formatTag(tag)}</span>`)
+    .join("");
+}
+
+/* CARD */
+
+function createCard(resource) {
+  return `
+    <div class="resource-card">
+
+      <div class="tag-row">
+        ${createTagHTML(resource)}
+      </div>
+
+      <h3>${resource.title}</h3>
+
+      <p>${resource.description || ""}</p>
+
+      <small>${resource.upload_date || ""}</small>
+
+      <button
+        class="unlock-btn"
+        data-link="${resource.link}">
+        Open Resource
+      </button>
+
+    </div>
+  `;
+}
+
+/* RENDER */
+
+function renderResources(data) {
+  resourcesContainer.innerHTML = "";
+
+  if (data.length === 0) {
+    emptyState.style.display = "block";
+    resourceCount.textContent = "0";
+    return;
+  }
+
+  emptyState.style.display = "none";
+
+  data.forEach(resource => {
+    resourcesContainer.innerHTML += createCard(resource);
+  });
+
+  resourceCount.textContent = data.length;
+}
+
+/* FEATURED */
+
+function loadFeatured() {
+  const featured = resources.find(item => item.featured);
+
+  if (!featured) {
+    featuredTitle.textContent = "No Featured Resource";
+    featuredDescription.textContent = "Admin panel se featured resource select karo.";
+    featuredButton.dataset.link = "#";
+    return;
+  }
+
+  featuredTitle.textContent = featured.title;
+  featuredDescription.textContent = featured.description || "";
+  featuredButton.dataset.link = featured.link || "#";
+}
+
+/* ACTIVE FILTER CHIPS */
+
+function renderActiveFilters() {
+  if (!activeFilters) return;
+
+  if (selectedTags.length === 0) {
+    activeFilters.innerHTML = "";
+    return;
+  }
+
+  activeFilters.innerHTML = selectedTags
+    .map(tag => `<span class="active-filter-chip">${formatTag(tag)}</span>`)
+    .join("");
+}
+
+/* SEARCH + MULTI FILTER */
+
+function applyFilters() {
+  const term = searchInput.value.toLowerCase().trim();
+
+  const filtered = resources.filter(resource => {
+    const tags = getResourceTags(resource);
+
+    const searchableText = [
+      resource.title,
+      resource.description,
+      resource.category,
+      ...(resource.tags || [])
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    const matchSearch =
+      term === "" || searchableText.includes(term);
+
+    const matchTags =
+      selectedTags.length === 0 ||
+      selectedTags.some(tag => tags.includes(tag));
+
+    return matchSearch && matchTags;
+  });
+
+  renderResources(filtered);
+  renderActiveFilters();
+}
+
+/* FILTER PANEL */
+
+filterToggleBtn?.addEventListener("click", () => {
+  if (!filterPanel) return;
+
+  filterPanel.style.display =
+    filterPanel.style.display === "none" ? "block" : "none";
 });
 
-resourceCount.textContent =
-data.length;
+tagFilters.forEach(input => {
+  input.addEventListener("change", () => {
+    selectedTags = Array.from(tagFilters)
+      .filter(item => item.checked)
+      .map(item => normalizeTag(item.value));
 
-}
-
-/* =======================
-   FEATURED
-======================= */
-
-function loadFeatured(){
-
-const featured =
-resources.find(
-item => item.featured
-);
-
-if(!featured) return;
-
-featuredTitle.textContent =
-featured.title;
-
-featuredDescription.textContent =
-featured.description;
-
-featuredButton.dataset.link =
-featured.link;
-
-}
-
-/* =======================
-   SEARCH + FILTER
-======================= */
-
-function applyFilters(){
-
-const term =
-searchInput.value
-.toLowerCase()
-.trim();
-
-const filtered =
-resources.filter(resource=>{
-
-const matchCategory =
-currentCategory === "all"
-||
-resource.category ===
-currentCategory;
-
-const matchSearch =
-
-(resource.title || "")
-.toLowerCase()
-.includes(term)
-
-||
-
-(resource.description || "")
-.toLowerCase()
-.includes(term);
-
-return (
-matchCategory &&
-matchSearch
-);
-
+    applyFilters();
+  });
 });
 
-renderResources(filtered);
+clearFiltersBtn?.addEventListener("click", () => {
+  selectedTags = [];
 
-}
+  tagFilters.forEach(input => {
+    input.checked = false;
+  });
 
-/* =======================
-   FILTER BUTTONS
-======================= */
-
-filterButtons.forEach(button=>{
-
-button.addEventListener(
-"click",
-()=>{
-
-filterButtons.forEach(btn=>
-btn.classList.remove(
-"active"
-)
-);
-
-button.classList.add(
-"active"
-);
-
-currentCategory =
-button.dataset.category;
-
-applyFilters();
-
+  applyFilters();
 });
 
-});
+searchInput?.addEventListener("input", applyFilters);
 
-searchInput?.addEventListener(
-"input",
-applyFilters
-);
+/* LOAD SUPABASE */
 
-/* =======================
-   LOAD SUPABASE
-======================= */
+async function loadResources() {
+  const { data, error } = await supabaseClient
+    .from("resources")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-async function loadResources(){
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-const { data, error } =
-await supabaseClient
-.from("resources")
-.select("*")
-.order(
-"created_at",
-{ ascending:false }
-);
+  resources = data || [];
 
-if(error){
-
-console.error(error);
-
-return;
-
-}
-
-resources = data;
-
-renderResources(resources);
-
-loadFeatured();
-
+  renderResources(resources);
+  loadFeatured();
 }
 
 loadResources();

@@ -653,3 +653,87 @@ section {
   font-size: 0.9rem;
 }
 
+.filter-toggle-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-panel-section {
+  padding-top: 0;
+  padding-bottom: 30px;
+}
+
+.filter-panel {
+  max-width: 780px;
+  margin: auto;
+  background: rgba(30, 41, 59, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.filter-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.filter-panel-header button {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.filter-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.filter-options label {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-light);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.active-filters {
+  margin-top: 15px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.active-filter-chip {
+  background: rgba(59, 130, 246, 0.18);
+  color: #bfdbfe;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}

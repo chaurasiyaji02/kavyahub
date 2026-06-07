@@ -3,6 +3,15 @@ const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
 const loginBox = document.getElementById("loginBox");
 const adminContainer = document.querySelector(".admin-container");
 
+function parseTags(value) {
+  if (!value) return [];
+
+  return value
+    .split(",")
+    .map(tag => tag.trim().toLowerCase())
+    .filter(tag => tag !== "");
+}
+
 async function checkAdminLogin() {
   const { data } = await supabaseClient.auth.getUser();
 
@@ -126,6 +135,7 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
     title: document.getElementById("resourceTitle").value,
     description: document.getElementById("resourceDescription").value,
     category: document.getElementById("resourceCategory").value,
+    tags: parseTags(document.getElementById("resourceTags").value),
     link: document.getElementById("resourceLink").value,
     upload_date: document.getElementById("resourceDate").value,
     featured: document.getElementById("resourceFeatured").checked
@@ -153,6 +163,7 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
     title: document.getElementById("videoTitle").value,
     description: document.getElementById("videoDescription").value,
     category: document.getElementById("videoCategory").value,
+    tags: parseTags(document.getElementById("videoTags").value),
     youtube_link: document.getElementById("youtubeLink").value,
     resource_link: document.getElementById("videoResourceLink").value,
     upload_date: document.getElementById("videoDate").value,
