@@ -3,6 +3,9 @@ const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
 const loginBox = document.getElementById("loginBox");
 const adminContainer = document.querySelector(".admin-container");
 
+let editingResourceId = null;
+let editingVideoId = null;
+
 function parseTags(value) {
   if (!value) return [];
 
@@ -10,6 +13,18 @@ function parseTags(value) {
     .split(",")
     .map(tag => tag.trim().toLowerCase())
     .filter(tag => tag !== "");
+}
+
+function tagsToText(tags) {
+  return Array.isArray(tags) ? tags.join(", ") : "";
+}
+
+function setActiveSection(sectionId) {
+  document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
+  document.querySelectorAll(".admin-section").forEach(s => s.classList.remove("active-section"));
+
+  document.querySelector(`[data-section="${sectionId}"]`)?.classList.add("active");
+  document.getElementById(sectionId)?.classList.add("active-section");
 }
 
 async function checkAdminLogin() {
@@ -67,7 +82,6 @@ document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 checkAdminLogin();
 
 async function uploadProfileImage(file) {
-
   const fileName = `${Date.now()}-${file.name}`;
 
   const { error } = await supabaseClient.storage
@@ -89,11 +103,7 @@ async function uploadProfileImage(file) {
 /* SIDEBAR */
 document.querySelectorAll(".menu-item").forEach(item => {
   item.addEventListener("click", () => {
-    document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
-    document.querySelectorAll(".admin-section").forEach(s => s.classList.remove("active-section"));
-
-    item.classList.add("active");
-    document.getElementById(item.dataset.section).classList.add("active-section");
+    setActiveSection(item.dataset.section);
   });
 });
 
@@ -116,7 +126,7 @@ async function loadDashboardData() {
 
   const { data: latestResource } = await supabaseClient
     .from("resources")
-    .select("title, created_at")
+    .select("title")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -127,7 +137,7 @@ async function loadDashboardData() {
   document.getElementById("latestUpload").textContent = latestResource?.title || "None";
 }
 
-/* SAVE RESOURCE */
+/* RESOURCE ADD / UPDATE */
 document.getElementById("resourceForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -141,21 +151,79 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
     featured: document.getElementById("resourceFeatured").checked
   };
 
-  const { error } = await supabaseClient.from("resources").insert([resource]);
+  let error;
+
+  if (editingResourceId) {
+    const result = await supabaseClient
+      .from("resources")
+      .update(resource)
+      .eq("id", editingResourceId);
+
+    error = result.error;
+  } else {
+    const result = await supabaseClient
+      .from("resources")
+      .insert([resource]);
+
+    error = result.error;
+  }
 
   if (error) {
     alert("Error: " + error.message);
     return;
   }
 
-  alert("Resource saved ✅");
+  alert(editingResourceId ? "Resource updated ✅" : "Resource saved ✅");
+
+  editingResourceId = null;
   e.target.reset();
+  updateResourceButtonText();
 
   loadResourcesList();
   loadDashboardData();
 });
 
-/* SAVE VIDEO */
+function updateResourceButtonText() {
+  const btn = document.querySelector("#resourceForm button[type='submit']");
+  if (btn) {
+    btn.textContent = editingResourceId ? "Update Resource" : "Save Resource";
+  }
+}
+
+async function editResource(id) {
+  const { data, error } = await supabaseClient
+    .from("resources")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  editingResourceId = id;
+
+  document.getElementById("resourceTitle").value = data.title || "";
+  document.getElementById("resourceDescription").value = data.description || "";
+  document.getElementById("resourceCategory").value = data.category || "certificate";
+  document.getElementById("resourceTags").value = tagsToText(data.tags);
+  document.getElementById("resourceLink").value = data.link || "";
+  document.getElementById("resourceDate").value = data.upload_date || "";
+  document.getElementById("resourceFeatured").checked = data.featured || false;
+
+  updateResourceButtonText();
+  setActiveSection("resources");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function cancelResourceEdit() {
+  editingResourceId = null;
+  document.getElementById("resourceForm")?.reset();
+  updateResourceButtonText();
+}
+
+/* VIDEO ADD / UPDATE */
 document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -170,19 +238,78 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
     featured: document.getElementById("videoFeatured").checked
   };
 
-  const { error } = await supabaseClient.from("videos").insert([video]);
+  let error;
+
+  if (editingVideoId) {
+    const result = await supabaseClient
+      .from("videos")
+      .update(video)
+      .eq("id", editingVideoId);
+
+    error = result.error;
+  } else {
+    const result = await supabaseClient
+      .from("videos")
+      .insert([video]);
+
+    error = result.error;
+  }
 
   if (error) {
     alert("Error: " + error.message);
     return;
   }
 
-  alert("Video saved ✅");
+  alert(editingVideoId ? "Video updated ✅" : "Video saved ✅");
+
+  editingVideoId = null;
   e.target.reset();
+  updateVideoButtonText();
 
   loadVideosList();
   loadDashboardData();
 });
+
+function updateVideoButtonText() {
+  const btn = document.querySelector("#videoForm button[type='submit']");
+  if (btn) {
+    btn.textContent = editingVideoId ? "Update Video" : "Save Video";
+  }
+}
+
+async function editVideo(id) {
+  const { data, error } = await supabaseClient
+    .from("videos")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  editingVideoId = id;
+
+  document.getElementById("videoTitle").value = data.title || "";
+  document.getElementById("videoDescription").value = data.description || "";
+  document.getElementById("videoCategory").value = data.category || "certificate";
+  document.getElementById("videoTags").value = tagsToText(data.tags);
+  document.getElementById("youtubeLink").value = data.youtube_link || "";
+  document.getElementById("videoResourceLink").value = data.resource_link || "";
+  document.getElementById("videoDate").value = data.upload_date || "";
+  document.getElementById("videoFeatured").checked = data.featured || false;
+
+  updateVideoButtonText();
+  setActiveSection("videos");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function cancelVideoEdit() {
+  editingVideoId = null;
+  document.getElementById("videoForm")?.reset();
+  updateVideoButtonText();
+}
 
 /* PROFILE LOAD */
 async function loadProfile() {
@@ -214,15 +341,11 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   e.preventDefault();
 
   let imageUrl = document.getElementById("profileImage").value;
-
   const imageFile = document.getElementById("profileImageFile").files[0];
 
   if (imageFile) {
     imageUrl = await uploadProfileImage(imageFile);
-
-    if (!imageUrl) {
-      return;
-    }
+    if (!imageUrl) return;
   }
 
   const profile = {
@@ -266,7 +389,6 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   }
 
   alert("Profile saved ✅");
-
   document.getElementById("profileImageFile").value = "";
 });
 
@@ -295,11 +417,18 @@ async function loadResourcesList() {
       <div>
         <h3>${item.title}</h3>
         <p>${item.category || "Resource"} • ${item.upload_date || ""}</p>
+        <small>${tagsToText(item.tags)}</small>
       </div>
 
-      <button class="delete-btn" onclick="deleteResource(${item.id})">
-        Delete
-      </button>
+      <div class="admin-actions">
+        <button class="toggle-btn" onclick="editResource(${item.id})">
+          Edit
+        </button>
+
+        <button class="delete-btn" onclick="deleteResource(${item.id})">
+          Delete
+        </button>
+      </div>
     </div>
   `).join("");
 }
@@ -315,6 +444,10 @@ async function deleteResource(id) {
   if (error) {
     alert("Error: " + error.message);
     return;
+  }
+
+  if (editingResourceId === id) {
+    cancelResourceEdit();
   }
 
   loadResourcesList();
@@ -346,11 +479,18 @@ async function loadVideosList() {
       <div>
         <h3>${item.title}</h3>
         <p>${item.category || "Video"} • ${item.upload_date || ""}</p>
+        <small>${tagsToText(item.tags)}</small>
       </div>
 
-      <button class="delete-btn" onclick="deleteVideo(${item.id})">
-        Delete
-      </button>
+      <div class="admin-actions">
+        <button class="toggle-btn" onclick="editVideo(${item.id})">
+          Edit
+        </button>
+
+        <button class="delete-btn" onclick="deleteVideo(${item.id})">
+          Delete
+        </button>
+      </div>
     </div>
   `).join("");
 }
@@ -366,6 +506,10 @@ async function deleteVideo(id) {
   if (error) {
     alert("Error: " + error.message);
     return;
+  }
+
+  if (editingVideoId === id) {
+    cancelVideoEdit();
   }
 
   loadVideosList();
