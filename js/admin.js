@@ -150,10 +150,34 @@ async function loadDashboardData() {
     .limit(1)
     .maybeSingle();
 
+    const { data: topResource } = await supabaseClient
+  .from("resources")
+  .select("title, views")
+  .order("views", { ascending: false })
+  .limit(1)
+  .maybeSingle();
+
+const { data: topVideo } = await supabaseClient
+  .from("videos")
+  .select("title, views")
+  .order("views", { ascending: false })
+  .limit(1)
+  .maybeSingle();
+
   document.getElementById("totalResources").textContent = resourcesCount || 0;
   document.getElementById("totalVideos").textContent = videosCount || 0;
   document.getElementById("featuredResource").textContent = featured?.title || "None";
   document.getElementById("latestUpload").textContent = latestResource?.title || "None";
+
+  document.getElementById("mostViewedResource").textContent =
+  topResource
+    ? `${topResource.title} (${topResource.views || 0})`
+    : "None";
+
+document.getElementById("mostViewedVideo").textContent =
+  topVideo
+    ? `${topVideo.title} (${topVideo.views || 0})`
+    : "None";
 }
 
 /* RESOURCE ADD / UPDATE */
