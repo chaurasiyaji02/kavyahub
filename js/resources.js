@@ -55,6 +55,26 @@ function createTagHTML(resource) {
     .join("");
 }
 
+async function increaseResourceView(id) {
+  const resource = resources.find(item => item.id === id);
+
+  if (!resource) return;
+
+  const newViews = (resource.views || 0) + 1;
+
+  const { error } = await supabaseClient
+    .from("resources")
+    .update({ views: newViews })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  resource.views = newViews;
+}
+
 /* CARD */
 
 function createCard(resource) {
@@ -71,11 +91,14 @@ function createCard(resource) {
 
       <small>${resource.upload_date || ""}</small>
 
-      <button
-        class="unlock-btn"
-        data-link="${resource.link}">
-        Open Resource
-      </button>
+      <small>👁 ${resource.views || 0} views</small>
+
+    <button
+      class="unlock-btn resource-view-btn"
+      data-id="${resource.id}"
+      data-link="${resource.link}">
+      Open Resource
+    </button>
 
     </div>
   `;
@@ -215,3 +238,13 @@ async function loadResources() {
 }
 
 loadResources();
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".resource-view-btn");
+
+  if (!btn) return;
+
+  const id = Number(btn.dataset.id);
+
+  await increaseResourceView(id);
+});
