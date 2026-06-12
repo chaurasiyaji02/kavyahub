@@ -1,3 +1,6 @@
+const trendingResources = document.getElementById("trendingResources");
+const trendingVideos = document.getElementById("trendingVideos");
+
 const homeLatestResources = document.getElementById("homeLatestResources");
 const homeLatestVideos = document.getElementById("homeLatestVideos");
 
@@ -58,6 +61,10 @@ function getPlatformIcon(platform) {
   return icons[platform] || "fa-solid fa-link";
 }
 
+function formatViews(views) {
+  return Number(views || 0);
+}
+
 function createSocialCard(platform, url, title, subtitle) {
   if (!url || url.trim() === "") return "";
 
@@ -100,6 +107,8 @@ function createHomeResourceCard(resource) {
 
       <small>${resource.upload_date || ""}</small>
 
+      <small>👁 ${formatViews(resource.views)} views</small>
+
       <button class="unlock-btn" data-link="${resource.link}">
         Open Resource
       </button>
@@ -121,6 +130,8 @@ function createHomeVideoCard(video) {
       <p>${video.description || ""}</p>
 
       <small>${video.upload_date || ""}</small>
+
+      <small>👁 ${formatViews(video.views)} views</small>
 
       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
         <a href="${video.youtube_link}" target="_blank" class="small-btn">
@@ -225,12 +236,57 @@ async function loadHomeData() {
     .order("created_at", { ascending: false })
     .limit(3);
 
-  if (resourceError) {
-    console.error(resourceError);
+  const { data: trendingResourceData, error: trendingResourceError } =
+    await supabaseClient
+      .from("resources")
+      .select("*")
+      .order("views", { ascending: false })
+      .limit(3);
+
+  const { data: trendingVideoData, error: trendingVideoError } =
+    await supabaseClient
+      .from("videos")
+      .select("*")
+      .order("views", { ascending: false })
+      .limit(3);
+
+  if (resourceError) console.error(resourceError);
+  if (videoError) console.error(videoError);
+  if (trendingResourceError) console.error(trendingResourceError);
+  if (trendingVideoError) console.error(trendingVideoError);
+
+  if (trendingResources) {
+    trendingResources.innerHTML = "";
+
+    if (trendingResourceData && trendingResourceData.length > 0) {
+      trendingResourceData.forEach(resource => {
+        trendingResources.innerHTML += createHomeResourceCard(resource);
+      });
+    } else {
+      trendingResources.innerHTML = `
+        <div class="resource-card">
+          <h3>No Trending Resources Yet</h3>
+          <p>Popular resources will appear here after users start opening them.</p>
+        </div>
+      `;
+    }
   }
 
-  if (videoError) {
-    console.error(videoError);
+  if (trendingVideos) {
+    trendingVideos.innerHTML = "";
+
+    if (trendingVideoData && trendingVideoData.length > 0) {
+      trendingVideoData.forEach(video => {
+        trendingVideos.innerHTML += createHomeVideoCard(video);
+      });
+    } else {
+      trendingVideos.innerHTML = `
+        <div class="resource-card">
+          <h3>No Trending Videos Yet</h3>
+          <p>Popular videos will appear here after users start watching them.</p>
+        </div>
+      `;
+    }
   }
 
   homeLatestResources.innerHTML = "";
@@ -243,7 +299,7 @@ async function loadHomeData() {
     homeLatestResources.innerHTML = `
       <div class="resource-card">
         <h3>No Resources Yet</h3>
-        <p>Admin panel se resources add karo.</p>
+        <p>No resources available yet.</p>
       </div>
     `;
   }
@@ -258,7 +314,7 @@ async function loadHomeData() {
     homeLatestVideos.innerHTML = `
       <div class="resource-card">
         <h3>No Videos Yet</h3>
-        <p>Admin panel se videos add karo.</p>
+        <p>No videos available yet.</p>
       </div>
     `;
   }
