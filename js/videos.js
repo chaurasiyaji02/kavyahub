@@ -47,6 +47,26 @@ function getYouTubeThumbnail(url) {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 }
 
+async function increaseVideoView(id) {
+  const video = videos.find(item => item.id === id);
+
+  if (!video) return;
+
+  const newViews = (video.views || 0) + 1;
+
+  const { error } = await supabaseClient
+    .from("videos")
+    .update({ views: newViews })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  video.views = newViews;
+}
+
 function createVideoCard(video) {
   const thumbnail = getYouTubeThumbnail(video.youtube_link);
 
@@ -66,9 +86,14 @@ function createVideoCard(video) {
       </small>
 
       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-        <a href="${video.youtube_link}" target="_blank" class="small-btn">
-          Watch Video
-        </a>
+        <a
+        href="${video.youtube_link}"
+        target="_blank"
+        class="small-btn video-view-btn"
+        data-id="${video.id}">
+        <small>👁 ${video.views || 0} views</small>
+        Watch Video
+      </a>
 
         ${
           video.resource_link
@@ -195,3 +220,13 @@ async function loadVideos() {
 }
 
 loadVideos();
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".video-view-btn");
+
+  if (!btn) return;
+
+  const id = Number(btn.dataset.id);
+
+  await increaseVideoView(id);
+});
