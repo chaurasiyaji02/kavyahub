@@ -379,3 +379,37 @@
   border-radius: 999px;
   cursor: pointer;
 }
+
+.dashboard-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dashboard-card p {
+  font-size: 1.25rem;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.admin-list-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.admin-list-card h3,
+.admin-list-card p,
+.admin-list-card small {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .dashboard-card p {
+    font-size: 1.1rem;
+  }
+
+  .admin-section h1 {
+    font-size: 1.6rem;
+  }
+}
