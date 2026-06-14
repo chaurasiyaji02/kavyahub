@@ -16,6 +16,7 @@ const tagFilters = document.querySelectorAll(".tag-filter");
 const activeFilters = document.getElementById("activeFilters");
 
 let selectedTags = [];
+let currentFilteredResources = [];
 
 /* TAG HELPERS */
 
@@ -55,24 +56,27 @@ function createTagHTML(resource) {
     .join("");
 }
 
+/* VIEW COUNTER */
+
 async function increaseResourceView(id) {
   const resource = resources.find(item => item.id === id);
 
-  if (!resource) return;
-
-  const newViews = (resource.views || 0) + 1;
-
-  const { error } = await supabaseClient
-    .from("resources")
-    .update({ views: newViews })
-    .eq("id", id);
-
-  if (error) {
-    console.error(error);
-    return;
+  if (resource) {
+    resource.views = (resource.views || 0) + 1;
   }
 
-  resource.views = newViews;
+  const { error } = await supabaseClient.rpc(
+    "increment_resource_views",
+    { resource_id: id }
+  );
+
+  if (error) {
+    console.error("Resource view error:", error);
+
+    if (resource) {
+      resource.views = Math.max((resource.views || 1) - 1, 0);
+    }
+  }
 }
 
 /* CARD */
@@ -93,12 +97,12 @@ function createCard(resource) {
 
       <small>👁 ${resource.views || 0} views</small>
 
-    <button
-      class="unlock-btn resource-view-btn"
-      data-id="${resource.id}"
-      data-link="${resource.link}">
-      Open Resource
-    </button>
+      <button
+        class="unlock-btn resource-view-btn"
+        data-id="${resource.id}"
+        data-link="${resource.link}">
+        Open Resource
+      </button>
 
     </div>
   `;
@@ -107,6 +111,7 @@ function createCard(resource) {
 /* RENDER */
 
 function renderResources(data) {
+  currentFilteredResources = data;
   resourcesContainer.innerHTML = "";
 
   if (data.length === 0) {
@@ -131,14 +136,16 @@ function loadFeatured() {
 
   if (!featured) {
     featuredTitle.textContent = "No Featured Resource";
-    featuredDescription.textContent = "Admin panel se featured resource select karo.";
+    featuredDescription.textContent = "Select a featured resource from the admin panel.";
     featuredButton.dataset.link = "#";
+    featuredButton.dataset.id = "";
     return;
   }
 
   featuredTitle.textContent = featured.title;
   featuredDescription.textContent = featured.description || "";
   featuredButton.dataset.link = featured.link || "#";
+  featuredButton.dataset.id = featured.id;
 }
 
 /* ACTIVE FILTER CHIPS */
@@ -239,12 +246,35 @@ async function loadResources() {
 
 loadResources();
 
+/* CLICK VIEW COUNTER */
+
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".resource-view-btn");
 
   if (!btn) return;
 
+  if (btn.dataset.clicked === "true") return;
+  btn.dataset.clicked = "true";
+
   const id = Number(btn.dataset.id);
 
-  await increaseResourceView(id);
+  if (id) {
+    await increaseResourceView(id);
+    renderResources(currentFilteredResources);
+    loadFeatured();
+  }
+
+  setTimeout(() => {
+    btn.dataset.clicked = "false";
+  }, 1500);
+});
+
+featuredButton?.addEventListener("click", async () => {
+  const id = Number(featuredButton.dataset.id);
+
+  if (id) {
+    await increaseResourceView(id);
+    renderResources(currentFilteredResources);
+    loadFeatured();
+  }
 });

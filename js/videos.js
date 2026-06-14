@@ -12,6 +12,7 @@ const featuredVideoButton = document.getElementById("featuredVideoButton");
 const featuredVideoResourceButton = document.getElementById("featuredVideoResourceButton");
 
 let currentCategory = "all";
+let currentFilteredVideos = [];
 
 function getYouTubeId(url) {
   if (!url) return null;
@@ -50,21 +51,22 @@ function getYouTubeThumbnail(url) {
 async function increaseVideoView(id) {
   const video = videos.find(item => item.id === id);
 
-  if (!video) return;
-
-  const newViews = (video.views || 0) + 1;
-
-  const { error } = await supabaseClient
-    .from("videos")
-    .update({ views: newViews })
-    .eq("id", id);
-
-  if (error) {
-    console.error(error);
-    return;
+  if (video) {
+    video.views = (video.views || 0) + 1;
   }
 
-  video.views = newViews;
+  const { error } = await supabaseClient.rpc(
+    "increment_video_views",
+    { video_id: id }
+  );
+
+  if (error) {
+    console.error("Video view error:", error);
+
+    if (video) {
+      video.views = Math.max((video.views || 1) - 1, 0);
+    }
+  }
 }
 
 function createVideoCard(video) {
@@ -85,15 +87,16 @@ function createVideoCard(video) {
         ${video.created_at ? new Date(video.created_at).toLocaleDateString() : ""}
       </small>
 
+      <small>👁 ${video.views || 0} views</small>
+
       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
         <a
-        href="${video.youtube_link}"
-        target="_blank"
-        class="small-btn video-view-btn"
-        data-id="${video.id}">
-        <small>👁 ${video.views || 0} views</small>
-        Watch Video
-      </a>
+          href="${video.youtube_link}"
+          target="_blank"
+          class="small-btn video-view-btn"
+          data-id="${video.id}">
+          Watch Video
+        </a>
 
         ${
           video.resource_link
@@ -109,6 +112,7 @@ function createVideoCard(video) {
 }
 
 function renderVideos(data) {
+  currentFilteredVideos = data;
   videosContainer.innerHTML = "";
 
   if (data.length === 0) {
@@ -135,8 +139,9 @@ function loadFeaturedVideo() {
 
   if (!featured) {
     featuredVideoTitle.textContent = "No Video Added Yet";
-    featuredVideoDescription.textContent = "Admin panel se video add karo.";
+    featuredVideoDescription.textContent = "Add a video from the admin panel.";
     featuredVideoButton.dataset.link = "#";
+    featuredVideoButton.dataset.id = "";
     featuredVideoResourceButton.dataset.link = "#";
     return;
   }
@@ -145,6 +150,7 @@ function loadFeaturedVideo() {
   featuredVideoDescription.textContent = featured.description || "";
 
   featuredVideoButton.dataset.link = featured.youtube_link || "#";
+  featuredVideoButton.dataset.id = featured.id;
   featuredVideoResourceButton.dataset.link = featured.resource_link || "#";
 }
 
@@ -155,9 +161,17 @@ function applyFilters() {
     const matchCategory =
       currentCategory === "all" || video.category === currentCategory;
 
+    const searchableText = [
+      video.title,
+      video.description,
+      video.category,
+      ...(video.tags || [])
+    ]
+      .join(" ")
+      .toLowerCase();
+
     const matchSearch =
-      (video.title || "").toLowerCase().includes(term) ||
-      (video.description || "").toLowerCase().includes(term);
+      term === "" || searchableText.includes(term);
 
     return matchCategory && matchSearch;
   });
@@ -177,8 +191,15 @@ filterButtons.forEach(button => {
 
 videoSearch?.addEventListener("input", applyFilters);
 
-featuredVideoButton?.addEventListener("click", () => {
+featuredVideoButton?.addEventListener("click", async () => {
   const link = featuredVideoButton.dataset.link;
+  const id = Number(featuredVideoButton.dataset.id);
+
+  if (id) {
+    await increaseVideoView(id);
+    renderVideos(currentFilteredVideos);
+    loadFeaturedVideo();
+  }
 
   if (link && link !== "#") {
     window.open(link, "_blank");
@@ -226,7 +247,18 @@ document.addEventListener("click", async (e) => {
 
   if (!btn) return;
 
+  if (btn.dataset.clicked === "true") return;
+  btn.dataset.clicked = "true";
+
   const id = Number(btn.dataset.id);
 
-  await increaseVideoView(id);
+  if (id) {
+    await increaseVideoView(id);
+    renderVideos(currentFilteredVideos);
+    loadFeaturedVideo();
+  }
+
+  setTimeout(() => {
+    btn.dataset.clicked = "false";
+  }, 1500);
 });
