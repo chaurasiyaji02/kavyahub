@@ -547,8 +547,7 @@ section {
 }
 
 /* --------------------------------------------------------------------------
-   12. MUTABLE RESOURCES EXPANDABLE LIST SYSTEM (CONSOLIDATED ENHANCEMENT)
-   Optimization: Merged duplicate trailing selectors to optimize browser tree compilation
+   12. MUTABLE RESOURCES EXPANDABLE LIST SYSTEM (FIXED)
    -------------------------------------------------------------------------- */
 #resourcesContainer {
   display: flex;
@@ -586,9 +585,13 @@ section {
   grid-row: 2 / span 3;
 }
 
-/* Expandable Descriptions & Button Anchors Engine */
+/* --- Read More / Read Less Logic Clamping & Expansion --- */
+/* Targetting both tags and classes to ensure 100% JS compatibility */
 .resource-description,
+.resource-card p,
+#resourcesContainer .resource-card p,
 #resourcesContainer .resource-description {
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -596,7 +599,10 @@ section {
   color: var(--text-light);
 }
 
+/* Active hook when 'Read More' triggers class injection */
 .resource-description.expanded,
+.resource-card p.expanded,
+#resourcesContainer .resource-card p.expanded,
 #resourcesContainer .resource-description.expanded {
   display: block !important;
   -webkit-line-clamp: unset !important;
