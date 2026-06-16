@@ -91,7 +91,17 @@ function createCard(resource) {
 
       <h3>${resource.title}</h3>
 
-      <p>${resource.description || ""}</p>
+      <p class="resource-description">
+  ${resource.description || ""}
+</p>
+
+${
+  (resource.description || "").length > 120
+    ? `<button class="read-more-btn">
+         Read More
+       </button>`
+    : ""
+}
 
       <small>${resource.upload_date || ""}</small>
 
@@ -277,4 +287,20 @@ featuredButton?.addEventListener("click", async () => {
     renderResources(currentFilteredResources);
     loadFeatured();
   }
+});
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".read-more-btn");
+
+  if (!btn) return;
+
+  const description =
+    btn.previousElementSibling;
+
+  description.classList.toggle("expanded");
+
+  btn.textContent =
+    description.classList.contains("expanded")
+      ? "Read Less"
+      : "Read More";
 });
