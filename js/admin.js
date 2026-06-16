@@ -1,3 +1,7 @@
+/* ==========================================================================
+   KAVYAHUB - ADMIN DASHBOARD CONTROLLER
+   ========================================================================== */
+
 const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
 
 const loginBox = document.getElementById("loginBox");
@@ -6,9 +10,12 @@ const adminContainer = document.querySelector(".admin-container");
 let editingResourceId = null;
 let editingVideoId = null;
 
+/* --------------------------------------------------------------------------
+   1. STRING & TAG UTILITIES
+   -------------------------------------------------------------------------- */
+
 function parseTags(value) {
   if (!value) return [];
-
   return value
     .split(",")
     .map(tag => tag.trim().toLowerCase())
@@ -26,7 +33,6 @@ function getCheckedTags(className) {
 
 function setCheckedTags(className, tags) {
   const selectedTags = Array.isArray(tags) ? tags : [];
-
   document.querySelectorAll(`.${className}`).forEach(input => {
     input.checked = selectedTags.includes(input.value);
   });
@@ -38,6 +44,10 @@ function clearCheckedTags(className) {
   });
 }
 
+/* --------------------------------------------------------------------------
+   2. UI NAVIGATION MANAGEMENT
+   -------------------------------------------------------------------------- */
+
 function setActiveSection(sectionId) {
   document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(s => s.classList.remove("active-section"));
@@ -46,18 +56,30 @@ function setActiveSection(sectionId) {
   document.getElementById(sectionId)?.classList.add("active-section");
 }
 
+// Sidebar Click Register
+document.querySelectorAll(".menu-item").forEach(item => {
+  item.addEventListener("click", () => {
+    setActiveSection(item.dataset.section);
+  });
+});
+
+/* --------------------------------------------------------------------------
+   3. AUTHENTICATION SYSTEM (LOGIN / LOGOUT)
+   -------------------------------------------------------------------------- */
+
 async function checkAdminLogin() {
   const { data } = await supabaseClient.auth.getUser();
 
   if (!data.user || data.user.email !== ADMIN_EMAIL) {
-    adminContainer.style.display = "none";
-    loginBox.style.display = "flex";
+    if (adminContainer) adminContainer.style.display = "none";
+    if (loginBox) loginBox.style.display = "flex";
     return;
   }
 
-  loginBox.style.display = "none";
-  adminContainer.style.display = "flex";
+  if (loginBox) loginBox.style.display = "none";
+  if (adminContainer) adminContainer.style.display = "flex";
 
+  // Parallel loading triggers
   loadDashboardData();
   loadProfile();
   loadResourcesList();
@@ -67,6 +89,9 @@ async function checkAdminLogin() {
 
 async function adminLogin(e) {
   e.preventDefault();
+  
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true; // Prevents double login attempts
 
   const email = document.getElementById("adminEmail").value;
   const password = document.getElementById("adminPassword").value;
@@ -78,16 +103,18 @@ async function adminLogin(e) {
 
   if (error) {
     alert("Login failed: " + error.message);
+    if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
   if (data.user.email !== ADMIN_EMAIL) {
     await supabaseClient.auth.signOut();
     alert("You are not allowed to access admin panel.");
+    if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
-  checkAdminLogin();
+  await checkAdminLogin();
 }
 
 async function adminLogout() {
@@ -98,7 +125,12 @@ async function adminLogout() {
 document.getElementById("loginForm")?.addEventListener("submit", adminLogin);
 document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 
+// Run Auth Check on Load
 checkAdminLogin();
+
+/* --------------------------------------------------------------------------
+   4. STORAGE MANAGEMENT
+   -------------------------------------------------------------------------- */
 
 async function uploadProfileImage(file) {
   const fileName = `${Date.now()}-${file.name}`;
@@ -119,70 +151,56 @@ async function uploadProfileImage(file) {
   return data.publicUrl;
 }
 
-/* SIDEBAR */
-document.querySelectorAll(".menu-item").forEach(item => {
-  item.addEventListener("click", () => {
-    setActiveSection(item.dataset.section);
-  });
-});
+/* --------------------------------------------------------------------------
+   5. DASHBOARD STATS (HIGH OPTIMIZATION VIA PROMISE.ALL)
+   -------------------------------------------------------------------------- */
 
-/* DASHBOARD */
 async function loadDashboardData() {
-  const { count: resourcesCount } = await supabaseClient
-    .from("resources")
-    .select("*", { count: "exact", head: true });
+  try {
+    // Optimization: Executes all 6 network requests in parallel. Massive speedup!
+    const [
+      resCountResult,
+      vidCountResult,
+      featuredResult,
+      latestResult,
+      topResResult,
+      topVidResult
+    ] = await Promise.all([
+      supabaseClient.from("resources").select("*", { count: "exact", head: true }),
+      supabaseClient.from("videos").select("*", { count: "exact", head: true }),
+      supabaseClient.from("resources").select("title").eq("featured", true).limit(1).maybeSingle(),
+      supabaseClient.from("resources").select("title").order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      supabaseClient.from("resources").select("title, views").order("views", { ascending: false }).limit(1).maybeSingle(),
+      supabaseClient.from("videos").select("title, views").order("views", { ascending: false }).limit(1).maybeSingle()
+    ]);
 
-  const { count: videosCount } = await supabaseClient
-    .from("videos")
-    .select("*", { count: "exact", head: true });
+    // DOM Updates
+    document.getElementById("totalResources").textContent = resCountResult.count || 0;
+    document.getElementById("totalVideos").textContent = vidCountResult.count || 0;
+    document.getElementById("featuredResource").textContent = featuredResult.data?.title || "None";
+    document.getElementById("latestUpload").textContent = latestResult.data?.title || "None";
 
-  const { data: featured } = await supabaseClient
-    .from("resources")
-    .select("title")
-    .eq("featured", true)
-    .limit(1)
-    .maybeSingle();
+    document.getElementById("mostViewedResource").textContent = topResResult.data
+      ? `${topResResult.data.title} (${topResResult.data.views || 0})`
+      : "None";
 
-  const { data: latestResource } = await supabaseClient
-    .from("resources")
-    .select("title")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-    const { data: topResource } = await supabaseClient
-  .from("resources")
-  .select("title, views")
-  .order("views", { ascending: false })
-  .limit(1)
-  .maybeSingle();
-
-const { data: topVideo } = await supabaseClient
-  .from("videos")
-  .select("title, views")
-  .order("views", { ascending: false })
-  .limit(1)
-  .maybeSingle();
-
-  document.getElementById("totalResources").textContent = resourcesCount || 0;
-  document.getElementById("totalVideos").textContent = videosCount || 0;
-  document.getElementById("featuredResource").textContent = featured?.title || "None";
-  document.getElementById("latestUpload").textContent = latestResource?.title || "None";
-
-  document.getElementById("mostViewedResource").textContent =
-  topResource
-    ? `${topResource.title} (${topResource.views || 0})`
-    : "None";
-
-document.getElementById("mostViewedVideo").textContent =
-  topVideo
-    ? `${topVideo.title} (${topVideo.views || 0})`
-    : "None";
+    document.getElementById("mostViewedVideo").textContent = topVidResult.data
+      ? `${topVidResult.data.title} (${topVidResult.data.views || 0})`
+      : "None";
+  } catch (err) {
+    console.error("Dashboard calculation error:", err);
+  }
 }
 
-/* RESOURCE ADD / UPDATE */
+/* --------------------------------------------------------------------------
+   6. RESOURCES OPERATIONS (CRUD)
+   -------------------------------------------------------------------------- */
+
 document.getElementById("resourceForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true; // UX Enhancement: Lock button
 
   const resource = {
     title: document.getElementById("resourceTitle").value,
@@ -201,18 +219,17 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
       .from("resources")
       .update(resource)
       .eq("id", editingResourceId);
-
     error = result.error;
   } else {
     const result = await supabaseClient
       .from("resources")
       .insert([resource]);
-
     error = result.error;
   }
 
   if (error) {
     alert("Error: " + error.message);
+    if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
@@ -225,6 +242,7 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
 
   loadResourcesList();
   loadDashboardData();
+  if (submitBtn) submitBtn.disabled = false;
 });
 
 function updateResourceButtonText() {
@@ -268,9 +286,70 @@ function cancelResourceEdit() {
   updateResourceButtonText();
 }
 
-/* VIDEO ADD / UPDATE */
+async function deleteResource(id) {
+  if (!confirm("Delete this resource?")) return;
+
+  const { error } = await supabaseClient
+    .from("resources")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  if (editingResourceId == id) {
+    cancelResourceEdit();
+  }
+
+  loadResourcesList();
+  loadDashboardData();
+}
+
+async function loadResourcesList() {
+  const list = document.getElementById("resourcesList");
+  if (!list) return;
+
+  const { data, error } = await supabaseClient
+    .from("resources")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = `<p class="admin-empty">No resources added yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = data.map(item => `
+    <div class="admin-list-card">
+      <div>
+        <h3>${item.title}</h3>
+        <p>${item.category || "Resource"} • ${item.upload_date || ""}</p>
+        <small>${tagsToText(item.tags)}</small>
+      </div>
+      <div class="admin-actions">
+        <button class="toggle-btn" onclick="editResource(${item.id})">Edit</button>
+        <button class="delete-btn" onclick="deleteResource(${item.id})">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* --------------------------------------------------------------------------
+   7. VIDEOS OPERATIONS (CRUD)
+   -------------------------------------------------------------------------- */
+
 document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true;
 
   const video = {
     title: document.getElementById("videoTitle").value,
@@ -290,18 +369,17 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
       .from("videos")
       .update(video)
       .eq("id", editingVideoId);
-
     error = result.error;
   } else {
     const result = await supabaseClient
       .from("videos")
       .insert([video]);
-
     error = result.error;
   }
 
   if (error) {
     alert("Error: " + error.message);
+    if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
@@ -314,6 +392,7 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
 
   loadVideosList();
   loadDashboardData();
+  if (submitBtn) submitBtn.disabled = false;
 });
 
 function updateVideoButtonText() {
@@ -358,7 +437,65 @@ function cancelVideoEdit() {
   updateVideoButtonText();
 }
 
-/* PROFILE LOAD */
+async function deleteVideo(id) {
+  if (!confirm("Delete this video?")) return;
+
+  const { error } = await supabaseClient
+    .from("videos")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
+
+  if (editingVideoId == id) {
+    cancelVideoEdit();
+  }
+
+  loadVideosList();
+  loadDashboardData();
+}
+
+async function loadVideosList() {
+  const list = document.getElementById("videosList");
+  if (!list) return;
+
+  const { data, error } = await supabaseClient
+    .from("videos")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = `<p class="admin-empty">No videos added yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = data.map(item => `
+    <div class="admin-list-card">
+      <div>
+        <h3>${item.title}</h3>
+        <p>${item.category || "Video"} • ${item.upload_date || ""}</p>
+        <small>${tagsToText(item.tags)}</small>
+      </div>
+      <div class="admin-actions">
+        <button class="toggle-btn" onclick="editVideo(${item.id})">Edit</button>
+        <button class="delete-btn" onclick="deleteVideo(${item.id})">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* --------------------------------------------------------------------------
+   8. PROFILE OPERATIONS
+   -------------------------------------------------------------------------- */
+
 async function loadProfile() {
   const { data, error } = await supabaseClient
     .from("profile")
@@ -383,16 +520,21 @@ async function loadProfile() {
   document.getElementById("whatsappUrl").value = data.whatsapp || "";
 }
 
-/* PROFILE SAVE */
 document.getElementById("profileForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true;
 
   let imageUrl = document.getElementById("profileImage").value;
   const imageFile = document.getElementById("profileImageFile").files[0];
 
   if (imageFile) {
     imageUrl = await uploadProfileImage(imageFile);
-    if (!imageUrl) return;
+    if (!imageUrl) {
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
   }
 
   const profile = {
@@ -420,152 +562,34 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
       .from("profile")
       .update(profile)
       .eq("id", existing.id);
-
     error = result.error;
   } else {
     const result = await supabaseClient
       .from("profile")
       .insert([profile]);
-
     error = result.error;
   }
 
   if (error) {
     alert("Error: " + error.message);
+    if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
   alert("Profile saved ✅");
   document.getElementById("profileImageFile").value = "";
+  if (submitBtn) submitBtn.disabled = false;
 });
 
-/* RESOURCES LIST */
-async function loadResourcesList() {
-  const list = document.getElementById("resourcesList");
-  if (!list) return;
+/* --------------------------------------------------------------------------
+   9. OTHER ACCOUNTS MODULE
+   -------------------------------------------------------------------------- */
 
-  const { data, error } = await supabaseClient
-    .from("resources")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    list.innerHTML = `<p class="admin-empty">No resources added yet.</p>`;
-    return;
-  }
-
-  list.innerHTML = data.map(item => `
-    <div class="admin-list-card">
-      <div>
-        <h3>${item.title}</h3>
-        <p>${item.category || "Resource"} • ${item.upload_date || ""}</p>
-        <small>${tagsToText(item.tags)}</small>
-      </div>
-
-      <div class="admin-actions">
-        <button class="toggle-btn" onclick="editResource(${item.id})">
-          Edit
-        </button>
-
-        <button class="delete-btn" onclick="deleteResource(${item.id})">
-          Delete
-        </button>
-      </div>
-    </div>
-  `).join("");
-}
-
-async function deleteResource(id) {
-  if (!confirm("Delete this resource?")) return;
-
-  const { error } = await supabaseClient
-    .from("resources")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    alert("Error: " + error.message);
-    return;
-  }
-
-  if (editingResourceId === id) {
-    cancelResourceEdit();
-  }
-
-  loadResourcesList();
-  loadDashboardData();
-}
-
-/* VIDEOS LIST */
-async function loadVideosList() {
-  const list = document.getElementById("videosList");
-  if (!list) return;
-
-  const { data, error } = await supabaseClient
-    .from("videos")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    list.innerHTML = `<p class="admin-empty">No videos added yet.</p>`;
-    return;
-  }
-
-  list.innerHTML = data.map(item => `
-    <div class="admin-list-card">
-      <div>
-        <h3>${item.title}</h3>
-        <p>${item.category || "Video"} • ${item.upload_date || ""}</p>
-        <small>${tagsToText(item.tags)}</small>
-      </div>
-
-      <div class="admin-actions">
-        <button class="toggle-btn" onclick="editVideo(${item.id})">
-          Edit
-        </button>
-
-        <button class="delete-btn" onclick="deleteVideo(${item.id})">
-          Delete
-        </button>
-      </div>
-    </div>
-  `).join("");
-}
-
-async function deleteVideo(id) {
-  if (!confirm("Delete this video?")) return;
-
-  const { error } = await supabaseClient
-    .from("videos")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    alert("Error: " + error.message);
-    return;
-  }
-
-  if (editingVideoId === id) {
-    cancelVideoEdit();
-  }
-
-  loadVideosList();
-  loadDashboardData();
-}
-
-/* OTHER ACCOUNTS SAVE */
 document.getElementById("accountForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  if (submitBtn) submitBtn.disabled = true;
 
   const account = {
     account_name: document.getElementById("accountName").value,
@@ -581,6 +605,7 @@ document.getElementById("accountForm")?.addEventListener("submit", async (e) => 
 
   if (error) {
     alert("Error: " + error.message);
+    if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
@@ -588,9 +613,9 @@ document.getElementById("accountForm")?.addEventListener("submit", async (e) => 
   e.target.reset();
 
   loadAccountsList();
+  if (submitBtn) submitBtn.disabled = false;
 });
 
-/* OTHER ACCOUNTS LIST */
 async function loadAccountsList() {
   const list = document.getElementById("accountsList");
   if (!list) return;
@@ -616,15 +641,11 @@ async function loadAccountsList() {
         <h3>${item.account_name}</h3>
         <p>${item.platform || "Account"} • ${item.is_active ? "Visible" : "Hidden"}</p>
       </div>
-
       <div class="admin-actions">
         <button class="toggle-btn" onclick="toggleAccount(${item.id}, ${item.is_active})">
           ${item.is_active ? "Hide" : "Show"}
         </button>
-
-        <button class="delete-btn" onclick="deleteAccount(${item.id})">
-          Delete
-        </button>
+        <button class="delete-btn" onclick="deleteAccount(${item.id})">Delete</button>
       </div>
     </div>
   `).join("");
@@ -660,7 +681,18 @@ async function deleteAccount(id) {
   loadAccountsList();
 }
 
-/* SETTINGS */
+/* --------------------------------------------------------------------------
+   10. FUTURE-PROOF MODULE BINDING (CRITICAL FOR SCOPING)
+   -------------------------------------------------------------------------- */
+// Explicitly exposing functions to the window scope to prevent failures in strict/module environments
+window.editResource = editResource;
+window.deleteResource = deleteResource;
+window.editVideo = editVideo;
+window.deleteVideo = deleteVideo;
+window.toggleAccount = toggleAccount;
+window.deleteAccount = deleteAccount;
+
+/* Settings placeholder action */
 document.getElementById("settingsForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   alert("Settings system next phase me connect karenge ✅");

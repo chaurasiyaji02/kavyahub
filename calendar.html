@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Calendar | KavyaHub</title>
+  <meta name="description" content="Select a date to view resources, videos, certificates, and internships uploaded on that specific day on KavyaHub." />
 
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
@@ -12,10 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
@@ -27,14 +25,14 @@
       </div>
 
       <ul class="nav-links" id="navLinks">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="resources.html">Resources</a></li>
-      <li><a href="videos.html">Videos</a></li>
-      <li><a href="calendar.html">Calendar</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="privacy.html" class="active">Privacy</a></li>
-    </ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="videos.html">Videos</a></li>
+        <li><a href="calendar.html">Calendar</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
 
       <div class="menu-icon" id="menuIcon">
         <i class="fa-solid fa-bars"></i>
@@ -42,111 +40,82 @@
     </nav>
   </header>
 
-  <section class="resources-hero">
-    <div class="section-heading">
-      <h1>Upload Calendar</h1>
-      <p>
-        Select a date to view resources, videos, certificates, and internships uploaded on that day.
-      </p>
-    </div>
-  </section>
+  <main>
 
-  <section class="search-section">
-    <div class="search-box">
-      <i class="fa-solid fa-calendar-days"></i>
+    <section class="resources-hero">
+      <div class="section-heading">
+        <h1>Upload Calendar</h1>
+        <p>Select a date to view resources, videos, certificates, and internships uploaded on that day.</p>
+      </div>
+    </section>
 
-      <input
-        type="date"
-        id="calendarDate"
-      />
-    </div>
-  </section>
+    <section class="search-section">
+      <div class="search-box">
+        <i class="fa-solid fa-calendar-days"></i>
+        <input type="date" id="calendarDate" />
+      </div>
+    </section>
 
-  <section class="resource-count-section">
-    <h3>
-      Uploads on Selected Date:
-      <span id="calendarCount">0</span>
-    </h3>
-  </section>
+    <section class="resource-count-section">
+      <h3>Uploads on Selected Date: <span id="calendarCount">0</span></h3>
+    </section>
 
-  <section class="resources-grid-section">
+    <section class="resources-grid-section">
+      <div class="section-heading">
+        <h2 id="selectedDateTitle">Select a Date</h2>
+        <p>All resources and videos from the selected date will appear here.</p>
+      </div>
 
-    <div class="section-heading">
-      <h2 id="selectedDateTitle">Select a Date</h2>
-      <p>All resources and videos from the selected date will appear here.</p>
-    </div>
+      <div class="resources-grid" id="calendarContainer">
+        </div>
 
-    <div class="resources-grid" id="calendarContainer">
-      <!-- Uploads will be loaded by JavaScript -->
-    </div>
+      <div id="calendarEmptyState" class="empty-state" style="display:none;">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <h3>No Uploads Found</h3>
+        <p>No resources or videos were uploaded on this date.</p>
+      </div>
+    </section>
 
-    <div id="calendarEmptyState" class="empty-state" style="display:none;">
-      <i class="fa-solid fa-calendar-xmark"></i>
-      <h3>No Uploads Found</h3>
-      <p>No resources or videos were uploaded on this date.</p>
-    </div>
-
-  </section>
+  </main>
 
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup-box">
-
-      <button class="popup-close" id="popupClose">
+      <button class="popup-close" id="popupClose" aria-label="Close Popup">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
       <h2>Unlock Resource</h2>
-
-      <p>
-        Please support by subscribing on YouTube and following on Instagram before accessing this resource.
-      </p>
+      <p>Please support by subscribing on YouTube and following on Instagram before accessing this resource.</p>
 
       <div class="popup-buttons">
-        <a
-          href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
-          class="popup-social-btn youtube-btn"
-          target="_blank">
-          <i class="fa-brands fa-youtube"></i>
-          Subscribe
+        <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" class="popup-social-btn youtube-btn" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-youtube"></i> Subscribe
         </a>
-
-        <a
-          href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
-          class="popup-social-btn insta-btn"
-          target="_blank">
-          <i class="fa-brands fa-instagram"></i>
-          Follow
+        <a href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx" class="popup-social-btn insta-btn" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-instagram"></i> Follow
         </a>
       </div>
 
-      <button class="continue-btn" id="continueBtn">
-        Continue to Resource
-      </button>
-
+      <button class="continue-btn" id="continueBtn">Continue to Resource</button>
     </div>
   </div>
 
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
-
-      <p>
-        Browse free resources, certificates, internships, and videos by date.
-      </p>
+      <p>Browse free resources, certificates, internships, and videos by date.</p>
 
       <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="resources.html">Resources</a>
-      <a href="videos.html">Videos</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="privacy.html">Privacy</a>
-    </div>
+        <a href="index.html">Home</a>
+        <a href="resources.html">Resources</a>
+        <a href="videos.html">Videos</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
 
-      <p class="copyright">
-        © 2026 KavyaHub. All Rights Reserved.
-      </p>
+      <p class="copyright">© 2026 KavyaHub. All Rights Reserved.</p>
     </div>
   </footer>
 

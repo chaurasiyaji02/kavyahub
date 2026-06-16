@@ -1,5 +1,12 @@
-let resources = [];
+/* ==========================================================================
+   KAVYAHUB - RESOURCES CONTROLLER (SEARCH, FILTER & VIEWS)
+   ========================================================================== */
 
+let resources = [];
+let selectedTags = [];
+let currentFilteredResources = [];
+
+// DOM Elements Selection
 const resourcesContainer = document.getElementById("resourcesContainer");
 const searchInput = document.getElementById("resourceSearch");
 const resourceCount = document.getElementById("resourceCount");
@@ -15,26 +22,17 @@ const clearFiltersBtn = document.getElementById("clearFiltersBtn");
 const tagFilters = document.querySelectorAll(".tag-filter");
 const activeFilters = document.getElementById("activeFilters");
 
-let selectedTags = [];
-let currentFilteredResources = [];
-
-/* TAG HELPERS */
+/* --------------------------------------------------------------------------
+   1. TAG HELPERS
+   -------------------------------------------------------------------------- */
 
 function normalizeTag(tag) {
-  return String(tag || "")
-    .trim()
-    .toLowerCase();
+  return String(tag || "").trim().toLowerCase();
 }
 
 function getResourceTags(resource) {
-  const tags = Array.isArray(resource.tags)
-    ? resource.tags
-    : [];
-
-  const category = resource.category
-    ? [resource.category]
-    : [];
-
+  const tags = Array.isArray(resource.tags) ? resource.tags : [];
+  const category = resource.category ? [resource.category] : [];
   return [...new Set([...category, ...tags].map(normalizeTag))];
 }
 
@@ -56,10 +54,13 @@ function createTagHTML(resource) {
     .join("");
 }
 
-/* VIEW COUNTER */
+/* --------------------------------------------------------------------------
+   2. VIEW COUNTER LOGIC
+   -------------------------------------------------------------------------- */
 
 async function increaseResourceView(id) {
-  const resource = resources.find(item => item.id === id);
+  // Loose equality (==) allows matching both string UUIDs and numeric IDs seamlessly
+  const resource = resources.find(item => item.id == id);
 
   if (resource) {
     resource.views = (resource.views || 0) + 1;
@@ -72,39 +73,34 @@ async function increaseResourceView(id) {
 
   if (error) {
     console.error("Resource view error:", error);
-
+    // Rollback if DB write fails
     if (resource) {
       resource.views = Math.max((resource.views || 1) - 1, 0);
     }
   }
 }
 
-/* CARD */
+/* --------------------------------------------------------------------------
+   3. CARD HTML TEMPLATE
+   -------------------------------------------------------------------------- */
 
 function createCard(resource) {
+  const descriptionText = resource.description || "";
+  const isLongDescription = descriptionText.length > 120;
+
   return `
     <div class="resource-card">
-
       <div class="tag-row">
         ${createTagHTML(resource)}
       </div>
 
       <h3>${resource.title}</h3>
 
-      <p class="resource-description">
-  ${resource.description || ""}
-</p>
+      <p class="resource-description">${descriptionText}</p>
 
-${
-  (resource.description || "").length > 120
-    ? `<button class="read-more-btn">
-         Read More
-       </button>`
-    : ""
-}
+      ${isLongDescription ? `<button class="read-more-btn">Read More</button>` : ""}
 
       <small>${resource.upload_date || ""}</small>
-
       <small>👁 ${resource.views || 0} views</small>
 
       <button
@@ -113,35 +109,43 @@ ${
         data-link="${resource.link}">
         Open Resource
       </button>
-
     </div>
   `;
 }
 
-/* RENDER */
+/* --------------------------------------------------------------------------
+   4. RENDER MODULE
+   -------------------------------------------------------------------------- */
 
 function renderResources(data) {
   currentFilteredResources = data;
-  resourcesContainer.innerHTML = "";
+  
+  if (!resourcesContainer) return; // Guard clause
 
   if (data.length === 0) {
-    emptyState.style.display = "block";
-    resourceCount.textContent = "0";
+    resourcesContainer.innerHTML = "";
+    if (emptyState) emptyState.style.display = "block";
+    if (resourceCount) resourceCount.textContent = "0";
     return;
   }
 
-  emptyState.style.display = "none";
+  if (emptyState) emptyState.style.display = "none";
 
-  data.forEach(resource => {
-    resourcesContainer.innerHTML += createCard(resource);
-  });
+  // Optimization: Map string building and update DOM once. Massive performance gain!
+  resourcesContainer.innerHTML = data.map(resource => createCard(resource)).join("");
 
-  resourceCount.textContent = data.length;
+  if (resourceCount) {
+    resourceCount.textContent = data.length;
+  }
 }
 
-/* FEATURED */
+/* --------------------------------------------------------------------------
+   5. FEATURED CONTAINER
+   -------------------------------------------------------------------------- */
 
 function loadFeatured() {
+  if (!featuredTitle || !featuredDescription || !featuredButton) return;
+
   const featured = resources.find(item => item.featured);
 
   if (!featured) {
@@ -158,7 +162,9 @@ function loadFeatured() {
   featuredButton.dataset.id = featured.id;
 }
 
-/* ACTIVE FILTER CHIPS */
+/* --------------------------------------------------------------------------
+   6. ACTIVE FILTER CHIPS
+   -------------------------------------------------------------------------- */
 
 function renderActiveFilters() {
   if (!activeFilters) return;
@@ -173,10 +179,12 @@ function renderActiveFilters() {
     .join("");
 }
 
-/* SEARCH + MULTI FILTER */
+/* --------------------------------------------------------------------------
+   7. SEARCH + MULTI FILTER LOGIC
+   -------------------------------------------------------------------------- */
 
 function applyFilters() {
-  const term = searchInput.value.toLowerCase().trim();
+  const term = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
   const filtered = resources.filter(resource => {
     const tags = getResourceTags(resource);
@@ -190,12 +198,8 @@ function applyFilters() {
       .join(" ")
       .toLowerCase();
 
-    const matchSearch =
-      term === "" || searchableText.includes(term);
-
-    const matchTags =
-      selectedTags.length === 0 ||
-      selectedTags.some(tag => tags.includes(tag));
+    const matchSearch = term === "" || searchableText.includes(term);
+    const matchTags = selectedTags.length === 0 || selectedTags.some(tag => tags.includes(tag));
 
     return matchSearch && matchTags;
   });
@@ -204,15 +208,18 @@ function applyFilters() {
   renderActiveFilters();
 }
 
-/* FILTER PANEL */
+/* --------------------------------------------------------------------------
+   8. EVENT LISTENERS & INITIALIZATION
+   -------------------------------------------------------------------------- */
 
-filterToggleBtn?.addEventListener("click", () => {
-  if (!filterPanel) return;
+// Toggle Filter Panel View
+if (filterToggleBtn && filterPanel) {
+  filterToggleBtn.addEventListener("click", () => {
+    filterPanel.style.display = filterPanel.style.display === "none" ? "block" : "none";
+  });
+}
 
-  filterPanel.style.display =
-    filterPanel.style.display === "none" ? "block" : "none";
-});
-
+// Multi-tag filters change
 tagFilters.forEach(input => {
   input.addEventListener("change", () => {
     selectedTags = Array.from(tagFilters)
@@ -223,20 +230,23 @@ tagFilters.forEach(input => {
   });
 });
 
-clearFiltersBtn?.addEventListener("click", () => {
-  selectedTags = [];
-
-  tagFilters.forEach(input => {
-    input.checked = false;
+// Clear filters button action
+if (clearFiltersBtn) {
+  clearFiltersBtn.addEventListener("click", () => {
+    selectedTags = [];
+    tagFilters.forEach(input => {
+      input.checked = false;
+    });
+    applyFilters();
   });
+}
 
-  applyFilters();
-});
+// Search input interaction
+if (searchInput) {
+  searchInput.addEventListener("input", applyFilters);
+}
 
-searchInput?.addEventListener("input", applyFilters);
-
-/* LOAD SUPABASE */
-
+// Main resource initializer from Supabase
 async function loadResources() {
   const { data, error } = await supabaseClient
     .from("resources")
@@ -244,7 +254,7 @@ async function loadResources() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Error loading resources:", error);
     return;
   }
 
@@ -254,53 +264,54 @@ async function loadResources() {
   loadFeatured();
 }
 
+// Initialize on page run
 loadResources();
 
-/* CLICK VIEW COUNTER */
+/* --------------------------------------------------------------------------
+   9. GLOBAL DELEGATED CLICK EVENTS (PC & Mobile Safe)
+   -------------------------------------------------------------------------- */
 
 document.addEventListener("click", async (e) => {
+  // Handle Resource Views Click
   const btn = e.target.closest(".resource-view-btn");
+  if (btn) {
+    if (btn.dataset.clicked === "true") return;
+    btn.dataset.clicked = "true";
 
-  if (!btn) return;
+    const id = btn.dataset.id; // Kept flexible for integer or string uuid
 
-  if (btn.dataset.clicked === "true") return;
-  btn.dataset.clicked = "true";
+    if (id) {
+      await increaseResourceView(id);
+      renderResources(currentFilteredResources);
+      loadFeatured();
+    }
 
-  const id = Number(btn.dataset.id);
-
-  if (id) {
-    await increaseResourceView(id);
-    renderResources(currentFilteredResources);
-    loadFeatured();
+    setTimeout(() => {
+      btn.dataset.clicked = "false";
+    }, 1500);
+    return; // Fast exit
   }
 
-  setTimeout(() => {
-    btn.dataset.clicked = "false";
-  }, 1500);
-});
-
-featuredButton?.addEventListener("click", async () => {
-  const id = Number(featuredButton.dataset.id);
-
-  if (id) {
-    await increaseResourceView(id);
-    renderResources(currentFilteredResources);
-    loadFeatured();
+  // Handle Read More / Read Less Toggle
+  const readMoreBtn = e.target.closest(".read-more-btn");
+  if (readMoreBtn) {
+    const description = readMoreBtn.previousElementSibling;
+    if (description) {
+      description.classList.toggle("expanded");
+      readMoreBtn.textContent = description.classList.contains("expanded") ? "Read Less" : "Read More";
+    }
+    return;
   }
 });
 
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".read-more-btn");
-
-  if (!btn) return;
-
-  const description =
-    btn.previousElementSibling;
-
-  description.classList.toggle("expanded");
-
-  btn.textContent =
-    description.classList.contains("expanded")
-      ? "Read Less"
-      : "Read More";
-});
+// Featured resource button listener
+if (featuredButton) {
+  featuredButton.addEventListener("click", async () => {
+    const id = featuredButton.dataset.id;
+    if (id) {
+      await increaseResourceView(id);
+      renderResources(currentFilteredResources);
+      loadFeatured();
+    }
+  });
+}

@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Resources | KavyaHub</title>
+  <meta name="description" content="Explore free certificates, courses, internships, roadmaps, notes, and useful tech resources on KavyaHub." />
 
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -19,197 +19,154 @@
 
 <body>
 
-<header class="main-header">
-  <nav class="navbar">
-    <div class="logo">
-      <a href="index.html">Kavya<span>Hub</span></a>
-    </div>
+  <header class="main-header">
+    <nav class="navbar">
+      <div class="logo">
+        <a href="index.html">Kavya<span>Hub</span></a>
+      </div>
 
-    <ul class="nav-links" id="navLinks">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="resources.html">Resources</a></li>
-      <li><a href="videos.html">Videos</a></li>
-      <li><a href="calendar.html">Calendar</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="privacy.html" class="active">Privacy</a></li>
-    </ul>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="videos.html">Videos</a></li>
+        <li><a href="calendar.html">Calendar</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
 
-    <div class="menu-icon" id="menuIcon">
-      <i class="fa-solid fa-bars"></i>
-    </div>
-  </nav>
-</header>
+      <div class="menu-icon" id="menuIcon">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+    </nav>
+  </header>
 
-<section class="resources-hero">
-  <div class="section-heading">
-    <h1>Free Resources</h1>
-    <p>Explore free certificates, courses, internships, roadmaps, notes, and useful tech resources.</p>
-  </div>
-</section>
+  <main>
+    
+    <section class="resources-hero">
+      <div class="section-heading">
+        <h1>Free Resources</h1>
+        <p>Explore free certificates, courses, internships, roadmaps, notes, and useful tech resources.</p>
+      </div>
+    </section>
 
-<section class="search-section">
-  <div class="search-box">
-    <i class="fa-solid fa-magnifying-glass"></i>
+    <section class="search-section">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="text"
+          id="resourceSearch"
+          placeholder="Search by title, description, category or tags..."
+        />
+        <button class="filter-toggle-btn" id="filterToggleBtn" type="button">
+          <i class="fa-solid fa-sliders"></i> Filters
+        </button>
+      </div>
+    </section>
 
-    <input
-      type="text"
-      id="resourceSearch"
-      placeholder="Search by title, description, category or tags..."
-    />
+    <section class="filter-panel-section" id="filterPanel" style="display:none;">
+      <div class="filter-panel">
+        <div class="filter-panel-header">
+          <h3>Filter Resources</h3>
+          <button type="button" id="clearFiltersBtn">Clear</button>
+        </div>
 
-    <button class="filter-toggle-btn" id="filterToggleBtn" type="button">
-      <i class="fa-solid fa-sliders"></i>
-      Filters
-    </button>
-  </div>
-</section>
+        <div class="filter-options">
+          <label>
+            <input type="checkbox" class="tag-filter" value="certificate"> Certificates
+          </label>
+          <label>
+            <input type="checkbox" class="tag-filter" value="course"> Courses
+          </label>
+          <label>
+            <input type="checkbox" class="tag-filter" value="notes"> Notes
+          </label>
+          <label>
+            <input type="checkbox" class="tag-filter" value="internship"> Internships
+          </label>
+          <label>
+            <input type="checkbox" class="tag-filter" value="ai-tool"> AI Tools
+          </label>
+          <label>
+            <input type="checkbox" class="tag-filter" value="roadmap"> Roadmaps
+          </label>
+        </div>
 
-<section class="filter-panel-section" id="filterPanel" style="display:none;">
-  <div class="filter-panel">
+        <div class="active-filters" id="activeFilters"></div>
+      </div>
+    </section>
 
-    <div class="filter-panel-header">
-      <h3>Filter Resources</h3>
+    <section class="featured-resource">
+      <div class="featured-card">
+        <div class="featured-badge">⭐ Featured Resource</div>
+        <h2 id="featuredTitle">Loading...</h2>
+        <p id="featuredDescription">Discover this featured learning resource.</p>
+        <button class="unlock-btn" id="featuredButton">Unlock Resource</button>
+      </div>
+    </section>
 
-      <button type="button" id="clearFiltersBtn">
-        Clear
+    <section class="resource-count-section">
+      <h3>Available Resources: <span id="resourceCount">0</span></h3>
+    </section>
+
+    <section class="resources-grid-section">
+      <div class="resources-grid" id="resourcesContainer">
+        </div>
+
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <i class="fa-solid fa-folder-open"></i>
+        <h3>No Resources Found</h3>
+        <p>Try a different keyword or filter option.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-box">
+      <button class="popup-close" id="popupClose" aria-label="Close Popup">
+        <i class="fa-solid fa-xmark"></i>
       </button>
+
+      <h2>Unlock Resource</h2>
+      <p>Please support by subscribing on YouTube and following on Instagram before accessing this resource.</p>
+
+      <div class="popup-buttons">
+        <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" class="popup-social-btn youtube-btn" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-youtube"></i> Subscribe
+        </a>
+        <a href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx" class="popup-social-btn insta-btn" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-instagram"></i> Follow
+        </a>
+      </div>
+
+      <button class="continue-btn" id="continueBtn">Continue to Resource</button>
     </div>
+  </div>
 
-    <div class="filter-options">
+  <footer class="footer">
+    <div class="footer-content">
+      <h2>Kavya<span>Hub</span></h2>
+      <p>Your hub for free learning resources, certificates, internships, and tech opportunities.</p>
 
-      <label>
-        <input type="checkbox" class="tag-filter" value="certificate">
-        Certificates
-      </label>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="resources.html">Resources</a>
+        <a href="videos.html">Videos</a>
+        <a href="calendar.html">Calendar</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
 
-      <label>
-        <input type="checkbox" class="tag-filter" value="course">
-        Courses
-      </label>
-
-      <label>
-        <input type="checkbox" class="tag-filter" value="notes">
-        Notes
-      </label>
-
-      <label>
-        <input type="checkbox" class="tag-filter" value="internship">
-        Internships
-      </label>
-
-      <label>
-        <input type="checkbox" class="tag-filter" value="ai-tool">
-        AI Tools
-      </label>
-
-      <label>
-        <input type="checkbox" class="tag-filter" value="roadmap">
-        Roadmaps
-      </label>
-
+      <p class="copyright">© 2026 KavyaHub. All Rights Reserved.</p>
     </div>
+  </footer>
 
-    <div class="active-filters" id="activeFilters"></div>
-
-  </div>
-</section>
-
-<section class="featured-resource">
-  <div class="featured-card">
-    <div class="featured-badge">⭐ Featured Resource</div>
-
-    <h2 id="featuredTitle">Loading...</h2>
-
-    <p id="featuredDescription">Discover this featured learning resource.</p>
-
-    <button class="unlock-btn" id="featuredButton">
-      Unlock Resource
-    </button>
-  </div>
-</section>
-
-<section class="resource-count-section">
-  <h3>
-    Available Resources:
-    <span id="resourceCount">0</span>
-  </h3>
-</section>
-
-<section class="resources-grid-section">
-  <div class="resources-grid" id="resourcesContainer">
-    <!-- JS Generate Karegi -->
-  </div>
-
-  <div id="emptyState" class="empty-state" style="display:none;">
-    <i class="fa-solid fa-folder-open"></i>
-    <h3>No Resources Found</h3>
-    <p>Try a different keyword or filter option.</p>
-  </div>
-</section>
-
-<div class="popup-overlay" id="popupOverlay">
-  <div class="popup-box">
-
-    <button class="popup-close" id="popupClose">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-
-    <h2>Unlock Resource</h2>
-
-    <p>Please support by subscribing on YouTube and following on Instagram before accessing this resource.</p>
-
-    <div class="popup-buttons">
-      <a
-        href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ"
-        class="popup-social-btn youtube-btn"
-        target="_blank">
-        <i class="fa-brands fa-youtube"></i>
-        Subscribe
-      </a>
-
-      <a
-        href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx"
-        class="popup-social-btn insta-btn"
-        target="_blank">
-        <i class="fa-brands fa-instagram"></i>
-        Follow
-      </a>
-    </div>
-
-    <button class="continue-btn" id="continueBtn">
-      Continue to Resource
-    </button>
-
-  </div>
-</div>
-
-<footer class="footer">
-  <div class="footer-content">
-    <h2>Kavya<span>Hub</span></h2>
-
-    <p>Your hub for free learning resources, certificates, internships, and tech opportunities.</p>
-
-   <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="resources.html">Resources</a>
-      <a href="videos.html">Videos</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="privacy.html">Privacy</a>
-    </div>
-
-    <p class="copyright">
-      © 2026 KavyaHub. All Rights Reserved.
-    </p>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase/config.js"></script>
-<script src="js/main.js"></script>
-<script src="js/resources.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase/config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/resources.js"></script>
 
 </body>
 </html>

@@ -1,3 +1,8 @@
+/* ==========================================================================
+   KAVYAHUB - CALENDAR CONTROLLER (DATE-WISE FILTER SYSTEM)
+   ========================================================================== */
+
+// DOM Elements Selection
 const calendarDate = document.getElementById("calendarDate");
 const calendarContainer = document.getElementById("calendarContainer");
 const calendarCount = document.getElementById("calendarCount");
@@ -6,6 +11,10 @@ const selectedDateTitle = document.getElementById("selectedDateTitle");
 
 let allResources = [];
 let allVideos = [];
+
+/* --------------------------------------------------------------------------
+   1. DATE & UTILITY HELPERS
+   -------------------------------------------------------------------------- */
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -43,25 +52,20 @@ function getYouTubeId(url) {
 
 function getYouTubeThumbnail(url) {
   const videoId = getYouTubeId(url);
-
-  if (!videoId) {
-    return "assets/images/default-thumbnail.jpg";
-  }
-
-  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "assets/images/default-thumbnail.jpg";
 }
+
+/* --------------------------------------------------------------------------
+   2. CARD TEMPLATES (HTML BUILDERS)
+   -------------------------------------------------------------------------- */
 
 function createResourceCard(resource) {
   return `
     <div class="resource-card">
       <span class="tag">${resource.category || "Resource"}</span>
-
       <h3>${resource.title}</h3>
-
       <p>${resource.description || ""}</p>
-
       <small>${formatDate(resource.upload_date)}</small>
-
       <button class="unlock-btn" data-link="${resource.link}">
         Open Resource
       </button>
@@ -74,91 +78,105 @@ function createVideoCard(video) {
 
   return `
     <div class="resource-card">
-      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail">
-
+      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
       <span class="tag">Video / ${video.category || "General"}</span>
-
       <h3>${video.title}</h3>
-
       <p>${video.description || ""}</p>
-
       <small>${formatDate(video.upload_date)}</small>
 
       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-        <a href="${video.youtube_link}" target="_blank" class="small-btn">
+        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn">
           Watch Video
         </a>
-
-        ${
-          video.resource_link
-            ? `<button class="unlock-btn" data-link="${video.resource_link}">
-                Open Resource
-              </button>`
-            : ""
-        }
+        ${video.resource_link ? `
+          <button class="unlock-btn" data-link="${video.resource_link}">
+            Open Resource
+          </button>
+        ` : ""}
       </div>
     </div>
   `;
 }
 
+/* --------------------------------------------------------------------------
+   3. CALENDAR RENDER MODULE
+   -------------------------------------------------------------------------- */
+
 function renderCalendarItems(selectedDate) {
-  calendarContainer.innerHTML = "";
+  if (!calendarContainer) return; // Guard Clause
 
-  selectedDateTitle.textContent = formatDate(selectedDate);
+  if (selectedDateTitle) {
+    selectedDateTitle.textContent = formatDate(selectedDate);
+  }
 
+  // Filter items matching the chosen exact date
   const resources = allResources.filter(item => item.upload_date === selectedDate);
   const videos = allVideos.filter(item => item.upload_date === selectedDate);
-
   const total = resources.length + videos.length;
 
-  calendarCount.textContent = total;
+  if (calendarCount) {
+    calendarCount.textContent = total;
+  }
 
   if (total === 0) {
-    calendarEmptyState.style.display = "block";
+    calendarContainer.innerHTML = "";
+    if (calendarEmptyState) calendarEmptyState.style.display = "block";
     return;
   }
 
-  calendarEmptyState.style.display = "none";
+  if (calendarEmptyState) calendarEmptyState.style.display = "none";
 
-  resources.forEach(resource => {
-    calendarContainer.innerHTML += createResourceCard(resource);
-  });
+  // Optimization: Map lists to array strings, combine, and perform exactly 1 DOM injection
+  const resourcesHTML = resources.map(resource => createResourceCard(resource)).join("");
+  const videosHTML = videos.map(video => createVideoCard(video)).join("");
 
-  videos.forEach(video => {
-    calendarContainer.innerHTML += createVideoCard(video);
-  });
+  calendarContainer.innerHTML = resourcesHTML + videosHTML;
 }
+
+/* --------------------------------------------------------------------------
+   4. DATA INITIALIZER & NETWORK FETCHING
+   -------------------------------------------------------------------------- */
 
 async function loadCalendarData() {
-  const { data: resourcesData, error: resourceError } = await supabaseClient
-    .from("resources")
-    .select("*")
-    .order("upload_date", { ascending: false });
+  try {
+    // Optimization: Parallelizes network queries instead of waiting sequentially
+    const [resourcesResult, videosResult] = await Promise.all([
+      supabaseClient.from("resources").select("*").order("upload_date", { ascending: false }),
+      supabaseClient.from("videos").select("*").order("upload_date", { ascending: false })
+    ]);
 
-  const { data: videosData, error: videoError } = await supabaseClient
-    .from("videos")
-    .select("*")
-    .order("upload_date", { ascending: false });
+    if (resourcesResult.error) console.error(resourcesResult.error);
+    if (videosResult.error) console.error(videosResult.error);
 
-  if (resourceError) {
-    console.error(resourceError);
+    allResources = resourcesResult.data || [];
+    allVideos = videosResult.data || [];
+
+    // Optimization/Fix: Get safe local YYYY-MM-DD instead of forced UTC ISO split
+    const localDate = new Date();
+    const yyyy = localDate.getFullYear();
+    const mm = String(localDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(localDate.getDate()).padStart(2, '0');
+    const today = `${yyyy}-${mm}-${dd}`;
+
+    if (calendarDate) {
+      calendarDate.value = today;
+    }
+    
+    renderCalendarItems(today);
+  } catch (err) {
+    console.error("Calendar system data processing error:", err);
   }
-
-  if (videoError) {
-    console.error(videoError);
-  }
-
-  allResources = resourcesData || [];
-  allVideos = videosData || [];
-
-  const today = new Date().toISOString().split("T")[0];
-
-  calendarDate.value = today;
-  renderCalendarItems(today);
 }
 
-calendarDate?.addEventListener("change", () => {
-  renderCalendarItems(calendarDate.value);
-});
+/* --------------------------------------------------------------------------
+   5. EVENT LISTENERS
+   -------------------------------------------------------------------------- */
 
+if (calendarDate) {
+  calendarDate.addEventListener("change", () => {
+    renderCalendarItems(calendarDate.value);
+  });
+}
+
+// Trigger Execution
 loadCalendarData();

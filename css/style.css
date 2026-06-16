@@ -1,9 +1,12 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ==========================================================================
+   KAVYAHUB - GLOBAL CENTRAL ARCHITECTURE STYLESHEET
+   Description: Core tokens, variables, generic element overrides, layout systems,
+                components, modals, and dynamic list-view blocks.
+   ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   1. GLOBAL CENTRAL STYLE TOKENS
+   -------------------------------------------------------------------------- */
 :root {
   --primary: #3b82f6;
   --secondary: #8b5cf6;
@@ -21,15 +24,21 @@
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
   font-family: "Poppins", sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(59,130,246,0.18), transparent 35%),
-    radial-gradient(circle at top right, rgba(139,92,246,0.15), transparent 35%),
+  background: 
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 35%),
+    radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent 35%),
     var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -44,8 +53,12 @@ a {
 
 img {
   max-width: 100%;
+  height: auto;
 }
 
+/* --------------------------------------------------------------------------
+   2. CONTENT LAYOUT BLOCKS & STRUCTURAL HEADINGS
+   -------------------------------------------------------------------------- */
 section {
   padding: 80px 8%;
 }
@@ -68,18 +81,20 @@ section {
   margin: auto;
 }
 
-/* BUTTONS */
-
+/* --------------------------------------------------------------------------
+   3. GLOBAL BUTTON INTERACTION HOOKS
+   -------------------------------------------------------------------------- */
 .btn,
 .small-btn,
 .unlock-btn,
 .continue-btn,
-.video-watch-btn {
+.video-watch-btn,
+.read-more-btn {
   border: none;
   cursor: pointer;
   font-family: inherit;
   font-weight: 700;
-  transition: 0.25s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease; /* Fluid acceleration transition */
 }
 
 .btn {
@@ -102,7 +117,7 @@ section {
 .secondary-btn {
   border: 1px solid var(--border);
   color: white;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .primary-btn:hover,
@@ -127,8 +142,9 @@ section {
   border-radius: 12px;
 }
 
-/* NAVBAR */
-
+/* --------------------------------------------------------------------------
+   4. STICKY GLASSMORPHIC HEADER NAVBAR
+   -------------------------------------------------------------------------- */
 .main-header {
   position: sticky;
   top: 0;
@@ -166,13 +182,13 @@ section {
   font-weight: 600;
   padding: 10px 14px;
   border-radius: 12px;
-  transition: 0.25s;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .nav-links a.active,
 .nav-links a:hover {
   color: white;
-  background: rgba(59,130,246,0.16);
+  background: rgba(59, 130, 246, 0.16);
 }
 
 .menu-icon {
@@ -181,8 +197,9 @@ section {
   cursor: pointer;
 }
 
-/* HERO */
-
+/* --------------------------------------------------------------------------
+   5. LANDING HERO BLOCK SECTIONS
+   -------------------------------------------------------------------------- */
 .hero-section {
   min-height: 88vh;
   display: flex;
@@ -203,9 +220,9 @@ section {
   width: 170px;
   height: 170px;
   border-radius: 50%;
-  border: 4px solid rgba(59,130,246,0.9);
+  border: 4px solid rgba(59, 130, 246, 0.9);
   object-fit: cover;
-  box-shadow: 0 0 45px rgba(59,130,246,0.35);
+  box-shadow: 0 0 45px rgba(59, 130, 246, 0.35);
   margin-bottom: 25px;
 }
 
@@ -235,8 +252,9 @@ section {
   flex-wrap: wrap;
 }
 
-/* SEARCH */
-
+/* --------------------------------------------------------------------------
+   6. USER INTERACTION MODULES (SEARCH BAR & TABS)
+   -------------------------------------------------------------------------- */
 .search-section {
   padding-top: 15px;
   padding-bottom: 30px;
@@ -246,7 +264,7 @@ section {
   width: 100%;
   max-width: 780px;
   margin: auto;
-  background: rgba(30,41,59,0.88);
+  background: rgba(30, 41, 59, 0.88);
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 16px 20px;
@@ -275,8 +293,6 @@ section {
   font-size: 1.1rem;
 }
 
-/* FILTERS */
-
 .filter-section {
   padding-top: 10px;
   padding-bottom: 35px;
@@ -293,13 +309,13 @@ section {
 .video-filter-btn {
   padding: 11px 18px;
   border-radius: 999px;
-  background: rgba(30,41,59,0.8);
+  background: rgba(30, 41, 59, 0.8);
   border: 1px solid var(--border);
   color: var(--text-light);
   cursor: pointer;
   font-family: inherit;
   font-weight: 600;
-  transition: 0.25s;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .filter-btn.active,
@@ -310,8 +326,9 @@ section {
   color: white;
 }
 
-/* CARDS COMMON */
-
+/* --------------------------------------------------------------------------
+   7. CORE CARDS ARCHITECTURE FEED MODULES
+   -------------------------------------------------------------------------- */
 .social-cards,
 .category-grid,
 .latest-grid,
@@ -332,7 +349,7 @@ section {
   border: 1px solid var(--border);
   border-radius: 22px;
   box-shadow: var(--shadow);
-  transition: 0.25s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
 }
 
 .social-card:hover,
@@ -342,7 +359,7 @@ section {
 .video-card:hover,
 .featured-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(59,130,246,0.45);
+  border-color: rgba(59, 130, 246, 0.45);
 }
 
 .social-card,
@@ -370,8 +387,9 @@ section {
   color: var(--text-light);
 }
 
-/* ACCOUNT */
-
+/* --------------------------------------------------------------------------
+   8. EXTERNAL RELATED ACCOUNTS FEEDS
+   -------------------------------------------------------------------------- */
 .account-list {
   display: flex;
   flex-direction: column;
@@ -391,8 +409,9 @@ section {
   color: var(--primary);
 }
 
-/* RESOURCE */
-
+/* --------------------------------------------------------------------------
+   9. DYNAMIC CONTENT COMPONENT CONTROLS (PILLS, LABELS, COUNTS)
+   -------------------------------------------------------------------------- */
 .resource-card {
   padding: 24px;
   overflow: hidden;
@@ -404,11 +423,18 @@ section {
   margin-top: 12px;
 }
 
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .tag {
   display: inline-flex;
-  background: rgba(59,130,246,0.18);
+  background: rgba(59, 130, 246, 0.18);
   color: #bfdbfe;
-  border: 1px solid rgba(59,130,246,0.25);
+  border: 1px solid rgba(59, 130, 246, 0.25);
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 0.8rem;
@@ -416,8 +442,23 @@ section {
   text-transform: capitalize;
 }
 
-/* FEATURED */
+.resource-count-section {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  text-align: center;
+}
 
+.resource-count-section h3 {
+  color: var(--text-light);
+}
+
+.resource-count-section span {
+  color: white;
+}
+
+/* --------------------------------------------------------------------------
+   10. MAIN FEATURED CARD WRAPPER
+   -------------------------------------------------------------------------- */
 .featured-resource {
   padding-top: 25px;
   padding-bottom: 45px;
@@ -428,9 +469,7 @@ section {
   margin: auto;
   padding: 34px;
   text-align: center;
-  background:
-    linear-gradient(135deg, rgba(59,130,246,0.16), rgba(139,92,246,0.12)),
-    var(--card);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(139, 92, 246, 0.12)), var(--card);
 }
 
 .featured-badge {
@@ -438,9 +477,9 @@ section {
   margin-bottom: 16px;
   padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(250,204,21,0.12);
+  background: rgba(250, 204, 21, 0.12);
   color: #fde68a;
-  border: 1px solid rgba(250,204,21,0.25);
+  border: 1px solid rgba(250, 204, 21, 0.25);
   font-weight: 700;
 }
 
@@ -459,24 +498,9 @@ section {
   padding: 13px 22px;
 }
 
-/* COUNT */
-
-.resource-count-section {
-  padding-top: 10px;
-  padding-bottom: 20px;
-  text-align: center;
-}
-
-.resource-count-section h3 {
-  color: var(--text-light);
-}
-
-.resource-count-section span {
-  color: white;
-}
-
-/* VIDEO */
-
+/* --------------------------------------------------------------------------
+   11. SPECIFIC YOUTUBE MEDIA OVERLAY CONTEXT
+   -------------------------------------------------------------------------- */
 .video-grid {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
@@ -498,7 +522,7 @@ section {
 .video-thumbnail {
   width: 100%;
   height: 220px;
-  object-fit: contain;
+  object-fit: cover;
   background: #020617;
   border-radius: 16px;
   margin-bottom: 16px;
@@ -509,8 +533,6 @@ section {
   text-align: center;
   margin-top: 35px;
 }
-
-/* EMPTY STATE */
 
 .empty-state {
   text-align: center;
@@ -524,135 +546,78 @@ section {
   margin-bottom: 15px;
 }
 
-/* POPUP */
+/* --------------------------------------------------------------------------
+   12. MUTABLE RESOURCES EXPANDABLE LIST SYSTEM (CONSOLIDATED ENHANCEMENT)
+   Optimization: Merged duplicate trailing selectors to optimize browser tree compilation
+   -------------------------------------------------------------------------- */
+#resourcesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(2,6,23,0.82);
-  backdrop-filter: blur(8px);
-  display: none;
-  justify-content: center;
+#resourcesContainer .resource-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px 22px;
   align-items: center;
-  z-index: 9999;
-  padding: 20px;
+  padding: 20px 22px;
 }
 
-.popup-box {
-  background: #1e293b;
-  width: 100%;
-  max-width: 520px;
-  padding: 34px;
-  border-radius: 24px;
-  text-align: center;
-  position: relative;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+#resourcesContainer .tag-row {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
 }
 
-.popup-box h2 {
-  margin-bottom: 12px;
+#resourcesContainer .resource-card h3 {
+  margin: 0;
+  font-size: 1.15rem;
 }
 
-.popup-box p {
+#resourcesContainer .resource-card small {
+  margin-top: 4px;
+}
+
+#resourcesContainer .unlock-btn {
+  width: auto;
+  min-width: 150px;
+  margin-top: 0;
+  grid-column: 2;
+  grid-row: 2 / span 3;
+}
+
+/* Expandable Descriptions & Button Anchors Engine */
+.resource-description,
+#resourcesContainer .resource-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   color: var(--text-light);
 }
 
-.popup-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: rgba(255,255,255,0.06);
-  color: white;
+.resource-description.expanded,
+#resourcesContainer .resource-description.expanded {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+}
+
+.read-more-btn,
+#resourcesContainer .read-more-btn {
+  background: transparent;
   border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-}
-
-.popup-buttons {
-  display: flex;
-  gap: 14px;
-  margin-top: 24px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.popup-social-btn {
-  padding: 13px 20px;
-  border-radius: 13px;
-  color: white;
+  color: var(--primary);
   font-weight: 700;
-  min-width: 145px;
-  transition: 0.25s;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 6px;
+  text-align: left;
 }
 
-.popup-social-btn:hover {
-  transform: translateY(-3px);
-}
-
-.youtube-btn {
-  background: #ff0000;
-}
-
-.insta-btn {
-  background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
-}
-
-.continue-btn {
-  width: 100%;
-  margin-top: 20px;
-  padding: 14px;
-  border-radius: 13px;
-  background: var(--success);
-  color: white;
-}
-
-/* FOOTER */
-
-.footer {
-  background: rgba(2,6,23,0.95);
-  border-top: 1px solid var(--border);
-  padding: 60px 8%;
-  text-align: center;
-}
-
-.footer-content h2 {
-  margin-bottom: 12px;
-}
-
-.footer-content span {
-  color: var(--primary);
-}
-
-.footer-content p {
-  color: var(--text-light);
-}
-
-.footer-links {
-  margin: 25px 0;
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.footer-links a {
-  color: var(--text-light);
-  font-weight: 600;
-}
-
-.footer-links a:hover {
-  color: var(--primary);
-}
-
-.copyright {
-  margin-top: 20px;
-  font-size: 0.9rem;
-}
-
+/* --------------------------------------------------------------------------
+   13. ADVANCED SELECTION EXPANDABLE SIDE-PANEL SYSTEM
+   -------------------------------------------------------------------------- */
 .filter-toggle-btn {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
@@ -731,118 +696,144 @@ section {
   font-size: 0.8rem;
 }
 
-.tag-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+/* --------------------------------------------------------------------------
+   14. MODERN PREMIUM FADE MODAL OVERLAY (RULE 5 ALIGNMENT)
+   Optimization: Shifted from structural display hacks to opacity layer transitions
+   -------------------------------------------------------------------------- */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex;                 /* Kept flex to allow center constraints layout mapping */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  opacity: 0;                     /* Native invisible layer setup */
+  pointer-events: none;           /* Disables target clicking while invisible */
+  transition: opacity 0.3s ease-in-out; /* Premium fluid fade animation */
+}
+
+/* JavaScript active lifecycle hook class synchronization */
+.popup-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popup-box {
+  background: #1e293b;
+  width: 100%;
+  max-width: 520px;
+  padding: 34px;
+  border-radius: 24px;
+  text-align: center;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.popup-box h2 {
   margin-bottom: 12px;
 }
 
-/* RESOURCES PAGE LIST VIEW */
-#resourcesContainer {
+.popup-box p {
+  color: var(--text-light);
+}
+
+.popup-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.popup-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  margin-top: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-#resourcesContainer .resource-card {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 14px 22px;
-  align-items: center;
-  padding: 20px 22px;
-}
-
-#resourcesContainer .tag-row {
-  grid-column: 1 / -1;
-  margin-bottom: 0;
-}
-
-#resourcesContainer .resource-card h3 {
-  margin: 0;
-  font-size: 1.15rem;
-}
-
-#resourcesContainer .resource-card p {
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-#resourcesContainer .resource-card small {
-  margin-top: 4px;
-}
-
-#resourcesContainer .unlock-btn {
-  width: auto;
-  min-width: 150px;
-  margin-top: 0;
-  grid-column: 2;
-  grid-row: 2 / span 3;
-}
-
-/* MOBILE: CARD VIEW */
-@media (max-width: 700px) {
-  #resourcesContainer .resource-card {
-    display: block;
-    padding: 20px;
-  }
-
-  #resourcesContainer .resource-card p {
-    -webkit-line-clamp: 3;
-    margin-top: 8px;
-  }
-
-  #resourcesContainer .unlock-btn {
-    width: 100%;
-    margin-top: 18px;
-  }
-}
-
-.resource-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.resource-description.expanded {
-  display: block;
-  overflow: visible;
-}
-
-.read-more-btn {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  margin-top: 6px;
-}
-
-#resourcesContainer .resource-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-#resourcesContainer .resource-description.expanded {
-  display: block !important;
-  -webkit-line-clamp: unset !important;
-  overflow: visible !important;
-}
-
-#resourcesContainer .read-more-btn {
-  background: transparent;
-  border: none;
-  color: var(--primary);
+.popup-social-btn {
+  padding: 13px 20px;
+  border-radius: 13px;
+  color: white;
   font-weight: 700;
-  cursor: pointer;
-  padding: 0;
-  margin-top: 6px;
-  text-align: left;
+  min-width: 145px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.popup-social-btn:hover {
+  transform: translateY(-3px);
+}
+
+.youtube-btn {
+  background: #ff0000;
+}
+
+.insta-btn {
+  background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
+}
+
+.continue-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 13px;
+  background: var(--success);
+  color: white;
+}
+
+/* --------------------------------------------------------------------------
+   15. BASE TERMINAL FOOTER BRANDING
+   -------------------------------------------------------------------------- */
+.footer {
+  background: rgba(2, 6, 23, 0.95);
+  border-top: 1px solid var(--border);
+  padding: 60px 8%;
+  text-align: center;
+}
+
+.footer-content h2 {
+  margin-bottom: 12px;
+}
+
+.footer-content span {
+  color: var(--primary);
+}
+
+.footer-content p {
+  color: var(--text-light);
+}
+
+.footer-links {
+  margin: 25px 0;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--text-light);
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary);
+}
+
+.copyright {
+  margin-top: 20px;
+  font-size: 0.9rem;
 }

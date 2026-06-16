@@ -1,3 +1,8 @@
+/* ==========================================================================
+   KAVYAHUB - HOMEPAGE CONTROLLER (TRENDING & LATEST FEEDS)
+   ========================================================================== */
+
+// DOM Elements Selection
 const trendingResources = document.getElementById("trendingResources");
 const trendingVideos = document.getElementById("trendingVideos");
 
@@ -13,6 +18,10 @@ const socialCardsContainer = document.getElementById("socialCardsContainer");
 
 const otherAccountsSection = document.getElementById("otherAccountsSection");
 const otherAccountsContainer = document.getElementById("otherAccountsContainer");
+
+/* --------------------------------------------------------------------------
+   1. UTILITY & URL HELPERS
+   -------------------------------------------------------------------------- */
 
 function getYouTubeId(url) {
   if (!url) return null;
@@ -40,12 +49,7 @@ function getYouTubeId(url) {
 
 function getYouTubeThumbnail(url) {
   const videoId = getYouTubeId(url);
-
-  if (!videoId) {
-    return "assets/images/default-thumbnail.jpg";
-  }
-
-  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "assets/images/default-thumbnail.jpg";
 }
 
 function getPlatformIcon(platform) {
@@ -65,11 +69,15 @@ function formatViews(views) {
   return Number(views || 0);
 }
 
+/* --------------------------------------------------------------------------
+   2. CARD TEMPLATES (HTML BUILDERS)
+   -------------------------------------------------------------------------- */
+
 function createSocialCard(platform, url, title, subtitle) {
   if (!url || url.trim() === "") return "";
 
   return `
-    <a href="${url}" target="_blank" class="social-card ${platform}">
+    <a href="${url}" target="_blank" rel="noopener noreferrer" class="social-card ${platform}">
       <i class="${getPlatformIcon(platform)}"></i>
       <h3>${title}</h3>
       <p>${subtitle}</p>
@@ -83,13 +91,11 @@ function createOtherAccountCard(account) {
   return `
     <div class="account-card">
       <i class="${getPlatformIcon(account.platform)}"></i>
-
       <div>
         <h3>${account.account_name}</h3>
         <p>${account.description || account.platform || "Account"}</p>
       </div>
-
-      <a href="${account.url}" target="_blank" class="small-btn">
+      <a href="${account.url}" target="_blank" rel="noopener noreferrer" class="small-btn">
         Open
       </a>
     </div>
@@ -100,15 +106,10 @@ function createHomeResourceCard(resource) {
   return `
     <div class="resource-card">
       <span class="tag">${resource.category || "Resource"}</span>
-
       <h3>${resource.title}</h3>
-
       <p>${resource.description || ""}</p>
-
       <small>${resource.upload_date || ""}</small>
-
       <small>👁 ${formatViews(resource.views)} views</small>
-
       <button class="unlock-btn" data-link="${resource.link}">
         Open Resource
       </button>
@@ -121,35 +122,32 @@ function createHomeVideoCard(video) {
 
   return `
     <div class="resource-card">
-      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail">
-
+      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
       <span class="tag">${video.category || "Video"}</span>
-
       <h3>${video.title}</h3>
-
       <p>${video.description || ""}</p>
-
       <small>${video.upload_date || ""}</small>
-
       <small>👁 ${formatViews(video.views)} views</small>
 
       <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-        <a href="${video.youtube_link}" target="_blank" class="small-btn">
+        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn">
           Watch Video
         </a>
-
-        ${
-          video.resource_link
-            ? `<button class="unlock-btn" data-link="${video.resource_link}">
-                Open Resource
-              </button>`
-            : ""
-        }
+        ${video.resource_link ? `
+          <button class="unlock-btn" data-link="${video.resource_link}">
+            Open Resource
+          </button>
+        ` : ""}
       </div>
     </div>
   `;
 }
 
+/* --------------------------------------------------------------------------
+   3. DATA INITIALIZERS
+   -------------------------------------------------------------------------- */
+
+// Profile & Social Media Loader
 async function loadProfileAndSocials() {
   const { data, error } = await supabaseClient
     .from("profile")
@@ -158,22 +156,22 @@ async function loadProfileAndSocials() {
     .maybeSingle();
 
   if (error) {
-    console.error(error);
+    console.error("Profile load error:", error);
     return;
   }
 
   if (!data) return;
 
-  if (data.name) {
+  if (data.name && homeProfileName) {
     homeProfileName.textContent = data.name;
     document.title = `${data.name} | Resource Hub`;
   }
 
-  if (data.bio) {
+  if (data.bio && homeProfileBio) {
     homeProfileBio.textContent = data.bio;
   }
 
-  if (data.profile_image) {
+  if (data.profile_image && homeProfileImage) {
     homeProfileImage.src = data.profile_image;
   }
 
@@ -185,14 +183,15 @@ async function loadProfileAndSocials() {
     createSocialCard("whatsapp", data.whatsapp, "WhatsApp", "Direct Updates")
   ].join("");
 
-  if (socialCards.trim() !== "") {
+  if (socialCards.trim() !== "" && socialCardsContainer && socialSection) {
     socialCardsContainer.innerHTML = socialCards;
     socialSection.style.display = "block";
-  } else {
+  } else if (socialSection) {
     socialSection.style.display = "none";
   }
 }
 
+// Other Accounts Sub-channel Loader
 async function loadOtherAccounts() {
   const { data, error } = await supabaseClient
     .from("other_accounts")
@@ -201,125 +200,116 @@ async function loadOtherAccounts() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Other accounts load error:", error);
     return;
   }
 
   if (!data || data.length === 0) {
+    if (otherAccountsSection) otherAccountsSection.style.display = "none";
+    return;
+  }
+
+  const accountsHTML = data.map(account => createOtherAccountCard(account)).join("");
+
+  if (accountsHTML.trim() === "" && otherAccountsSection) {
     otherAccountsSection.style.display = "none";
     return;
   }
 
-  const accountsHTML = data
-    .map(account => createOtherAccountCard(account))
-    .join("");
-
-  if (accountsHTML.trim() === "") {
-    otherAccountsSection.style.display = "none";
-    return;
+  if (otherAccountsContainer && otherAccountsSection) {
+    otherAccountsContainer.innerHTML = accountsHTML;
+    otherAccountsSection.style.display = "block";
   }
-
-  otherAccountsContainer.innerHTML = accountsHTML;
-  otherAccountsSection.style.display = "block";
 }
 
+// Home Feeds Loader (Optimized Parallel Execution)
 async function loadHomeData() {
-  const { data: resources, error: resourceError } = await supabaseClient
-    .from("resources")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(3);
+  try {
+    // Optimization: Run all 4 content fetches parallelly instead of a sequential waterfall
+    const [
+      latestResResult,
+      latestVidResult,
+      trendingResResult,
+      trendingVidResult
+    ] = await Promise.all([
+      supabaseClient.from("resources").select("*").order("created_at", { ascending: false }).limit(3),
+      supabaseClient.from("videos").select("*").order("created_at", { ascending: false }).limit(3),
+      supabaseClient.from("resources").select("*").order("views", { ascending: false }).limit(3),
+      supabaseClient.from("videos").select("*").order("views", { ascending: false }).limit(3)
+    ]);
 
-  const { data: videos, error: videoError } = await supabaseClient
-    .from("videos")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(3);
+    if (latestResResult.error) console.error(latestResResult.error);
+    if (latestVidResult.error) console.error(latestVidResult.error);
+    if (trendingResResult.error) console.error(trendingResResult.error);
+    if (trendingVidResult.error) console.error(trendingVidResult.error);
 
-  const { data: trendingResourceData, error: trendingResourceError } =
-    await supabaseClient
-      .from("resources")
-      .select("*")
-      .order("views", { ascending: false })
-      .limit(3);
-
-  const { data: trendingVideoData, error: trendingVideoError } =
-    await supabaseClient
-      .from("videos")
-      .select("*")
-      .order("views", { ascending: false })
-      .limit(3);
-
-  if (resourceError) console.error(resourceError);
-  if (videoError) console.error(videoError);
-  if (trendingResourceError) console.error(trendingResourceError);
-  if (trendingVideoError) console.error(trendingVideoError);
-
-  if (trendingResources) {
-    trendingResources.innerHTML = "";
-
-    if (trendingResourceData && trendingResourceData.length > 0) {
-      trendingResourceData.forEach(resource => {
-        trendingResources.innerHTML += createHomeResourceCard(resource);
-      });
-    } else {
-      trendingResources.innerHTML = `
-        <div class="resource-card">
-          <h3>No Trending Resources Yet</h3>
-          <p>Popular resources will appear here after users start opening them.</p>
-        </div>
-      `;
+    // Render Trending Resources
+    if (trendingResources) {
+      const trendResourcesData = trendingResResult.data || [];
+      if (trendResourcesData.length > 0) {
+        trendingResources.innerHTML = trendResourcesData.map(r => createHomeResourceCard(r)).join("");
+      } else {
+        trendingResources.innerHTML = `
+          <div class="resource-card">
+            <h3>No Trending Resources Yet</h3>
+            <p>Popular resources will appear here after users start opening them.</p>
+          </div>
+        `;
+      }
     }
-  }
 
-  if (trendingVideos) {
-    trendingVideos.innerHTML = "";
-
-    if (trendingVideoData && trendingVideoData.length > 0) {
-      trendingVideoData.forEach(video => {
-        trendingVideos.innerHTML += createHomeVideoCard(video);
-      });
-    } else {
-      trendingVideos.innerHTML = `
-        <div class="resource-card">
-          <h3>No Trending Videos Yet</h3>
-          <p>Popular videos will appear here after users start watching them.</p>
-        </div>
-      `;
+    // Render Trending Videos
+    if (trendingVideos) {
+      const trendVideosData = trendingVidResult.data || [];
+      if (trendVideosData.length > 0) {
+        trendingVideos.innerHTML = trendVideosData.map(v => createHomeVideoCard(v)).join("");
+      } else {
+        trendingVideos.innerHTML = `
+          <div class="resource-card">
+            <h3>No Trending Videos Yet</h3>
+            <p>Popular videos will appear here after users start watching them.</p>
+          </div>
+        `;
+      }
     }
-  }
 
-  homeLatestResources.innerHTML = "";
+    // Render Latest Resources
+    if (homeLatestResources) {
+      const resourcesData = latestResResult.data || [];
+      if (resourcesData.length > 0) {
+        homeLatestResources.innerHTML = resourcesData.map(r => createHomeResourceCard(r)).join("");
+      } else {
+        homeLatestResources.innerHTML = `
+          <div class="resource-card">
+            <h3>No Resources Yet</h3>
+            <p>No resources available yet.</p>
+          </div>
+        `;
+      }
+    }
 
-  if (resources && resources.length > 0) {
-    resources.forEach(resource => {
-      homeLatestResources.innerHTML += createHomeResourceCard(resource);
-    });
-  } else {
-    homeLatestResources.innerHTML = `
-      <div class="resource-card">
-        <h3>No Resources Yet</h3>
-        <p>No resources available yet.</p>
-      </div>
-    `;
-  }
-
-  homeLatestVideos.innerHTML = "";
-
-  if (videos && videos.length > 0) {
-    videos.forEach(video => {
-      homeLatestVideos.innerHTML += createHomeVideoCard(video);
-    });
-  } else {
-    homeLatestVideos.innerHTML = `
-      <div class="resource-card">
-        <h3>No Videos Yet</h3>
-        <p>No videos available yet.</p>
-      </div>
-    `;
+    // Render Latest Videos
+    if (homeLatestVideos) {
+      const videosData = latestVidResult.data || [];
+      if (videosData.length > 0) {
+        homeLatestVideos.innerHTML = videosData.map(v => createHomeVideoCard(v)).join("");
+      } else {
+        homeLatestVideos.innerHTML = `
+          <div class="resource-card">
+            <h3>No Videos Yet</h3>
+            <p>No videos available yet.</p>
+          </div>
+        `;
+      }
+    }
+  } catch (err) {
+    console.error("Error processing home blocks:", err);
   }
 }
 
+/* --------------------------------------------------------------------------
+   4. EXECUTION TRIGGERS
+   -------------------------------------------------------------------------- */
 loadProfileAndSocials();
 loadOtherAccounts();
 loadHomeData();

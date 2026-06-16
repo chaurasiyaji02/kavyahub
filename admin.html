@@ -1,659 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | KavyaHub</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/responsive.css">
 
-    <title>Admin Dashboard | KavyaHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/responsive.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
 
-    <!-- Login Box -->
+  <div class="login-box" id="loginBox" style="display:none;">
+    <form id="loginForm" class="login-form">
+      <h2>Admin Login</h2>
+      <input type="email" id="adminEmail" placeholder="Admin Email" required>
+      <input type="password" id="adminPassword" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 
-    <div
-    class="login-box"
-    id="loginBox"
-    style="display:none;">
+  <div class="admin-container" style="display:none;">
 
-        <form
-        id="loginForm"
-        class="login-form">
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <h2>Kavya<span>Hub</span></h2>
+      </div>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
 
-            <h2>Admin Login</h2>
+      <ul class="admin-menu">
+        <li class="menu-item active" data-section="dashboard">
+          <i class="fa-solid fa-chart-line"></i> Dashboard
+        </li>
+        <li class="menu-item" data-section="resources">
+          <i class="fa-solid fa-folder"></i> Resources
+        </li>
+        <li class="menu-item" data-section="videos">
+          <i class="fa-solid fa-video"></i> Videos
+        </li>
+        <li class="menu-item" data-section="profile">
+          <i class="fa-solid fa-user"></i> Profile
+        </li>
+        <li class="menu-item" data-section="accounts">
+          <i class="fa-solid fa-link"></i> Other Accounts
+        </li>
+        <li class="menu-item" data-section="settings">
+          <i class="fa-solid fa-gear"></i> Settings
+        </li>
+      </ul>
+    </aside>
 
-            <input
-            type="email"
-            id="adminEmail"
-            placeholder="Admin Email"
-            required>
+    <main class="admin-main">
 
-            <input
-            type="password"
-            id="adminPassword"
-            placeholder="Password"
-            required>
+      <section class="admin-section active-section" id="dashboard">
+        <h1>Dashboard</h1>
+        
+        <div class="dashboard-cards">
+          <div class="dashboard-card">
+            <h3>Total Resources</h3>
+            <p id="totalResources">0</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>Total Videos</h3>
+            <p id="totalVideos">0</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>Featured Resource</h3>
+            <p id="featuredResource">None</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>Latest Upload</h3>
+            <p id="latestUpload">None</p>
+          </div>
+        </div>
 
-            <button type="submit">
-                Login
-            </button>
+        <div class="dashboard-cards" style="margin-top: 20px;">
+          <div class="dashboard-card">
+            <h3>Most Viewed Resource</h3>
+            <p id="mostViewedResource">None</p>
+          </div>
+          <div class="dashboard-card">
+            <h3>Most Viewed Video</h3>
+            <p id="mostViewedVideo">None</p>
+          </div>
+        </div>
+      </section>
 
+      <section class="admin-section" id="resources">
+        <h1>Add Resource</h1>
+        
+        <form id="resourceForm">
+          <input type="text" id="resourceTitle" placeholder="Resource Title" required>
+          <textarea id="resourceDescription" placeholder="Description" required></textarea>
+          
+          <select id="resourceCategory">
+            <option value="certificate">Certificate</option>
+            <option value="course">Course</option>
+            <option value="notes">Notes</option>
+            <option value="internship">Internship</option>
+            <option value="roadmap">Roadmap</option>
+            <option value="ai-tool">AI Tool</option>
+          </select>
+
+          <div class="tag-select-box">
+            <p>Select Tags</p>
+            <label><input type="checkbox" class="resource-tag-check" value="certificate"> Certificate</label>
+            <label><input type="checkbox" class="resource-tag-check" value="course"> Course</label>
+            <label><input type="checkbox" class="resource-tag-check" value="ai-tool"> AI Tool</label>
+            <label><input type="checkbox" class="resource-tag-check" value="internship"> Internship</label>
+            <label><input type="checkbox" class="resource-tag-check" value="notes"> Notes</label>
+            <label><input type="checkbox" class="resource-tag-check" value="roadmap"> Roadmap</label>
+            <label><input type="checkbox" class="resource-tag-check" value="free"> Free</label>
+            <label><input type="checkbox" class="resource-tag-check" value="beginner"> Beginner</label>
+          </div>
+
+          <input type="url" id="resourceLink" placeholder="Resource Link">
+          <input type="date" id="resourceDate">
+          
+          <label class="checkbox-label">
+            <input type="checkbox" id="resourceFeatured"> Featured Resource
+          </label>
+          
+          <button type="submit">Save Resource</button>
         </form>
 
-    </div>
-
-    <!-- Admin Container -->
-
-    <div class="admin-container">
-
-        <!-- Sidebar -->
-
-        <aside class="admin-sidebar">
-
-            <div class="admin-logo">
-                <h2>Kavya<span>Hub</span></h2>
-            </div>
-
-            <button
-            id="logoutBtn"
-            class="logout-btn">
-                Logout
-            </button>
-
-            <ul class="admin-menu">
-
-                <li
-                class="menu-item active"
-                data-section="dashboard">
-
-                    <i class="fa-solid fa-chart-line"></i>
-                    Dashboard
-
-                </li>
-
-                <li
-                class="menu-item"
-                data-section="resources">
-
-                    <i class="fa-solid fa-folder"></i>
-                    Resources
-
-                </li>
-
-                <li
-                class="menu-item"
-                data-section="videos">
-
-                    <i class="fa-solid fa-video"></i>
-                    Videos
-
-                </li>
-
-                <li
-                class="menu-item"
-                data-section="profile">
-
-                    <i class="fa-solid fa-user"></i>
-                    Profile
-
-                </li>
-
-                <li
-                class="menu-item"
-                data-section="accounts">
-
-                    <i class="fa-solid fa-link"></i>
-                    Other Accounts
-
-                </li>
-
-                <li
-                class="menu-item"
-                data-section="settings">
-
-                    <i class="fa-solid fa-gear"></i>
-                    Settings
-
-                </li>
-
-            </ul>
-
-        </aside>
-
-        <!-- Main Content -->
-
-        <main class="admin-main">
-
-            <!-- Dashboard -->
-
-            <section
-            class="admin-section active-section"
-            id="dashboard">
-
-                <h1>Dashboard</h1>
-
-                <div class="dashboard-cards">
-
-                    <div class="dashboard-card">
-
-                        <h3>Total Resources</h3>
-
-                        <p id="totalResources">
-                            0
-                        </p>
-
-                    </div>
-
-                    <div class="dashboard-card">
-
-                        <h3>Total Videos</h3>
-
-                        <p id="totalVideos">
-                            0
-                        </p>
-
-                    </div>
-
-                    <div class="dashboard-card">
-
-                        <h3>Featured Resource</h3>
-
-                        <p id="featuredResource">
-                            None
-                        </p>
-
-                    </div>
-
-                    <div class="dashboard-card">
-
-                        <h3>Latest Upload</h3>
-
-                        <p id="latestUpload">
-                            None
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="dashboard-card">
-
-    <h3>Most Viewed Resource</h3>
-
-    <p id="mostViewedResource">
-        None
-    </p>
-
-</div>
-
-<div class="dashboard-card">
-
-    <h3>Most Viewed Video</h3>
-
-    <p id="mostViewedVideo">
-        None
-    </p>
-
-</div>
-
-            </section>
-
-            <!-- Resources -->
-
-            <section
-            class="admin-section"
-            id="resources">
-
-                <h1>Add Resource</h1>
-
-                <form id="resourceForm">
-
-                    <input
-                    type="text"
-                    id="resourceTitle"
-                    placeholder="Resource Title"
-                    required>
-
-                    <textarea
-                    id="resourceDescription"
-                    placeholder="Description"
-                    required></textarea>
-
-                    <select id="resourceCategory">
-
-                        <option value="certificate">
-                            Certificate
-                        </option>
-
-                        <option value="course">
-                            Course
-                        </option>
-
-                        <option value="notes">
-                            Notes
-                        </option>
-
-                        <option value="internship">
-                            Internship
-                        </option>
-
-                        <option value="roadmap">
-                            Roadmap
-                        </option>
-
-                        <option value="ai-tool">
-                            AI Tool
-                        </option>
-
-                    </select>
-
-                   <div class="tag-select-box">
-  <p>Select Tags</p>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="certificate">
-    Certificate
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="course">
-    Course
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="ai-tool">
-    AI Tool
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="internship">
-    Internship
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="notes">
-    Notes
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="roadmap">
-    Roadmap
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="free">
-    Free
-  </label>
-
-  <label>
-    <input type="checkbox" class="resource-tag-check" value="beginner">
-    Beginner
-  </label>
-</div>
-
-                    <input
-                    type="url"
-                    id="resourceLink"
-                    placeholder="Resource Link">
-
-                    <input
-                    type="date"
-                    id="resourceDate">
-
-                    <label>
-
-                        <input
-                        type="checkbox"
-                        id="resourceFeatured">
-
-                        Featured Resource
-
-                    </label>
-
-                    <button type="submit">
-                        Save Resource
-                    </button>
-
-                </form>
-
-                <div
-                class="admin-list"
-                id="resourcesList">
-
-                    <!-- Resources list JS se aayegi -->
-
-                </div>
-
-            </section>
-
-            <!-- Videos -->
-
-            <section
-            class="admin-section"
-            id="videos">
-
-                <h1>Add Video</h1>
-
-                <form id="videoForm">
-
-                    <input
-                    type="text"
-                    id="videoTitle"
-                    placeholder="Video Title"
-                    required>
-
-                    <textarea
-                    id="videoDescription"
-                    placeholder="Description"
-                    required></textarea>
-
-                    <select id="videoCategory">
-
-                        <option value="certificate">
-                            Certificate
-                        </option>
-
-                        <option value="course">
-                            Course
-                        </option>
-
-                        <option value="career">
-                            Career
-                        </option>
-
-                        <option value="ai">
-                            AI
-                        </option>
-
-                        <option value="coding">
-                            Coding
-                        </option>
-
-                        <option value="roadmap">
-                            Roadmap
-                        </option>
-
-                    </select>
-
-                    <div class="tag-select-box">
-  <p>Select Tags</p>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="certificate">
-    Certificate
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="course">
-    Course
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="ai-tool">
-    AI Tool
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="career">
-    Career
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="coding">
-    Coding
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="roadmap">
-    Roadmap
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="free">
-    Free
-  </label>
-
-  <label>
-    <input type="checkbox" class="video-tag-check" value="beginner">
-    Beginner
-  </label>
-</div>
-
-                    <input
-                    type="url"
-                    id="youtubeLink"
-                    placeholder="YouTube Link">
-
-                    <input
-                    type="date"
-                    id="videoDate">
-
-                    <input
-                    type="url"
-                    id="videoResourceLink"
-                    placeholder="Resource Link">
-
-                    <label>
-
-                        <input
-                        type="checkbox"
-                        id="videoFeatured">
-
-                        Featured Video
-
-                    </label>
-
-                    <button type="submit">
-                        Save Video
-                    </button>
-
-                </form>
-
-                <div
-                class="admin-list"
-                id="videosList">
-
-                    <!-- Videos list JS se aayegi -->
-
-                </div>
-
-            </section>
-
-            <!-- Profile -->
-
-            <section
-            class="admin-section"
-            id="profile">
-
-                <h1>Profile & Social Links</h1>
-
-                <form id="profileForm">
-
-                    <input
-                    type="text"
-                    id="profileName"
-                    placeholder="Your Name">
-
-                    <textarea
-                    id="profileBio"
-                    placeholder="Your Bio / Description"></textarea>
-
-                    <input
-                    type="file"
-                    id="profileImageFile"
-                    accept="image/*">
-
-                    <input
-                    type="hidden"
-                    id="profileImage">
-
-                    <input
-                    type="url"
-                    id="youtubeUrl"
-                    placeholder="YouTube URL">
-
-                    <input
-                    type="url"
-                    id="instagramUrl"
-                    placeholder="Instagram URL">
-
-                    <input
-                    type="url"
-                    id="telegramUrl"
-                    placeholder="Telegram URL">
-
-                    <input
-                    type="url"
-                    id="linkedinUrl"
-                    placeholder="LinkedIn URL">
-
-                    <input
-                    type="url"
-                    id="whatsappUrl"
-                    placeholder="WhatsApp URL">
-
-                    <button type="submit">
-                        Save Profile
-                    </button>
-
-                </form>
-
-            </section>
-
-            <!-- Other Accounts -->
-
-            <section
-            class="admin-section"
-            id="accounts">
-
-                <h1>Other Accounts</h1>
-
-                <form id="accountForm">
-
-                    <input
-                    type="text"
-                    id="accountName"
-                    placeholder="Account Name"
-                    required>
-
-                    <select id="accountPlatform">
-
-                        <option value="youtube">
-                            YouTube
-                        </option>
-
-                        <option value="instagram">
-                            Instagram
-                        </option>
-
-                        <option value="telegram">
-                            Telegram
-                        </option>
-
-                        <option value="linkedin">
-                            LinkedIn
-                        </option>
-
-                        <option value="whatsapp">
-                            WhatsApp
-                        </option>
-
-                        <option value="website">
-                            Website
-                        </option>
-
-                    </select>
-
-                    <textarea
-                    id="accountDescription"
-                    placeholder="Account Description"></textarea>
-
-                    <input
-                    type="url"
-                    id="accountUrl"
-                    placeholder="Account URL"
-                    required>
-
-                    <label>
-
-                        <input
-                        type="checkbox"
-                        id="accountActive"
-                        checked>
-
-                        Show this account
-
-                    </label>
-
-                    <button type="submit">
-                        Save Account
-                    </button>
-
-                </form>
-
-                <div
-                class="admin-list"
-                id="accountsList">
-
-                    <!-- Accounts list JS se aayegi -->
-
-                </div>
-
-            </section>
-
-            <!-- Settings -->
-
-            <section
-            class="admin-section"
-            id="settings">
-
-                <h1>Website Settings</h1>
-
-                <form id="settingsForm">
-
-                    <input
-                    type="text"
-                    id="websiteName"
-                    placeholder="Website Name">
-
-                    <textarea
-                    id="popupMessage"
-                    placeholder="Popup Message"></textarea>
-
-                    <textarea
-                    id="footerText"
-                    placeholder="Footer Text"></textarea>
-
-                    <button type="submit">
-                        Save Settings
-                    </button>
-
-                </form>
-
-            </section>
-
-        </main>
-
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase/config.js"></script>
-    <script src="js/admin.js"></script>
+        <div class="admin-list" id="resourcesList"></div>
+      </section>
+
+      <section class="admin-section" id="videos">
+        <h1>Add Video</h1>
+        
+        <form id="videoForm">
+          <input type="text" id="videoTitle" placeholder="Video Title" required>
+          <textarea id="videoDescription" placeholder="Description" required></textarea>
+          
+          <select id="videoCategory">
+            <option value="certificate">Certificate</option>
+            <option value="course">Course</option>
+            <option value="career">Career</option>
+            <option value="ai">AI</option>
+            <option value="coding">Coding</option>
+            <option value="roadmap">Roadmap</option>
+          </select>
+
+          <div class="tag-select-box">
+            <p>Select Tags</p>
+            <label><input type="checkbox" class="video-tag-check" value="certificate"> Certificate</label>
+            <label><input type="checkbox" class="video-tag-check" value="course"> Course</label>
+            <label><input type="checkbox" class="video-tag-check" value="ai-tool"> AI Tool</label>
+            <label><input type="checkbox" class="video-tag-check" value="career"> Career</label>
+            <label><input type="checkbox" class="video-tag-check" value="coding"> Coding</label>
+            <label><input type="checkbox" class="video-tag-check" value="roadmap"> Roadmap</label>
+            <label><input type="checkbox" class="video-tag-check" value="free"> Free</label>
+            <label><input type="checkbox" class="video-tag-check" value="beginner"> Beginner</label>
+          </div>
+
+          <input type="url" id="youtubeLink" placeholder="YouTube Link">
+          <input type="date" id="videoDate">
+          <input type="url" id="videoResourceLink" placeholder="Resource Link">
+          
+          <label class="checkbox-label">
+            <input type="checkbox" id="videoFeatured"> Featured Video
+          </label>
+          
+          <button type="submit">Save Video</button>
+        </form>
+
+        <div class="admin-list" id="videosList"></div>
+      </section>
+
+      <section class="admin-section" id="profile">
+        <h1>Profile & Social Links</h1>
+        
+        <form id="profileForm">
+          <input type="text" id="profileName" placeholder="Your Name">
+          <textarea id="profileBio" placeholder="Your Bio / Description"></textarea>
+          
+          <input type="file" id="profileImageFile" accept="image/*">
+          <input type="hidden" id="profileImage">
+          
+          <input type="url" id="youtubeUrl" placeholder="YouTube URL">
+          <input type="url" id="instagramUrl" placeholder="Instagram URL">
+          <input type="url" id="telegramUrl" placeholder="Telegram URL">
+          <input type="url" id="linkedinUrl" placeholder="LinkedIn URL">
+          <input type="url" id="whatsappUrl" placeholder="WhatsApp URL">
+          
+          <button type="submit">Save Profile</button>
+        </form>
+      </section>
+
+      <section class="admin-section" id="accounts">
+        <h1>Other Accounts</h1>
+        
+        <form id="accountForm">
+          <input type="text" id="accountName" placeholder="Account Name" required>
+          
+          <select id="accountPlatform">
+            <option value="youtube">YouTube</option>
+            <option value="instagram">Instagram</option>
+            <option value="telegram">Telegram</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="website">Website</option>
+          </select>
+
+          <textarea id="accountDescription" placeholder="Account Description"></textarea>
+          <input type="url" id="accountUrl" placeholder="Account URL" required>
+          
+          <label class="checkbox-label">
+            <input type="checkbox" id="accountActive" checked> Show this account
+          </label>
+          
+          <button type="submit">Save Account</button>
+        </form>
+
+        <div class="admin-list" id="accountsList"></div>
+      </section>
+
+      <section class="admin-section" id="settings">
+        <h1>Website Settings</h1>
+        
+        <form id="settingsForm">
+          <input type="text" id="websiteName" placeholder="Website Name">
+          <textarea id="popupMessage" placeholder="Popup Message"></textarea>
+          <textarea id="footerText" placeholder="Footer Text"></textarea>
+          
+          <button type="submit">Save Settings</button>
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase/config.js"></script>
+  <script src="js/admin.js"></script>
 
 </body>
 </html>
