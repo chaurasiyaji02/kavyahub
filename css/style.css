@@ -822,3 +822,27 @@ section {
   padding: 0;
   margin-top: 6px;
 }
+
+#resourcesContainer .resource-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#resourcesContainer .resource-description.expanded {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+}
+
+#resourcesContainer .read-more-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 6px;
+  text-align: left;
+}
