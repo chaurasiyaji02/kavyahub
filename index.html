@@ -36,147 +36,157 @@
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="menu-icon" id="menuIcon">
-        <i class="fa-solid fa-bars"></i>
+      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        
+        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+          <i class="fa-solid fa-bars"></i>
+        </div>
       </div>
 
     </nav>
   </header>
 
-  <section class="hero-section">
-    <div class="hero-content">
+  <main>
+    <section class="hero-section">
+      <div class="hero-content">
 
-      <div class="profile-image-box">
-        <img
-          src="assets/images/profile.jpg"
-          alt="Kavya Profile Image"
-          class="profile-image"
-          id="homeProfileImage"
-        />
+        <div class="profile-image-box">
+          <img
+            src="assets/images/profile.jpg"
+            alt="Kavya Profile Image"
+            class="profile-image"
+            id="homeProfileImage"
+          />
+        </div>
+
+        <h1>Hi, I am <span id="homeProfileName">Kavya</span></h1>
+
+        <p class="hero-bio" id="homeProfileBio">
+          Find free courses, certificates, internships, notes, videos, and useful tech resources in one place.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="resources.html" class="btn primary-btn">Explore Resources</a>
+          <a href="videos.html" class="btn secondary-btn">Watch Videos</a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="social-section" id="socialSection" style="display:none;">
+      <div class="section-heading">
+        <h2>Connect With Me</h2>
+        <p>Follow my official social media accounts for updates.</p>
       </div>
 
-      <h1>Hi, I am <span id="homeProfileName">Kavya</span></h1>
+      <div class="social-cards" id="socialCardsContainer"></div>
+    </section>
 
-      <p class="hero-bio" id="homeProfileBio">
-        Find free courses, certificates, internships, notes, videos, and useful tech resources in one place.
-      </p>
-
-      <div class="hero-buttons">
-        <a href="resources.html" class="btn primary-btn">Explore Resources</a>
-        <a href="videos.html" class="btn secondary-btn">Watch Videos</a>
+    <section class="accounts-section" id="otherAccountsSection" style="display:none;">
+      <div class="section-heading">
+        <h2>My Other Accounts</h2>
+        <p>Explore my other active channels and pages.</p>
       </div>
 
-    </div>
-  </section>
+      <div class="account-list" id="otherAccountsContainer"></div>
+    </section>
 
-  <section class="social-section" id="socialSection" style="display:none;">
-    <div class="section-heading">
-      <h2>Connect With Me</h2>
-      <p>Follow my official social media accounts for updates.</p>
-    </div>
-
-    <div class="social-cards" id="socialCardsContainer">
-      </div>
-  </section>
-
-  <section class="accounts-section" id="otherAccountsSection" style="display:none;">
-    <div class="section-heading">
-      <h2>My Other Accounts</h2>
-      <p>Explore my other active channels and pages.</p>
-    </div>
-
-    <div class="account-list" id="otherAccountsContainer">
-      </div>
-  </section>
-
-  <section class="category-section">
-    <div class="section-heading">
-      <h2>Explore Categories</h2>
-      <p>Browse useful resources by category.</p>
-    </div>
-
-    <div class="category-grid">
-      <a href="resources.html" class="category-card">
-        <i class="fa-solid fa-certificate"></i>
-        <h3>Free Certificates</h3>
-        <p>Find free certificate opportunities from trusted platforms.</p>
-      </a>
-
-      <a href="resources.html" class="category-card">
-        <i class="fa-solid fa-graduation-cap"></i>
-        <h3>Free Courses</h3>
-        <p>Learn new skills with free courses and learning resources.</p>
-      </a>
-
-      <a href="resources.html" class="category-card">
-        <i class="fa-solid fa-file-lines"></i>
-        <h3>Free Notes</h3>
-        <p>Access useful notes for college, coding, and career learning.</p>
-      </a>
-
-      <a href="resources.html" class="category-card">
-        <i class="fa-solid fa-briefcase"></i>
-        <h3>Internships</h3>
-        <p>Explore internship opportunities and student programs.</p>
-      </a>
-
-      <a href="videos.html" class="category-card">
-        <i class="fa-solid fa-video"></i>
-        <h3>YouTube Videos</h3>
-        <p>Watch tutorials, updates, roadmaps, and learning videos.</p>
-      </a>
-
-      <a href="calendar.html" class="category-card">
-        <i class="fa-solid fa-calendar-days"></i>
-        <h3>Date Wise Uploads</h3>
-        <p>View resources and videos based on upload dates.</p>
-      </a>
-    </div>
-  </section>
-
-  <section class="latest-section">
-    <div class="section-heading">
-      <h2>🔥 Trending Resources</h2>
-      <p>Most viewed resources on KavyaHub.</p>
-    </div>
-    <div class="latest-grid" id="trendingResources"></div>
-  </section>
-
-  <section class="latest-section">
-    <div class="section-heading">
-      <h2>Latest Resources</h2>
-      <p>Recently added courses, certificates, internships, and useful links.</p>
-    </div>
-
-    <div class="latest-grid" id="homeLatestResources">
+    <section class="category-section">
+      <div class="section-heading">
+        <h2>Explore Categories</h2>
+        <p>Browse useful resources by category.</p>
       </div>
 
-    <div class="center-btn">
-      <a href="resources.html" class="btn primary-btn">View All Resources</a>
-    </div>
-  </section>
+      <div class="category-grid">
+        <a href="resources.html" class="category-card">
+          <i class="fa-solid fa-certificate"></i>
+          <h3>Free Certificates</h3>
+          <p>Find free certificate opportunities from trusted platforms.</p>
+        </a>
 
-  <section class="latest-section">
-    <div class="section-heading">
-      <h2>🎥 Trending Videos</h2>
-      <p>Most viewed videos on KavyaHub.</p>
-    </div>
-    <div class="latest-grid" id="trendingVideos"></div>
-  </section>
+        <a href="resources.html" class="category-card">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <h3>Free Courses</h3>
+          <p>Learn new skills with free courses and learning resources.</p>
+        </a>
 
-  <section class="latest-section">
-    <div class="section-heading">
-      <h2>Latest Videos</h2>
-      <p>Recently added YouTube videos and learning updates.</p>
-    </div>
+        <a href="resources.html" class="category-card">
+          <i class="fa-solid fa-file-lines"></i>
+          <h3>Free Notes</h3>
+          <p>Access useful notes for college, coding, and career learning.</p>
+        </a>
 
-    <div class="latest-grid" id="homeLatestVideos">
+        <a href="resources.html" class="category-card">
+          <i class="fa-solid fa-briefcase"></i>
+          <h3>Internships</h3>
+          <p>Explore internship opportunities and student programs.</p>
+        </a>
+
+        <a href="resources.html" class="category-card">
+          <i class="fa-solid fa-user-tie"></i>
+          <h3>Job Updates</h3>
+          <p>Find recent job openings, remote roles, and entry-level tech opportunities.</p>
+        </a>
+
+        <a href="videos.html" class="category-card">
+          <i class="fa-solid fa-video"></i>
+          <h3>YouTube Videos</h3>
+          <p>Watch tutorials, updates, roadmaps, and learning videos.</p>
+        </a>
+
+        <a href="calendar.html" class="category-card">
+          <i class="fa-solid fa-calendar-days"></i>
+          <h3>Date Wise Uploads</h3>
+          <p>View resources and videos based on upload dates.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="latest-section">
+      <div class="section-heading">
+        <h2>🔥 Trending Resources</h2>
+        <p>Most viewed resources on KavyaHub.</p>
+      </div>
+      <div class="latest-grid" id="trendingResources"></div>
+    </section>
+
+    <section class="latest-section">
+      <div class="section-heading">
+        <h2>Latest Resources</h2>
+        <p>Recently added courses, certificates, internships, and useful links.</p>
       </div>
 
-    <div class="center-btn">
-      <a href="videos.html" class="btn primary-btn">View All Videos</a>
-    </div>
-  </section>
+      <div class="latest-grid" id="homeLatestResources"></div>
+
+      <div class="center-btn">
+        <a href="resources.html" class="btn primary-btn">View All Resources</a>
+      </div>
+    </section>
+
+    <section class="latest-section">
+      <div class="section-heading">
+        <h2>🎥 Trending Videos</h2>
+        <p>Most viewed videos on KavyaHub.</p>
+      </div>
+      <div class="latest-grid" id="trendingVideos"></div>
+    </section>
+
+    <section class="latest-section">
+      <div class="section-heading">
+        <h2>Latest Videos</h2>
+        <p>Recently added YouTube videos and learning updates.</p>
+      </div>
+
+      <div class="latest-grid" id="homeLatestVideos"></div>
+
+      <div class="center-btn">
+        <a href="videos.html" class="btn primary-btn">View All Videos</a>
+      </div>
+    </section>
+  </main>
 
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup-box">
@@ -220,7 +230,7 @@
 
       <p class="copyright">© 2026 KavyaHub. All Rights Reserved.</p>
     </div>
-  </footer >
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase/config.js"></script>

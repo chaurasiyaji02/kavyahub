@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - VIDEOS CONTROLLER (SEARCH, CATEGORY FILTERS & VIEWS)
+   KAVYAHUB - VIDEOS CONTROLLER (AUDITED & DEEP-LINK POWERED)
    ========================================================================== */
 
 let videos = [];
@@ -56,7 +56,6 @@ function getYouTubeThumbnail(url) {
    -------------------------------------------------------------------------- */
 
 async function increaseVideoView(id) {
-  // Loose equality (==) allows compatibility with both numeric and string UUIDs
   const video = videos.find(item => item.id == id);
 
   if (video) {
@@ -70,7 +69,6 @@ async function increaseVideoView(id) {
 
   if (error) {
     console.error("Video view error:", error);
-    // Rollback if DB tracking fails
     if (video) {
       video.views = Math.max((video.views || 1) - 1, 0);
     }
@@ -78,39 +76,58 @@ async function increaseVideoView(id) {
 }
 
 /* --------------------------------------------------------------------------
-   3. CARD HTML TEMPLATE
+   3. CARD HTML TEMPLATE (DEEP-LINK UPDATED)
    -------------------------------------------------------------------------- */
 
 function createVideoCard(video) {
   const thumbnail = getYouTubeThumbnail(video.youtube_link);
   const videoDate = video.created_at ? new Date(video.created_at).toLocaleDateString() : "";
+  const descriptionText = video.description || "";
+  const isLongDescription = descriptionText.length > 120;
+
+  // FIXED: Generates platform-locked inbound tracking loops
+  const deepShareLink = `${window.location.origin}/videos.html?search=${encodeURIComponent(video.title)}`;
 
   return `
     <div class="resource-card">
       <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
-      <span class="tag">${video.category || "Video"}</span>
+      <span class="tag" style="text-transform: capitalize;">${video.category || "Video"}</span>
 
       <h3>${video.title}</h3>
-      <p>${video.description || ""}</p>
+      
+      <p class="resource-description">${descriptionText}</p>
+      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
 
-      <small>${videoDate}</small>
-      <small>👁 ${video.views || 0} views</small>
+      <div style="margin-bottom: 12px; display: block;">
+        <small style="display:inline-block; margin-right:10px;">${videoDate}</small>
+        <small style="display:inline-block;">👁 ${video.views || 0} views</small>
+      </div>
 
-      <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+      <div style="display:flex; gap:8px; margin-top:auto; flex-wrap:wrap; width: 100%;">
         <a
           href="${video.youtube_link}"
           target="_blank"
           rel="noopener noreferrer"
           class="small-btn video-view-btn"
-          data-id="${video.id}">
+          data-id="${video.id}"
+          style="flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; margin: 0;">
           Watch Video
         </a>
 
         ${video.resource_link ? `
-          <button type="button" class="unlock-btn" data-link="${video.resource_link}">
+          <button type="button" class="unlock-btn" data-link="${video.resource_link}" style="margin: 0; padding: 0 15px;">
             Open Resource
           </button>
         ` : ""}
+
+        <button 
+          type="button" 
+          class="share-btn" 
+          data-link="${deepShareLink}" 
+          title="Share via KavyaHub"
+          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
       </div>
     </div>
   `;
@@ -122,8 +139,7 @@ function createVideoCard(video) {
 
 function renderVideos(data) {
   currentFilteredVideos = data;
-
-  if (!videosContainer) return; // Guard clause
+  if (!videosContainer) return; 
 
   if (data.length === 0) {
     videosContainer.innerHTML = "";
@@ -133,8 +149,6 @@ function renderVideos(data) {
   }
 
   if (videoEmptyState) videoEmptyState.style.display = "none";
-
-  // Optimization: Render all elements in one single DOM operation
   videosContainer.innerHTML = data.map(video => createVideoCard(video)).join("");
 
   if (videoCount) {
@@ -151,7 +165,6 @@ function loadFeaturedVideo() {
 
   let featured = videos.find(video => video.featured);
 
-  // Fallback to first video if no explicit featured choice exists
   if (!featured && videos.length > 0) {
     featured = videos[0];
   }
@@ -173,11 +186,8 @@ function loadFeaturedVideo() {
 
   if (featuredVideoResourceButton) {
     featuredVideoResourceButton.dataset.link = featured.resource_link || "#";
-    
-    // Enhancement/Fix: Ensuring it integrates perfectly with main.js event delegation
     featuredVideoResourceButton.classList.add("unlock-btn"); 
     
-    // UI Feedback if resource is missing
     if (!featured.resource_link || featured.resource_link === "#") {
       featuredVideoResourceButton.style.display = "none";
     } else {
@@ -194,7 +204,7 @@ function applyFilters() {
   const term = videoSearch ? videoSearch.value.toLowerCase().trim() : "";
 
   const filtered = videos.filter(video => {
-    const matchCategory = currentCategory === "all" || video.category === currentCategory;
+    const matchCategory = currentCategory === "all" || String(video.category).toLowerCase() === currentCategory.toLowerCase();
 
     const searchableText = [
       video.title,
@@ -217,7 +227,6 @@ function applyFilters() {
    7. EVENT LISTENERS & INITIALIZATION
    -------------------------------------------------------------------------- */
 
-// Category Filter Tabs Click Actions
 filterButtons.forEach(button => {
   button.addEventListener("click", () => {
     filterButtons.forEach(btn => btn.classList.remove("active"));
@@ -228,12 +237,10 @@ filterButtons.forEach(button => {
   });
 });
 
-// Search typing action
 if (videoSearch) {
   videoSearch.addEventListener("input", applyFilters);
 }
 
-// Featured Video Play Button Action
 if (featuredVideoButton) {
   featuredVideoButton.addEventListener("click", async () => {
     const link = featuredVideoButton.dataset.link;
@@ -251,7 +258,6 @@ if (featuredVideoButton) {
   });
 }
 
-// Global Delegated Clicks for Video Cards (PC & Mobile Safe)
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".video-view-btn");
   if (!btn) return;
@@ -260,7 +266,6 @@ document.addEventListener("click", async (e) => {
   btn.dataset.clicked = "true";
 
   const id = btn.dataset.id;
-
   if (id) {
     await increaseVideoView(id);
     renderVideos(currentFilteredVideos);
@@ -285,10 +290,17 @@ async function loadVideos() {
   }
 
   videos = data || [];
-
   renderVideos(videos);
   loadFeaturedVideo();
+
+  // FEATURE: Inbound traffic deep-link router parser for video cards logs
+  const urlParams = new URLSearchParams(window.location.search);
+  const inboundVideoQuery = urlParams.get("search");
+  if (inboundVideoQuery && videoSearch) {
+    videoSearch.value = inboundVideoQuery;
+    applyFilters();
+    setTimeout(() => videoSearch.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+  }
 }
 
-// Run initializer
 loadVideos();

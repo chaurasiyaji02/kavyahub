@@ -106,7 +106,26 @@
             <option value="internship">Internship</option>
             <option value="roadmap">Roadmap</option>
             <option value="ai-tool">AI Tool</option>
+            <option value="job">Job</option>
           </select>
+
+          <div class="job-meta-inputs-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Type (If Job Category)</p>
+              <select id="resourceJobType" style="margin-bottom: 0;">
+                <option value="remote">Remote</option>
+                <option value="on-site">On-Site</option>
+                <option value="hybrid">Hybrid</option>
+              </select>
+            </div>
+            <div>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Status (If Job Category)</p>
+              <select id="resourceJobStatus" style="margin-bottom: 0;">
+                <option value="active">Active</option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+          </div>
 
           <div class="tag-select-box">
             <p>Select Tags</p>
@@ -116,6 +135,7 @@
             <label><input type="checkbox" class="resource-tag-check" value="internship"> Internship</label>
             <label><input type="checkbox" class="resource-tag-check" value="notes"> Notes</label>
             <label><input type="checkbox" class="resource-tag-check" value="roadmap"> Roadmap</label>
+            <label><input type="checkbox" class="resource-tag-check" value="job"> Job</label>
             <label><input type="checkbox" class="resource-tag-check" value="free"> Free</label>
             <label><input type="checkbox" class="resource-tag-check" value="beginner"> Beginner</label>
           </div>
@@ -147,6 +167,7 @@
             <option value="ai">AI</option>
             <option value="coding">Coding</option>
             <option value="roadmap">Roadmap</option>
+            <option value="job">Job</option>
           </select>
 
           <div class="tag-select-box">
@@ -157,6 +178,7 @@
             <label><input type="checkbox" class="video-tag-check" value="career"> Career</label>
             <label><input type="checkbox" class="video-tag-check" value="coding"> Coding</label>
             <label><input type="checkbox" class="video-tag-check" value="roadmap"> Roadmap</label>
+            <label><input type="checkbox" class="video-tag-check" value="job"> Job</label>
             <label><input type="checkbox" class="video-tag-check" value="free"> Free</label>
             <label><input type="checkbox" class="video-tag-check" value="beginner"> Beginner</label>
           </div>

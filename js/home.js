@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - HOMEPAGE CONTROLLER (TRENDING & LATEST FEEDS)
+   KAVYAHUB - HOMEPAGE CONTROLLER (AUDITED & DEEP-LINK POWERED)
    ========================================================================== */
 
 // DOM Elements Selection
@@ -70,7 +70,7 @@ function formatViews(views) {
 }
 
 /* --------------------------------------------------------------------------
-   2. CARD TEMPLATES (HTML BUILDERS)
+   2. CARD TEMPLATES (UPGRADED FOR DEEP-LINK RETENTION)
    -------------------------------------------------------------------------- */
 
 function createSocialCard(platform, url, title, subtitle) {
@@ -103,41 +103,109 @@ function createOtherAccountCard(account) {
 }
 
 function createHomeResourceCard(resource) {
+  const descriptionText = resource.description || "";
+  const isLongDescription = descriptionText.length > 120;
+  const isJob = String(resource.category).toLowerCase() === "job";
+
+  let jobBadgesHTML = "";
+  if (isJob) {
+    const jobType = resource.job_type ? resource.job_type : "Remote";
+    const isActive = resource.is_active !== false;
+    
+    jobBadgesHTML = `
+      <div class="job-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
+        <span class="job-type-badge" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 500; text-transform: capitalize;">
+          <i class="fa-solid fa-briefcase" style="font-size: 0.75rem; margin-right: 2px;"></i> ${jobType}
+        </span>
+        <span class="job-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
+          ${isActive ? 'Active' : 'Expired'}
+        </span>
+      </div>
+    `;
+  }
+
+  // FIXED: Routes homepage resource shares back through resources directory loops
+  const deepShareLink = `${window.location.origin}/resources.html?search=${encodeURIComponent(resource.title)}`;
+
   return `
     <div class="resource-card">
-      <span class="tag">${resource.category || "Resource"}</span>
+      <div class="tag-row" style="margin-bottom: 12px; display: block;">
+        <span class="tag" style="text-transform: capitalize;">${resource.category || "Resource"}</span>
+      </div>
+      
       <h3>${resource.title}</h3>
-      <p>${resource.description || ""}</p>
-      <small>${resource.upload_date || ""}</small>
-      <small>👁 ${formatViews(resource.views)} views</small>
-      <button class="unlock-btn" data-link="${resource.link}">
-        Open Resource
-      </button>
+
+      ${jobBadgesHTML}
+
+      <p class="resource-description">${descriptionText}</p>
+      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
+
+      <div style="margin-bottom: 12px; display: block;">
+        <small style="display:inline-block; margin-right:10px;">${resource.upload_date || ""}</small>
+        <small style="display:inline-block;">👁 ${formatViews(resource.views)} views</small>
+      </div>
+
+      <div style="display: flex; gap: 8px; width: 100%; margin-top: auto;">
+        <button type="button" class="unlock-btn" data-link="${resource.link}" style="flex: 1; margin: 0;">
+          Open Resource
+        </button>
+        <button 
+          type="button" 
+          class="share-btn" 
+          data-link="${deepShareLink}" 
+          title="Share via KavyaHub"
+          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </div>
     </div>
   `;
 }
 
 function createHomeVideoCard(video) {
   const thumbnail = getYouTubeThumbnail(video.youtube_link);
+  const descriptionText = video.description || "";
+  const isLongDescription = descriptionText.length > 120;
+
+  // FIXED: Routes homepage video shares back through videos sub-directories channels
+  const deepShareLink = `${window.location.origin}/videos.html?search=${encodeURIComponent(video.title)}`;
 
   return `
     <div class="resource-card">
       <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
-      <span class="tag">${video.category || "Video"}</span>
-      <h3>${video.title}</h3>
-      <p>${video.description || ""}</p>
-      <small>${video.upload_date || ""}</small>
-      <small>👁 ${formatViews(video.views)} views</small>
+      
+      <div class="tag-row" style="margin: 12px 0; display: block;">
+        <span class="tag" style="text-transform: capitalize;">${video.category || "Video"}</span>
+      </div>
 
-      <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn">
+      <h3>${video.title}</h3>
+
+      <p class="resource-description">${descriptionText}</p>
+      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
+      
+      <div style="margin-bottom: 12px; display: block;">
+        <small style="display:inline-block; margin-right:10px;">${video.upload_date || ""}</small>
+        <small style="display:inline-block;">👁 ${formatViews(video.views)} views</small>
+      </div>
+
+      <div style="display:flex; gap:8px; width: 100%; margin-top:auto;">
+        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn" style="flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; margin: 0;">
           Watch Video
         </a>
         ${video.resource_link ? `
-          <button class="unlock-btn" data-link="${video.resource_link}">
+          <button type="button" class="unlock-btn" data-link="${video.resource_link}" style="margin: 0; padding: 0 15px;">
             Open Resource
           </button>
         ` : ""}
+        <button 
+          type="button" 
+          class="share-btn" 
+          data-link="${deepShareLink}" 
+          title="Share via KavyaHub"
+          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
       </div>
     </div>
   `;
@@ -147,7 +215,6 @@ function createHomeVideoCard(video) {
    3. DATA INITIALIZERS
    -------------------------------------------------------------------------- */
 
-// Profile & Social Media Loader
 async function loadProfileAndSocials() {
   const { data, error } = await supabaseClient
     .from("profile")
@@ -191,7 +258,6 @@ async function loadProfileAndSocials() {
   }
 }
 
-// Other Accounts Sub-channel Loader
 async function loadOtherAccounts() {
   const { data, error } = await supabaseClient
     .from("other_accounts")
@@ -222,10 +288,8 @@ async function loadOtherAccounts() {
   }
 }
 
-// Home Feeds Loader (Optimized Parallel Execution)
 async function loadHomeData() {
   try {
-    // Optimization: Run all 4 content fetches parallelly instead of a sequential waterfall
     const [
       latestResResult,
       latestVidResult,
@@ -243,7 +307,6 @@ async function loadHomeData() {
     if (trendingResResult.error) console.error(trendingResResult.error);
     if (trendingVidResult.error) console.error(trendingVidResult.error);
 
-    // Render Trending Resources
     if (trendingResources) {
       const trendResourcesData = trendingResResult.data || [];
       if (trendResourcesData.length > 0) {
@@ -258,7 +321,6 @@ async function loadHomeData() {
       }
     }
 
-    // Render Trending Videos
     if (trendingVideos) {
       const trendVideosData = trendingVidResult.data || [];
       if (trendVideosData.length > 0) {
@@ -273,7 +335,6 @@ async function loadHomeData() {
       }
     }
 
-    // Render Latest Resources
     if (homeLatestResources) {
       const resourcesData = latestResResult.data || [];
       if (resourcesData.length > 0) {
@@ -288,7 +349,6 @@ async function loadHomeData() {
       }
     }
 
-    // Render Latest Videos
     if (homeLatestVideos) {
       const videosData = latestVidResult.data || [];
       if (videosData.length > 0) {

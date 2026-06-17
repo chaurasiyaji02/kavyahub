@@ -35,8 +35,14 @@
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="menu-icon" id="menuIcon">
-        <i class="fa-solid fa-bars"></i>
+      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        
+        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+          <i class="fa-solid fa-bars"></i>
+        </div>
       </div>
     </nav>
   </header>
@@ -61,6 +67,14 @@
         <button class="filter-toggle-btn" id="filterToggleBtn" type="button">
           <i class="fa-solid fa-sliders"></i> Filters
         </button>
+      </div>
+
+      <div class="trending-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; justify-content: center; align-items: center;">
+        <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">Trending:</span>
+        <button type="button" class="trending-chip" data-tag="course" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Courses</button>
+        <button type="button" class="trending-chip" data-tag="notes" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Notes</button>
+        <button type="button" class="trending-chip" data-tag="internship" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Internships</button>
+        <button type="button" class="trending-chip" data-tag="job" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Jobs</button>
       </div>
     </section>
 
@@ -90,6 +104,9 @@
           <label>
             <input type="checkbox" class="tag-filter" value="roadmap"> Roadmaps
           </label>
+          <label>
+            <input type="checkbox" class="tag-filter" value="job"> Jobs
+          </label>
         </div>
 
         <div class="active-filters" id="activeFilters"></div>
@@ -110,8 +127,7 @@
     </section>
 
     <section class="resources-grid-section">
-      <div class="resources-grid" id="resourcesContainer">
-        </div>
+      <div class="resources-grid" id="resourcesContainer"></div>
 
       <div id="emptyState" class="empty-state" style="display:none;">
         <i class="fa-solid fa-folder-open"></i>

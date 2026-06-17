@@ -56,43 +56,107 @@ function getYouTubeThumbnail(url) {
 }
 
 /* --------------------------------------------------------------------------
-   2. CARD TEMPLATES (HTML BUILDERS)
+   2. CARD TEMPLATES (HTML BUILDERS UPGRADED FOR ENGINE PARITY)
    -------------------------------------------------------------------------- */
 
 function createResourceCard(resource) {
+  const descriptionText = resource.description || "";
+  const isLongDescription = descriptionText.length > 120;
+  
+  // Checking safely if calendar element is logged as a Job Opportunity
+  const isJob = String(resource.category).toLowerCase() === "job";
+
+  let jobBadgesHTML = "";
+  if (isJob) {
+    const jobType = resource.job_type ? resource.job_type : "Remote";
+    const isActive = resource.is_active !== false;
+    
+    jobBadgesHTML = `
+      <div class="job-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
+        <span class="job-type-badge" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 500; text-transform: capitalize;">
+          <i class="fa-solid fa-briefcase" style="font-size: 0.75rem; margin-right: 2px;"></i> ${jobType}
+        </span>
+        <span class="job-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
+          ${isActive ? 'Active' : 'Expired'}
+        </span>
+      </div>
+    `;
+  }
+
   return `
     <div class="resource-card">
-      <span class="tag">${resource.category || "Resource"}</span>
+      <div class="tag-row" style="margin-bottom: 12px; display: block;">
+        <span class="tag" style="text-transform: capitalize;">${resource.category || "Resource"}</span>
+      </div>
+      
       <h3>${resource.title}</h3>
-      <p>${resource.description || ""}</p>
-      <small>${formatDate(resource.upload_date)}</small>
-      <button class="unlock-btn" data-link="${resource.link}">
-        Open Resource
-      </button>
+
+      ${jobBadgesHTML}
+
+      <p class="resource-description">${descriptionText}</p>
+      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
+      
+      <div style="margin-bottom: 12px; display: block;">
+        <small><i class="fa-solid fa-calendar-days" style="font-size:0.75rem; margin-right:4px;"></i>${formatDate(resource.upload_date)}</small>
+      </div>
+
+      <div style="display: flex; gap: 8px; width: 100%; margin-top: auto;">
+        <button type="button" class="unlock-btn" data-link="${resource.link}" style="flex: 1; margin: 0;">
+          Open Resource
+        </button>
+        <button 
+          type="button" 
+          class="share-btn" 
+          data-link="${resource.link}" 
+          title="Copy Link to Share"
+          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </div>
     </div>
   `;
 }
 
 function createVideoCard(video) {
   const thumbnail = getYouTubeThumbnail(video.youtube_link);
+  const descriptionText = video.description || "";
+  const isLongDescription = descriptionText.length > 120;
 
   return `
     <div class="resource-card">
       <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
-      <span class="tag">Video / ${video.category || "General"}</span>
-      <h3>${video.title}</h3>
-      <p>${video.description || ""}</p>
-      <small>${formatDate(video.upload_date)}</small>
+      
+      <div class="tag-row" style="margin: 12px 0; display: block;">
+        <span class="tag" style="text-transform: capitalize;">Video / ${video.category || "General"}</span>
+      </div>
 
-      <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn">
+      <h3>${video.title}</h3>
+
+      <p class="resource-description">${descriptionText}</p>
+      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
+
+      <div style="margin-bottom: 12px; display: block;">
+        <small><i class="fa-solid fa-calendar-days" style="font-size:0.75rem; margin-right:4px;"></i>${formatDate(video.upload_date)}</small>
+      </div>
+
+      <div style="display:flex; gap:8px; width: 100%; margin-top:auto;">
+        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn" style="flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; margin: 0;">
           Watch Video
         </a>
         ${video.resource_link ? `
-          <button class="unlock-btn" data-link="${video.resource_link}">
+          <button type="button" class="unlock-btn" data-link="${video.resource_link}" style="margin: 0; padding: 0 15px;">
             Open Resource
           </button>
         ` : ""}
+        <button 
+          type="button" 
+          class="share-btn" 
+          data-link="${video.youtube_link}" 
+          title="Copy Video Link to Share"
+          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
       </div>
     </div>
   `;
@@ -103,7 +167,7 @@ function createVideoCard(video) {
    -------------------------------------------------------------------------- */
 
 function renderCalendarItems(selectedDate) {
-  if (!calendarContainer) return; // Guard Clause
+  if (!calendarContainer) return; 
 
   if (selectedDateTitle) {
     selectedDateTitle.textContent = formatDate(selectedDate);

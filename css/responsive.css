@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - GLOBAL RESPONSIVE RESPONSIVENESS OVERRIDES
+   KAVYAHUB - GLOBAL RESPONSIVE RESPONSIVENESS OVERRIDES (AUDITED & SYNCED)
    Description: Clean mobile-first/desktop-down layouts cascading tree.
    ========================================================================== */
 
@@ -37,10 +37,10 @@
 
   .menu-icon {
     display: block;
-    color: white;
+    color: var(--text-main);
   }
 
-  /* Slide-out Mobile Navigation Drawer Menu */
+  /* Slide-out Mobile Navigation Drawer Menu (FIXED: Tied background with global theme variable tokens) */
   .nav-links {
     position: fixed;
     top: 70px;
@@ -48,8 +48,9 @@
     width: 82%;
     max-width: 320px;
     height: calc(100vh - 70px);
-    background: rgba(2, 6, 23, 0.98);
-    border-left: 1px solid rgba(148, 163, 184, 0.18);
+    background: var(--card-solid);
+    opacity: 0.99;
+    border-left: 1px solid var(--border);
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
@@ -57,6 +58,11 @@
     transition: right 0.35s ease;
     gap: 12px;
     z-index: 999;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark-mode .nav-links {
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
   }
 
   .nav-links.active {
@@ -151,7 +157,7 @@
     text-align: center;
   }
 
-  /* Optimization: Replaced fixed height with dynamic responsive video box aspect ratios */
+  /* Optimization: Responsive video box aspect ratios */
   .video-thumbnail {
     width: 100%;
     height: auto;
@@ -173,47 +179,43 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. STANDARD MOBILE INTERFACES (CONSOLIDATED RE-MAPPED SINGLE PASS REGISTRY)
-   Optimization: Merged three redundant media loops into one clean semantic layer
+   3. STANDARD MOBILE INTERFACES (CONSOLIDATED MOBILE FLOATING BOTTOM-SHEET)
    -------------------------------------------------------------------------- */
 @media (max-width: 600px) {
-  /* Prevent horizontal view-shifting global bounds */
   html, body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
   }
 
-  /* Fix: Removed hardcoded static display:none blocking rules to smoothly interlock with main.js active state toggles */
   .popup-overlay {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100dvh;
     padding: 0 10px 10px;
-    align-items: flex-end; /* Locks popups to slide out from screen bottom like a modern iOS/Android sheet */
+    align-items: flex-end; /* Custom iOS/Android bottom sheet feel */
     justify-content: center;
     overflow: hidden;
     z-index: 1000;
   }
 
-  /* Custom Modern Mobile Floating Bottom-Sheet Module */
   .popup-box {
     width: calc(100vw - 20px);
     max-width: calc(100vw - 20px);
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
     margin: 0 auto;
-    padding: 22px 16px 18px;
-    border-radius: 22px;
+    padding: 24px 16px 18px;
+    border-radius: 24px;
     transform: none;
     -webkit-overflow-scrolling: touch;
   }
 
   .popup-box h2 {
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     line-height: 1.35;
-    padding: 0 32px;
+    padding: 0 24px;
   }
 
   .popup-box p {
@@ -235,8 +237,9 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    display: block;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 13px 14px;
     font-size: 0.9rem;
   }
@@ -290,8 +293,17 @@
     text-align: center;
   }
 
-  .resource-card div[style*="display:flex"] {
-    flex-direction: column;
+  /* FIXED: Protection filter layer to ensure share button row stays inline on thin screens */
+  .resource-card div[style*="display: flex"] {
+    flex-direction: row !important; /* Forces row alignment to keep share icon look premium */
+  }
+  
+  .resource-card .job-meta-row {
+    flex-direction: row !important; /* Keeps job status badges beautiful */
+  }
+
+  .popup-box h2 {
+    font-size: 1.15rem;
   }
 }
 

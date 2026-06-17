@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - RESOURCES CONTROLLER (SEARCH, FILTER & VIEWS)
+   KAVYAHUB - RESOURCES CONTROLLER (AUDITED & DEEP-LINK POWERED)
    ========================================================================== */
 
 let resources = [];
@@ -59,7 +59,6 @@ function createTagHTML(resource) {
    -------------------------------------------------------------------------- */
 
 async function increaseResourceView(id) {
-  // Loose equality (==) allows matching both string UUIDs and numeric IDs seamlessly
   const resource = resources.find(item => item.id == id);
 
   if (resource) {
@@ -73,7 +72,6 @@ async function increaseResourceView(id) {
 
   if (error) {
     console.error("Resource view error:", error);
-    // Rollback if DB write fails
     if (resource) {
       resource.views = Math.max((resource.views || 1) - 1, 0);
     }
@@ -81,12 +79,34 @@ async function increaseResourceView(id) {
 }
 
 /* --------------------------------------------------------------------------
-   3. CARD HTML TEMPLATE
+   3. CARD HTML TEMPLATE (DEEP-LINK UPDATED)
    -------------------------------------------------------------------------- */
 
 function createCard(resource) {
   const descriptionText = resource.description || "";
   const isLongDescription = descriptionText.length > 120;
+  const isJob = normalizeTag(resource.category) === "job" || getResourceTags(resource).includes("job");
+
+  let jobBadgesHTML = "";
+  if (isJob) {
+    const jobType = resource.job_type ? formatTag(resource.job_type) : "Remote";
+    const isActive = resource.is_active !== false;
+    
+    jobBadgesHTML = `
+      <div class="job-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
+        <span class="job-type-badge" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 500;">
+          <i class="fa-solid fa-briefcase" style="font-size: 0.75rem; margin-right: 2px;"></i> ${jobType}
+        </span>
+        <span class="job-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
+          ${isActive ? 'Active' : 'Expired'}
+        </span>
+      </div>
+    `;
+  }
+
+  // FIXED: Generates KavyaHub traffic-retaining deep-link instead of direct bypass URLs
+  const deepShareLink = `${window.location.origin}/resources.html?search=${encodeURIComponent(resource.title)}`;
 
   return `
     <div class="resource-card">
@@ -96,19 +116,35 @@ function createCard(resource) {
 
       <h3>${resource.title}</h3>
 
+      ${jobBadgesHTML}
+
       <p class="resource-description">${descriptionText}</p>
 
-      ${isLongDescription ? `<button class="read-more-btn">Read More</button>` : ""}
+      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
 
-      <small>${resource.upload_date || ""}</small>
-      <small>👁 ${resource.views || 0} views</small>
+      <div style="margin-bottom: 12px; display: block;">
+        <small style="display:inline-block; margin-right:10px;">${resource.upload_date || ""}</small>
+        <small style="display:inline-block;">👁 ${resource.views || 0} views</small>
+      </div>
 
-      <button
-        class="unlock-btn resource-view-btn"
-        data-id="${resource.id}"
-        data-link="${resource.link}">
-        Open Resource
-      </button>
+      <div style="display: flex; gap: 8px; margin-top: auto; width: 100%;">
+        <button
+          type="button"
+          class="unlock-btn resource-view-btn"
+          data-id="${resource.id}"
+          data-link="${resource.link}"
+          style="flex: 1; margin: 0;">
+          Open Resource
+        </button>
+        <button 
+          type="button" 
+          class="share-btn" 
+          data-link="${deepShareLink}" 
+          title="Share via KavyaHub"
+          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </div>
     </div>
   `;
 }
@@ -119,8 +155,7 @@ function createCard(resource) {
 
 function renderResources(data) {
   currentFilteredResources = data;
-  
-  if (!resourcesContainer) return; // Guard clause
+  if (!resourcesContainer) return; 
 
   if (data.length === 0) {
     resourcesContainer.innerHTML = "";
@@ -130,8 +165,6 @@ function renderResources(data) {
   }
 
   if (emptyState) emptyState.style.display = "none";
-
-  // Optimization: Map string building and update DOM once. Massive performance gain!
   resourcesContainer.innerHTML = data.map(resource => createCard(resource)).join("");
 
   if (resourceCount) {
@@ -212,14 +245,12 @@ function applyFilters() {
    8. EVENT LISTENERS & INITIALIZATION
    -------------------------------------------------------------------------- */
 
-// Toggle Filter Panel View
 if (filterToggleBtn && filterPanel) {
   filterToggleBtn.addEventListener("click", () => {
     filterPanel.style.display = filterPanel.style.display === "none" ? "block" : "none";
   });
 }
 
-// Multi-tag filters change
 tagFilters.forEach(input => {
   input.addEventListener("change", () => {
     selectedTags = Array.from(tagFilters)
@@ -230,7 +261,6 @@ tagFilters.forEach(input => {
   });
 });
 
-// Clear filters button action
 if (clearFiltersBtn) {
   clearFiltersBtn.addEventListener("click", () => {
     selectedTags = [];
@@ -241,7 +271,6 @@ if (clearFiltersBtn) {
   });
 }
 
-// Search input interaction
 if (searchInput) {
   searchInput.addEventListener("input", applyFilters);
 }
@@ -259,27 +288,33 @@ async function loadResources() {
   }
 
   resources = data || [];
-
   renderResources(resources);
   loadFeatured();
+
+  // FEATURE: Inbound traffic router parser. Auto-scans URL parameters to deploy query state instantly
+  const urlParams = new URLSearchParams(window.location.search);
+  const inboundSearchQuery = urlParams.get("search");
+  if (inboundSearchQuery && searchInput) {
+    searchInput.value = inboundSearchQuery;
+    applyFilters();
+    // Smooth layout adjustment anchor
+    setTimeout(() => searchInput.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+  }
 }
 
-// Initialize on page run
 loadResources();
 
 /* --------------------------------------------------------------------------
-   9. GLOBAL DELEGATED CLICK EVENTS (PC & Mobile Safe)
+   9. GLOBAL DELEGATED CLICK EVENTS
    -------------------------------------------------------------------------- */
 
 document.addEventListener("click", async (e) => {
-  // Handle Resource Views Click
   const btn = e.target.closest(".resource-view-btn");
   if (btn) {
     if (btn.dataset.clicked === "true") return;
     btn.dataset.clicked = "true";
 
-    const id = btn.dataset.id; // Kept flexible for integer or string uuid
-
+    const id = btn.dataset.id;
     if (id) {
       await increaseResourceView(id);
       renderResources(currentFilteredResources);
@@ -289,22 +324,26 @@ document.addEventListener("click", async (e) => {
     setTimeout(() => {
       btn.dataset.clicked = "false";
     }, 1500);
-    return; // Fast exit
+    return; 
   }
 
-  // Handle Read More / Read Less Toggle
-  const readMoreBtn = e.target.closest(".read-more-btn");
-  if (readMoreBtn) {
-    const description = readMoreBtn.previousElementSibling;
-    if (description) {
-      description.classList.toggle("expanded");
-      readMoreBtn.textContent = description.classList.contains("expanded") ? "Read Less" : "Read More";
+  const trendingChip = e.target.closest(".trending-chip");
+  if (trendingChip) {
+    e.preventDefault();
+    const tagValue = normalizeTag(trendingChip.getAttribute("data-tag"));
+    const targetCheckbox = Array.from(tagFilters).find(item => normalizeTag(item.value) === tagValue);
+    
+    if (targetCheckbox) {
+      targetCheckbox.checked = !targetCheckbox.checked;
+      selectedTags = Array.from(tagFilters)
+        .filter(item => item.checked)
+        .map(item => normalizeTag(item.value));
+      applyFilters();
     }
     return;
   }
 });
 
-// Featured resource button listener
 if (featuredButton) {
   featuredButton.addEventListener("click", async () => {
     const id = featuredButton.dataset.id;

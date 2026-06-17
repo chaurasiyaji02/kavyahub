@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - ADMIN DASHBOARD CONTROLLER
+   KAVYAHUB - ADMIN DASHBOARD CONTROLLER (AUDITED & LIVE-OPTIMIZED)
    ========================================================================== */
 
 const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
@@ -326,16 +326,22 @@ async function loadResourcesList() {
     return;
   }
 
+  // OPTIMIZED: Render descriptions with clamping and local Read More selectors
   list.innerHTML = data.map(item => `
     <div class="admin-list-card">
-      <div>
+      <div style="flex: 1; min-width: 0;">
         <h3>${item.title}</h3>
-        <p>${item.category || "Resource"} • ${item.upload_date || ""}</p>
-        <small>${tagsToText(item.tags)}</small>
+        <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
+          ${item.category || "Resource"} • ${item.upload_date || ""}
+        </p>
+        <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
+        <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
+        <br>
+        <small>Tags: ${tagsToText(item.tags) || "None"}</small>
       </div>
       <div class="admin-actions">
-        <button class="toggle-btn" onclick="editResource(${item.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteResource(${item.id})">Delete</button>
+        <button type="button" class="toggle-btn" onclick="editResource(${item.id})">Edit</button>
+        <button type="button" class="delete-btn" onclick="deleteResource(${item.id})">Delete</button>
       </div>
     </div>
   `).join("");
@@ -477,16 +483,22 @@ async function loadVideosList() {
     return;
   }
 
+  // OPTIMIZED: Render video logs description with uniform styling layout controls
   list.innerHTML = data.map(item => `
     <div class="admin-list-card">
-      <div>
+      <div style="flex: 1; min-width: 0;">
         <h3>${item.title}</h3>
-        <p>${item.category || "Video"} • ${item.upload_date || ""}</p>
-        <small>${tagsToText(item.tags)}</small>
+        <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
+          ${item.category || "Video"} • ${item.upload_date || ""}
+        </p>
+        <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
+        <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
+        <br>
+        <small>Tags: ${tagsToText(item.tags) || "None"}</small>
       </div>
       <div class="admin-actions">
-        <button class="toggle-btn" onclick="editVideo(${item.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteVideo(${item.id})">Delete</button>
+        <button type="button" class="toggle-btn" onclick="editVideo(${item.id})">Edit</button>
+        <button type="button" class="delete-btn" onclick="deleteVideo(${item.id})">Delete</button>
       </div>
     </div>
   `).join("");
@@ -642,10 +654,10 @@ async function loadAccountsList() {
         <p>${item.platform || "Account"} • ${item.is_active ? "Visible" : "Hidden"}</p>
       </div>
       <div class="admin-actions">
-        <button class="toggle-btn" onclick="toggleAccount(${item.id}, ${item.is_active})">
+        <button type="button" class="toggle-btn" onclick="toggleAccount(${item.id}, ${item.is_active})">
           ${item.is_active ? "Hide" : "Show"}
         </button>
-        <button class="delete-btn" onclick="deleteAccount(${item.id})">Delete</button>
+        <button type="button" class="delete-btn" onclick="deleteAccount(${item.id})">Delete</button>
       </div>
     </div>
   `).join("");
@@ -682,8 +694,21 @@ async function deleteAccount(id) {
 }
 
 /* --------------------------------------------------------------------------
-   10. FUTURE-PROOF MODULE BINDING (CRITICAL FOR SCOPING)
+   10. MODULE ENGINE DELEGATION & LOCAL CLAMPING ACTIONS (MOBILE SAFE)
    -------------------------------------------------------------------------- */
+
+// Isolated delegated click scope handler for Admin Card Expansion logs
+document.addEventListener("click", (e) => {
+  const readMoreBtn = e.target.closest(".read-more-btn");
+  if (!readMoreBtn) return;
+
+  const description = readMoreBtn.previousElementSibling;
+  if (description && description.classList.contains("resource-description")) {
+    description.classList.toggle("expanded");
+    readMoreBtn.textContent = description.classList.contains("expanded") ? "Read Less" : "Read More";
+  }
+});
+
 // Explicitly exposing functions to the window scope to prevent failures in strict/module environments
 window.editResource = editResource;
 window.deleteResource = deleteResource;

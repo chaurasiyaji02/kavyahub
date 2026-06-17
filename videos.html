@@ -35,8 +35,14 @@
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="menu-icon" id="menuIcon">
-        <i class="fa-solid fa-bars"></i>
+      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        
+        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+          <i class="fa-solid fa-bars"></i>
+        </div>
       </div>
     </nav>
   </header>
@@ -70,6 +76,7 @@
         <button class="video-filter-btn" data-category="ai">AI</button>
         <button class="video-filter-btn" data-category="coding">Coding</button>
         <button class="video-filter-btn" data-category="roadmap">Roadmaps</button>
+        <button class="video-filter-btn" data-category="job">Jobs</button>
       </div>
     </section>
 
@@ -80,8 +87,8 @@
         <p id="featuredVideoDescription">Discover this featured video.</p>
 
         <div class="featured-actions">
-          <button class="video-watch-btn" id="featuredVideoButton" data-link="#">Watch Video</button>
-          <button class="unlock-btn" id="featuredVideoResourceButton" data-link="#">Open Resource</button>
+          <button type="button" class="video-watch-btn" id="featuredVideoButton" data-link="#">Watch Video</button>
+          <button type="button" class="unlock-btn" id="featuredVideoResourceButton" data-link="#">Open Resource</button>
         </div>
       </div>
     </section>
@@ -91,8 +98,7 @@
     </section>
 
     <section class="resources-grid-section">
-      <div class="resources-grid" id="videosContainer">
-        </div>
+      <div class="resources-grid" id="videosContainer"></div>
 
       <div id="videoEmptyState" class="empty-state" style="display: none;">
         <i class="fa-solid fa-video-slash"></i>

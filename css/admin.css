@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - ADMIN DASHBOARD COMPONENT STYLES
+   KAVYAHUB - ADMIN DASHBOARD COMPONENT STYLES (AUDITED & POLISHED)
    Description: Scope constraints for metrics grid, management panels & forms.
    ========================================================================== */
 
@@ -50,7 +50,7 @@
   border-radius: 12px;
   cursor: pointer;
   font-weight: 700;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease; /* Enhanced transition rendering */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
 }
 
 .admin-menu {
@@ -69,7 +69,7 @@
   cursor: pointer;
   color: #cbd5e1;
   font-weight: 600;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; /* Fluid transitions optimization */
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .menu-item:hover {
@@ -90,7 +90,7 @@
 .admin-main {
   flex: 1;
   padding: 40px;
-  min-width: 0; /* Prevents long dynamic table strings from fracturing layouts */
+  min-width: 0;
 }
 
 .admin-section {
@@ -117,7 +117,6 @@
   gap: 20px;
 }
 
-/* Consolidated Duplicate Declarations to prevent property tracking pollution */
 .dashboard-card {
   background: rgba(30, 41, 59, 0.86);
   border: 1px solid rgba(148, 163, 184, 0.16);
@@ -134,10 +133,9 @@
   font-size: 0.95rem;
 }
 
-/* Fix: Merged conflicting overrides into a unified property layer */
 .dashboard-card p {
   color: white;
-  font-size: 1.5rem; /* Dynamic compromise scale for both long text strings and numeric integers */
+  font-size: 1.5rem;
   font-weight: 800;
   line-height: 1.35;
   word-break: break-word;
@@ -220,12 +218,19 @@
   transform: translateY(-2px);
 }
 
-/* Optimization: Interlocks with admin.js network state to provide feedback during async calls */
 .admin-section button:disabled,
 .login-form button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* FEATURE: Form Grid Wrapper Rules for Job Meta Parameters */
+.job-meta-inputs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
 }
 
 /* Interactive Checkbox Pill Multi-Tags Management Engine */
@@ -298,11 +303,11 @@
   background: rgba(30, 41, 59, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 16px;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
   min-width: 0;
   overflow: hidden;
 }
@@ -321,6 +326,43 @@
   overflow-wrap: anywhere;
 }
 
+/* FEATURE: Admin Description Clamping Architecture rules override */
+.admin-list-card .resource-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.admin-list-card .resource-description.expanded {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+}
+
+.admin-list-card .read-more-btn {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border: none;
+  color: #3b82f6 !important;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 10px !important;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  text-align: left;
+  font-size: 0.8rem !important;
+  border-radius: 6px !important;
+  display: inline-block;
+}
+
+.admin-list-card .read-more-btn:hover {
+  background: rgba(59, 130, 246, 0.22) !important;
+  transform: translateY(-1px);
+}
+
 .admin-list-card small {
   color: #94a3b8;
   display: block;
@@ -329,11 +371,12 @@
   overflow-wrap: anywhere;
 }
 
-/* Specific Action Controls (Clean Specificity Overrides replacing code smell !important tags) */
+/* Specific Action Controls */
 .admin-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .admin-actions button {
@@ -428,6 +471,12 @@
   .admin-section form,
   .login-form {
     padding: 20px;
+  }
+
+  /* Stack Job parameters column on mobile */
+  .job-meta-inputs-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .menu-item {

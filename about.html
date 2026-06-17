@@ -34,8 +34,14 @@
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="menu-icon" id="menuIcon">
-        <i class="fa-solid fa-bars"></i>
+      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        
+        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+          <i class="fa-solid fa-bars"></i>
+        </div>
       </div>
     </nav>
   </header>
@@ -51,22 +57,26 @@
 
     <section class="latest-section">
       <div class="latest-grid">
+        
         <div class="resource-card">
           <span class="tag">Purpose</span>
           <h3>Why KavyaHub Exists</h3>
-          <p>The goal of KavyaHub is to collect useful learning opportunities in one place, so students and beginners can easily find free resources without wasting time.</p>
+          <p class="resource-description">The goal of KavyaHub is to collect useful learning opportunities in one place, so students and beginners can easily find free resources without wasting time.</p>
+          <button type="button" class="read-more-btn">Read More</button>
         </div>
 
         <div class="resource-card">
           <span class="tag">Content</span>
           <h3>What You Can Find</h3>
-          <p>You can explore free certificates, courses, internships, roadmaps, notes, YouTube videos, AI tools, and career-related learning resources.</p>
+          <p class="resource-description">You can explore free certificates, courses, internships, roadmaps, notes, YouTube videos, AI tools, and career-related learning resources.</p>
+          <button type="button" class="read-more-btn">Read More</button>
         </div>
 
         <div class="resource-card">
           <span class="tag">Creator</span>
           <h3>About Kavya</h3>
-          <p>I share useful tech, career, certificate, internship, and learning updates through YouTube, Instagram, and this website.</p>
+          <p class="resource-description">I share useful tech, career, certificate, internship, and learning updates through YouTube, Instagram, and this website.</p>
+          <button type="button" class="read-more-btn">Read More</button>
         </div>
       </div>
     </section>
