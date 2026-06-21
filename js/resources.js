@@ -79,14 +79,18 @@ async function increaseResourceView(id) {
 }
 
 /* --------------------------------------------------------------------------
-   3. CARD HTML TEMPLATE (DEEP-LINK UPDATED)
+   3. CARD HTML TEMPLATE (DEEP-LINK UPDATED WITH HACKATHON SUPPORT)
    -------------------------------------------------------------------------- */
 
 function createCard(resource) {
   const descriptionText = resource.description || "";
   const isLongDescription = descriptionText.length > 120;
-  const isJob = normalizeTag(resource.category) === "job" || getResourceTags(resource).includes("job");
+  
+  const currentCategory = normalizeTag(resource.category);
+  const isJob = currentCategory === "job" || getResourceTags(resource).includes("job");
+  const isHackathon = currentCategory === "hackathon" || getResourceTags(resource).includes("hackathon");
 
+  // A. JOB METADATA CARD GENERATOR
   let jobBadgesHTML = "";
   if (isJob) {
     const jobType = resource.job_type ? formatTag(resource.job_type) : "Remote";
@@ -105,7 +109,26 @@ function createCard(resource) {
     `;
   }
 
-  // FIXED: Generates KavyaHub traffic-retaining deep-link instead of direct bypass URLs
+  // B. HACKATHON METADATA CARD GENERATOR (NEW VIP ENTRY)
+  let hackathonBadgesHTML = "";
+  if (isHackathon) {
+    const hackathonMode = resource.job_type ? formatTag(resource.job_type) : "Online";
+    const isActive = resource.is_active !== false;
+
+    hackathonBadgesHTML = `
+      <div class="hackathon-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
+        <span class="hackathon-mode-badge" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; padding: 3px 8px; border-radius: 4px; font-weight: 500;">
+          <i class="fa-solid fa-laptop-code" style="font-size: 0.75rem; margin-right: 2px;"></i> ${hackathonMode}
+        </span>
+        <span class="hackathon-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
+          ${isActive ? 'Active' : 'Closed'}
+        </span>
+      </div>
+    `;
+  }
+
+  // Generates KavyaHub traffic-retaining deep-link instead of direct bypass URLs
   const deepShareLink = `${window.location.origin}/resources.html?search=${encodeURIComponent(resource.title)}`;
 
   return `
@@ -117,6 +140,7 @@ function createCard(resource) {
       <h3>${resource.title}</h3>
 
       ${jobBadgesHTML}
+      ${hackathonBadgesHTML}
 
       <p class="resource-description">${descriptionText}</p>
 

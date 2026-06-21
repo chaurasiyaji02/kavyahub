@@ -45,6 +45,26 @@ function clearCheckedTags(className) {
 }
 
 /* --------------------------------------------------------------------------
+   1B. DYNAMIC METADATA ROW VISIBILITY MANAGER
+   -------------------------------------------------------------------------- */
+
+function toggleMetaRows() {
+  const category = document.getElementById("resourceCategory")?.value;
+  const jobRow = document.getElementById("jobMetaRow");
+  const hackathonRow = document.getElementById("hackathonMetaRow");
+
+  if (jobRow) {
+    jobRow.style.display = (category === "job") ? "grid" : "none";
+  }
+  if (hackathonRow) {
+    hackathonRow.style.display = (category === "hackathon") ? "grid" : "none";
+  }
+}
+
+// Hook event to the dropdown change
+document.getElementById("resourceCategory")?.addEventListener("change", toggleMetaRows);
+
+/* --------------------------------------------------------------------------
    2. UI NAVIGATION MANAGEMENT
    -------------------------------------------------------------------------- */
 
@@ -79,6 +99,9 @@ async function checkAdminLogin() {
   if (loginBox) loginBox.style.display = "none";
   if (adminContainer) adminContainer.style.display = "flex";
 
+  // Run initial UI state manager
+  toggleMetaRows();
+
   // Parallel loading triggers
   loadDashboardData();
   loadProfile();
@@ -91,7 +114,7 @@ async function adminLogin(e) {
   e.preventDefault();
   
   const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true; // Prevents double login attempts
+  if (submitBtn) submitBtn.disabled = true;
 
   const email = document.getElementById("adminEmail").value;
   const password = document.getElementById("adminPassword").value;
@@ -157,7 +180,6 @@ async function uploadProfileImage(file) {
 
 async function loadDashboardData() {
   try {
-    // Optimization: Executes all 6 network requests in parallel. Massive speedup!
     const [
       resCountResult,
       vidCountResult,
@@ -174,7 +196,6 @@ async function loadDashboardData() {
       supabaseClient.from("videos").select("title, views").order("views", { ascending: false }).limit(1).maybeSingle()
     ]);
 
-    // DOM Updates
     document.getElementById("totalResources").textContent = resCountResult.count || 0;
     document.getElementById("totalVideos").textContent = vidCountResult.count || 0;
     document.getElementById("featuredResource").textContent = featuredResult.data?.title || "None";
@@ -200,12 +221,27 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
   e.preventDefault();
   
   const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true; // UX Enhancement: Lock button
+  if (submitBtn) submitBtn.disabled = true;
+
+  const categoryValue = document.getElementById("resourceCategory").value;
+  let finalJobType = "remote";
+  let finalIsActive = true;
+
+  // Evaluation algorithm based on context selection
+  if (categoryValue === "job") {
+    finalJobType = document.getElementById("resourceJobType").value;
+    finalIsActive = document.getElementById("resourceJobStatus").value === "active";
+  } else if (categoryValue === "hackathon") {
+    finalJobType = document.getElementById("resourceHackathonMode").value;
+    finalIsActive = document.getElementById("resourceHackathonStatus").value === "active";
+  }
 
   const resource = {
     title: document.getElementById("resourceTitle").value,
     description: document.getElementById("resourceDescription").value,
-    category: document.getElementById("resourceCategory").value,
+    category: categoryValue,
+    job_type: finalJobType,
+    is_active: finalIsActive,
     tags: getCheckedTags("resource-tag-check"),
     link: document.getElementById("resourceLink").value,
     upload_date: document.getElementById("resourceDate").value,
@@ -238,6 +274,7 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
   editingResourceId = null;
   e.target.reset();
   clearCheckedTags("resource-tag-check");
+  toggleMetaRows(); // Visibility reset
   updateResourceButtonText();
 
   loadResourcesList();
@@ -269,6 +306,18 @@ async function editResource(id) {
   document.getElementById("resourceTitle").value = data.title || "";
   document.getElementById("resourceDescription").value = data.description || "";
   document.getElementById("resourceCategory").value = data.category || "certificate";
+  
+  // Repopulating conditional forms
+  if (data.category === "job") {
+    document.getElementById("resourceJobType").value = data.job_type || "remote";
+    document.getElementById("resourceJobStatus").value = data.is_active ? "active" : "expired";
+  } else if (data.category === "hackathon") {
+    document.getElementById("resourceHackathonMode").value = data.job_type || "online";
+    document.getElementById("resourceHackathonStatus").value = data.is_active ? "active" : "closed";
+  }
+
+  toggleMetaRows(); // Trigger visibility update after value injection
+  
   setCheckedTags("resource-tag-check", data.tags);
   document.getElementById("resourceLink").value = data.link || "";
   document.getElementById("resourceDate").value = data.upload_date || "";
@@ -283,6 +332,7 @@ function cancelResourceEdit() {
   editingResourceId = null;
   document.getElementById("resourceForm")?.reset();
   clearCheckedTags("resource-tag-check");
+  toggleMetaRows();
   updateResourceButtonText();
 }
 
@@ -326,25 +376,34 @@ async function loadResourcesList() {
     return;
   }
 
-  // OPTIMIZED: Render descriptions with clamping and local Read More selectors
-  list.innerHTML = data.map(item => `
-    <div class="admin-list-card">
-      <div style="flex: 1; min-width: 0;">
-        <h3>${item.title}</h3>
-        <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
-          ${item.category || "Resource"} • ${item.upload_date || ""}
-        </p>
-        <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
-        <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
-        <br>
-        <small>Tags: ${tagsToText(item.tags) || "None"}</small>
+  list.innerHTML = data.map(item => {
+    // Dynamic metadata tracking for admin logs visibility
+    let specializedBadge = "";
+    if (item.category === "job") {
+      specializedBadge = ` • <span style="color:#10b981;">[Job: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'EXPIRED'}]</span>`;
+    } else if (item.category === "hackathon") {
+      specializedBadge = ` • <span style="color:#a855f7;">[Hackathon: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'CLOSED'}]</span>`;
+    }
+
+    return `
+      <div class="admin-list-card">
+        <div style="flex: 1; min-width: 0;">
+          <h3>${item.title}</h3>
+          <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
+            ${item.category || "Resource"}${specializedBadge} • ${item.upload_date || ""}
+          </p>
+          <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
+          <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
+          <br>
+          <small>Tags: ${tagsToText(item.tags) || "None"}</small>
+        </div>
+        <div class="admin-actions">
+          <button type="button" class="toggle-btn" onclick="editResource(${item.id})">Edit</button>
+          <button type="button" class="delete-btn" onclick="deleteResource(${item.id})">Delete</button>
+        </div>
       </div>
-      <div class="admin-actions">
-        <button type="button" class="toggle-btn" onclick="editResource(${item.id})">Edit</button>
-        <button type="button" class="delete-btn" onclick="deleteResource(${item.id})">Delete</button>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 /* --------------------------------------------------------------------------
@@ -483,7 +542,6 @@ async function loadVideosList() {
     return;
   }
 
-  // OPTIMIZED: Render video logs description with uniform styling layout controls
   list.innerHTML = data.map(item => `
     <div class="admin-list-card">
       <div style="flex: 1; min-width: 0;">
@@ -542,7 +600,7 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   const imageFile = document.getElementById("profileImageFile").files[0];
 
   if (imageFile) {
-    imageUrl = await uploadProfileImage(imageFile);
+    imageUrl = await uploadProfileImage(file);
     if (!imageUrl) {
       if (submitBtn) submitBtn.disabled = false;
       return;
@@ -697,7 +755,6 @@ async function deleteAccount(id) {
    10. MODULE ENGINE DELEGATION & LOCAL CLAMPING ACTIONS (MOBILE SAFE)
    -------------------------------------------------------------------------- */
 
-// Isolated delegated click scope handler for Admin Card Expansion logs
 document.addEventListener("click", (e) => {
   const readMoreBtn = e.target.closest(".read-more-btn");
   if (!readMoreBtn) return;
@@ -709,7 +766,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Explicitly exposing functions to the window scope to prevent failures in strict/module environments
+// Explicitly exposing functions to the window scope
 window.editResource = editResource;
 window.deleteResource = deleteResource;
 window.editVideo = editVideo;

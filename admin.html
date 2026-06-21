@@ -93,10 +93,10 @@
       </section>
 
       <section class="admin-section" id="resources">
-        <h1>Add Resource</h1>
+        <h1>Add Resource / Opportunity</h1>
         
         <form id="resourceForm">
-          <input type="text" id="resourceTitle" placeholder="Resource Title" required>
+          <input type="text" id="resourceTitle" placeholder="Resource / Title Name" required>
           <textarea id="resourceDescription" placeholder="Description" required></textarea>
           
           <select id="resourceCategory">
@@ -107,11 +107,12 @@
             <option value="roadmap">Roadmap</option>
             <option value="ai-tool">AI Tool</option>
             <option value="job">Job</option>
+            <option value="hackathon">Hackathon</option>
           </select>
 
-          <div class="job-meta-inputs-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+          <div class="job-meta-inputs-row" id="jobMetaRow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
             <div>
-              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Type (If Job Category)</p>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Type</p>
               <select id="resourceJobType" style="margin-bottom: 0;">
                 <option value="remote">Remote</option>
                 <option value="on-site">On-Site</option>
@@ -119,10 +120,28 @@
               </select>
             </div>
             <div>
-              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Status (If Job Category)</p>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Status</p>
               <select id="resourceJobStatus" style="margin-bottom: 0;">
                 <option value="active">Active</option>
                 <option value="expired">Expired</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="hackathon-meta-inputs-row" id="hackathonMetaRow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Hackathon Mode</p>
+              <select id="resourceHackathonMode" style="margin-bottom: 0;">
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+                <option value="hybrid">Hybrid</option>
+              </select>
+            </div>
+            <div>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Hackathon Status</p>
+              <select id="resourceHackathonStatus" style="margin-bottom: 0;">
+                <option value="active">Active</option>
+                <option value="closed">Closed</option>
               </select>
             </div>
           </div>
@@ -136,6 +155,7 @@
             <label><input type="checkbox" class="resource-tag-check" value="notes"> Notes</label>
             <label><input type="checkbox" class="resource-tag-check" value="roadmap"> Roadmap</label>
             <label><input type="checkbox" class="resource-tag-check" value="job"> Job</label>
+            <label><input type="checkbox" class="resource-tag-check" value="hackathon"> Hackathon</label>
             <label><input type="checkbox" class="resource-tag-check" value="free"> Free</label>
             <label><input type="checkbox" class="resource-tag-check" value="beginner"> Beginner</label>
           </div>
