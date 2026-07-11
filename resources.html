@@ -56,18 +56,23 @@
       </div>
     </section>
 
-    <section class="search-section">
+    <!-- UPGRADE: Enhanced Search Section Frame incorporating dynamic absolute drop suggestions container anchor -->
+    <section class="search-section" style="position: relative;">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input
           type="text"
           id="resourceSearch"
           placeholder="Search by title, description, category or tags..."
+          autocomplete="off"
         />
         <button class="filter-toggle-btn" id="filterToggleBtn" type="button">
           <i class="fa-solid fa-sliders"></i> Filters
         </button>
       </div>
+
+      <!-- ENHANCEMENT: Autocomplete Dropdown suggestions layer template container -->
+      <div id="searchSuggestions" class="search-suggestions-box" style="display: none; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden;"></div>
 
       <div class="trending-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; justify-content: center; align-items: center;">
         <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">Trending:</span>
@@ -76,6 +81,8 @@
         <button type="button" class="trending-chip" data-tag="internship" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Internships</button>
         <button type="button" class="trending-chip" data-tag="job" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Jobs</button>
         <button type="button" class="trending-chip" data-tag="hackathon" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Hackathons</button>
+        <!-- ENHANCEMENT: Newly added tracking category entry selector chip -->
+        <button type="button" class="trending-chip" data-tag="scholarship" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Scholarships</button>
       </div>
     </section>
 
@@ -110,6 +117,22 @@
           </label>
           <label>
             <input type="checkbox" class="tag-filter" value="hackathon"> Hackathons
+          </label>
+          <!-- ENHANCEMENT: Integrated Filter Target Box entry node for scholarships -->
+          <label>
+            <input type="checkbox" class="tag-filter" value="scholarship"> Scholarships
+          </label>
+        </div>
+
+        <!-- UPGRADE: Secondary Filter Section Group explicitly rendering Organization Sectors parameters (Govt vs Private) -->
+        <div class="filter-panel-divider" style="height: 1px; background: var(--border-color); margin: 15px 0;"></div>
+        <div class="filter-subtitle" style="font-size: 0.95rem; font-weight: 600; margin-bottom: 10px; color: var(--text-main); text-align: left;">Provider Sector</div>
+        <div class="filter-options sector-filters-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" class="sector-filter" value="government"> Government (Sarkari)
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" class="sector-filter" value="private"> Private (Corporate)
           </label>
         </div>
 
@@ -161,6 +184,20 @@
       </div>
 
       <button class="continue-btn" id="continueBtn">Continue to Resource</button>
+    </div>
+  </div>
+
+  <!-- UPGRADE: Premium Universal Blurred Description Container Modal Hook (Sync with main.js event delegates engine) -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
+    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
+      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Resource Title</h3>
+      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
+      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
+      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
     </div>
   </div>
 

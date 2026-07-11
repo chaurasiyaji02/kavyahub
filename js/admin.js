@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - ADMIN DASHBOARD CONTROLLER (AUDITED & LIVE-OPTIMIZED)
+   KAVYAHUB - ADMIN DASHBOARD CONTROLLER (RE-AUDITED & BUGLOCK RESOLVED)
    ========================================================================== */
 
 const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
@@ -45,24 +45,41 @@ function clearCheckedTags(className) {
 }
 
 /* --------------------------------------------------------------------------
-   1B. DYNAMIC METADATA ROW VISIBILITY MANAGER
+   1B. FIXED: DYNAMIC METADATA ROW VISIBILITY MANAGER
    -------------------------------------------------------------------------- */
 
 function toggleMetaRows() {
   const category = document.getElementById("resourceCategory")?.value;
+  const videoCategory = document.getElementById("videoCategory")?.value;
+  
   const jobRow = document.getElementById("jobMetaRow");
   const hackathonRow = document.getElementById("hackathonMetaRow");
+  const orgRow = document.getElementById("orgMetaRow");
+  const videoOrgRow = document.getElementById("videoOrgMetaRow");
 
+  // FIX: Job/Internship Metadata visible status conditional routing loops
   if (jobRow) {
-    jobRow.style.display = (category === "job") ? "grid" : "none";
+    jobRow.style.display = (category === "job" || category === "internship") ? "grid" : "none";
   }
+  
   if (hackathonRow) {
     hackathonRow.style.display = (category === "hackathon") ? "grid" : "none";
   }
+  
+  // FIX: Ensure Government/Private select displays for all inbound operational categories
+  if (orgRow) {
+    orgRow.style.display = (category === "job" || category === "internship" || category === "hackathon" || category === "scholarship") ? "grid" : "none";
+  }
+  
+  if (videoOrgRow) {
+    // Sync video metadata sector routing blocks
+    videoOrgRow.style.display = (videoCategory === "job" || videoCategory === "career" || videoCategory === "course" || videoCategory === "certificate") ? "grid" : "none";
+  }
 }
 
-// Hook event to the dropdown change
+// Attach listeners correctly
 document.getElementById("resourceCategory")?.addEventListener("change", toggleMetaRows);
+document.getElementById("videoCategory")?.addEventListener("change", toggleMetaRows);
 
 /* --------------------------------------------------------------------------
    2. UI NAVIGATION MANAGEMENT
@@ -76,7 +93,6 @@ function setActiveSection(sectionId) {
   document.getElementById(sectionId)?.classList.add("active-section");
 }
 
-// Sidebar Click Register
 document.querySelectorAll(".menu-item").forEach(item => {
   item.addEventListener("click", () => {
     setActiveSection(item.dataset.section);
@@ -99,10 +115,8 @@ async function checkAdminLogin() {
   if (loginBox) loginBox.style.display = "none";
   if (adminContainer) adminContainer.style.display = "flex";
 
-  // Run initial UI state manager
   toggleMetaRows();
 
-  // Parallel loading triggers
   loadDashboardData();
   loadProfile();
   loadResourcesList();
@@ -148,7 +162,6 @@ async function adminLogout() {
 document.getElementById("loginForm")?.addEventListener("submit", adminLogin);
 document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 
-// Run Auth Check on Load
 checkAdminLogin();
 
 /* --------------------------------------------------------------------------
@@ -175,7 +188,7 @@ async function uploadProfileImage(file) {
 }
 
 /* --------------------------------------------------------------------------
-   5. DASHBOARD STATS (HIGH OPTIMIZATION VIA PROMISE.ALL)
+   5. DASHBOARD STATS
    -------------------------------------------------------------------------- */
 
 async function loadDashboardData() {
@@ -227,13 +240,16 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
   let finalJobType = "remote";
   let finalIsActive = true;
 
-  // Evaluation algorithm based on context selection
-  if (categoryValue === "job") {
+  // FIX: Support extraction payloads mapping perfectly for job AND internship
+  if (categoryValue === "job" || categoryValue === "internship") {
     finalJobType = document.getElementById("resourceJobType").value;
     finalIsActive = document.getElementById("resourceJobStatus").value === "active";
   } else if (categoryValue === "hackathon") {
     finalJobType = document.getElementById("resourceHackathonMode").value;
     finalIsActive = document.getElementById("resourceHackathonStatus").value === "active";
+  } else if (categoryValue === "scholarship") {
+    finalJobType = "general";
+    finalIsActive = true; 
   }
 
   const resource = {
@@ -242,6 +258,7 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
     category: categoryValue,
     job_type: finalJobType,
     is_active: finalIsActive,
+    org_type: document.getElementById("resourceOrgType").value,
     tags: getCheckedTags("resource-tag-check"),
     link: document.getElementById("resourceLink").value,
     upload_date: document.getElementById("resourceDate").value,
@@ -274,7 +291,8 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
   editingResourceId = null;
   e.target.reset();
   clearCheckedTags("resource-tag-check");
-  toggleMetaRows(); // Visibility reset
+  document.getElementById("resourceOrgType").value = "none"; 
+  toggleMetaRows(); 
   updateResourceButtonText();
 
   loadResourcesList();
@@ -306,9 +324,10 @@ async function editResource(id) {
   document.getElementById("resourceTitle").value = data.title || "";
   document.getElementById("resourceDescription").value = data.description || "";
   document.getElementById("resourceCategory").value = data.category || "certificate";
-  
-  // Repopulating conditional forms
-  if (data.category === "job") {
+  document.getElementById("resourceOrgType").value = data.org_type || "none";
+
+  // FIX: Restore logic data binding values hydration engine cleanly
+  if (data.category === "job" || data.category === "internship") {
     document.getElementById("resourceJobType").value = data.job_type || "remote";
     document.getElementById("resourceJobStatus").value = data.is_active ? "active" : "expired";
   } else if (data.category === "hackathon") {
@@ -316,7 +335,7 @@ async function editResource(id) {
     document.getElementById("resourceHackathonStatus").value = data.is_active ? "active" : "closed";
   }
 
-  toggleMetaRows(); // Trigger visibility update after value injection
+  toggleMetaRows(); 
   
   setCheckedTags("resource-tag-check", data.tags);
   document.getElementById("resourceLink").value = data.link || "";
@@ -332,6 +351,7 @@ function cancelResourceEdit() {
   editingResourceId = null;
   document.getElementById("resourceForm")?.reset();
   clearCheckedTags("resource-tag-check");
+  document.getElementById("resourceOrgType").value = "none";
   toggleMetaRows();
   updateResourceButtonText();
 }
@@ -377,12 +397,17 @@ async function loadResourcesList() {
   }
 
   list.innerHTML = data.map(item => {
-    // Dynamic metadata tracking for admin logs visibility
     let specializedBadge = "";
-    if (item.category === "job") {
-      specializedBadge = ` • <span style="color:#10b981;">[Job: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'EXPIRED'}]</span>`;
+    if (item.category === "job" || item.category === "internship") {
+      specializedBadge = ` • <span style="color:#10b981;">[${item.category.toUpperCase()}: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'EXPIRED'}]</span>`;
     } else if (item.category === "hackathon") {
       specializedBadge = ` • <span style="color:#a855f7;">[Hackathon: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'CLOSED'}]</span>`;
+    } else if (item.category === "scholarship") {
+      specializedBadge = ` • <span style="color:#f59e0b;">[Scholarship: ACTIVE]</span>`;
+    }
+
+    if (item.org_type && item.org_type !== "none") {
+      specializedBadge += ` • <span style="color:#3b82f6; font-weight:700; text-transform:uppercase;">[${item.org_type}]</span>`;
     }
 
     return `
@@ -420,6 +445,7 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
     title: document.getElementById("videoTitle").value,
     description: document.getElementById("videoDescription").value,
     category: document.getElementById("videoCategory").value,
+    org_type: document.getElementById("videoOrgType").value,
     tags: getCheckedTags("video-tag-check"),
     youtube_link: document.getElementById("youtubeLink").value,
     resource_link: document.getElementById("videoResourceLink").value,
@@ -453,6 +479,8 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   editingVideoId = null;
   e.target.reset();
   clearCheckedTags("video-tag-check");
+  document.getElementById("videoOrgType").value = "none"; 
+  toggleMetaRows(); // ENHANCEMENT: Reset video metadata row display view instantly
   updateVideoButtonText();
 
   loadVideosList();
@@ -484,6 +512,10 @@ async function editVideo(id) {
   document.getElementById("videoTitle").value = data.title || "";
   document.getElementById("videoDescription").value = data.description || "";
   document.getElementById("videoCategory").value = data.category || "certificate";
+  document.getElementById("videoOrgType").value = data.org_type || "none";
+  
+  toggleMetaRows(); // ENHANCEMENT: Ensure correct context displays during initial hydration
+  
   setCheckedTags("video-tag-check", data.tags);
   document.getElementById("youtubeLink").value = data.youtube_link || "";
   document.getElementById("videoResourceLink").value = data.resource_link || "";
@@ -499,6 +531,8 @@ function cancelVideoEdit() {
   editingVideoId = null;
   document.getElementById("videoForm")?.reset();
   clearCheckedTags("video-tag-check");
+  document.getElementById("videoOrgType").value = "none";
+  toggleMetaRows(); // ENHANCEMENT: Clear layouts rows seamlessly
   updateVideoButtonText();
 }
 
@@ -542,24 +576,31 @@ async function loadVideosList() {
     return;
   }
 
-  list.innerHTML = data.map(item => `
-    <div class="admin-list-card">
-      <div style="flex: 1; min-width: 0;">
-        <h3>${item.title}</h3>
-        <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
-          ${item.category || "Video"} • ${item.upload_date || ""}
-        </p>
-        <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
-        <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
-        <br>
-        <small>Tags: ${tagsToText(item.tags) || "None"}</small>
+  list.innerHTML = data.map(item => {
+    let specializedBadge = "";
+    if (item.org_type && item.org_type !== "none") {
+      specializedBadge = ` • <span style="color:#3b82f6; font-weight:700; text-transform:uppercase;">[${item.org_type}]</span>`;
+    }
+
+    return `
+      <div class="admin-list-card">
+        <div style="flex: 1; min-width: 0;">
+          <h3>${item.title}</h3>
+          <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
+            ${item.category || "Video"}${specializedBadge} • ${item.upload_date || ""}
+          </p>
+          <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
+          <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
+          <br>
+          <small>Tags: ${tagsToText(item.tags) || "None"}</small>
+        </div>
+        <div class="admin-actions">
+          <button type="button" class="toggle-btn" onclick="editVideo(${item.id})">Edit</button>
+          <button type="button" class="delete-btn" onclick="deleteVideo(${item.id})">Delete</button>
+        </div>
       </div>
-      <div class="admin-actions">
-        <button type="button" class="toggle-btn" onclick="editVideo(${item.id})">Edit</button>
-        <button type="button" class="delete-btn" onclick="deleteVideo(${item.id})">Delete</button>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 /* --------------------------------------------------------------------------
@@ -600,7 +641,7 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   const imageFile = document.getElementById("profileImageFile").files[0];
 
   if (imageFile) {
-    imageUrl = await uploadProfileImage(file);
+    imageUrl = await uploadProfileImage(imageFile);
     if (!imageUrl) {
       if (submitBtn) submitBtn.disabled = false;
       return;
@@ -757,6 +798,15 @@ async function deleteAccount(id) {
 
 document.addEventListener("click", (e) => {
   const readMoreBtn = e.target.closest(".read-more-btn");
+  
+  const themeBtn = e.target.closest(".theme-toggle-btn") || e.target.closest("#themeToggleBtn");
+  if (themeBtn) {
+    e.preventDefault();
+    const isDark = document.documentElement.classList.toggle("dark-mode");
+    localStorage.setItem("kavyahub-theme", isDark ? "dark" : "light");
+    return;
+  }
+
   if (!readMoreBtn) return;
 
   const description = readMoreBtn.previousElementSibling;
@@ -766,7 +816,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Explicitly exposing functions to the window scope
 window.editResource = editResource;
 window.deleteResource = deleteResource;
 window.editVideo = editVideo;
@@ -774,7 +823,6 @@ window.deleteVideo = deleteVideo;
 window.toggleAccount = toggleAccount;
 window.deleteAccount = deleteAccount;
 
-/* Settings placeholder action */
 document.getElementById("settingsForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   alert("Settings system next phase me connect karenge ✅");

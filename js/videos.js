@@ -4,6 +4,8 @@
 
 let videos = [];
 let currentCategory = "all";
+// UPGRADE: New contextual state register tracking the checked video organization sectors
+let selectedVideoSectors = [];
 let currentFilteredVideos = [];
 
 // DOM Elements Selection
@@ -12,6 +14,9 @@ const videoSearch = document.getElementById("videoSearch");
 const videoCount = document.getElementById("videoCount");
 const videoEmptyState = document.getElementById("videoEmptyState");
 const filterButtons = document.querySelectorAll(".video-filter-btn");
+
+// UPGRADE: Select the newly added video checkboxes elements selectors explicitly
+const videoSectorFilters = document.querySelectorAll(".video-sector-filter");
 
 const featuredVideoTitle = document.getElementById("featuredVideoTitle");
 const featuredVideoDescription = document.getElementById("featuredVideoDescription");
@@ -85,13 +90,27 @@ function createVideoCard(video) {
   const descriptionText = video.description || "";
   const isLongDescription = descriptionText.length > 120;
 
+  // UPGRADE: Contextual extraction mapping inline badges for opportunity structural organization models
+  let orgBadgeHTML = "";
+  if (video.org_type && video.org_type !== "none") {
+    const isGov = video.org_type === "government";
+    orgBadgeHTML = `
+      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem; margin-left: 6px; text-transform: capitalize; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
+      </span>
+    `;
+  }
+
   // FIXED: Generates platform-locked inbound tracking loops
   const deepShareLink = `${window.location.origin}/videos.html?search=${encodeURIComponent(video.title)}`;
 
   return `
     <div class="resource-card">
       <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
-      <span class="tag" style="text-transform: capitalize;">${video.category || "Video"}</span>
+      <div class="video-tags-row" style="margin-top: 12px; margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+        <span class="tag" style="text-transform: capitalize; margin: 0;">${video.category || "Video"}</span>
+        ${orgBadgeHTML}
+      </div>
 
       <h3>${video.title}</h3>
       
@@ -197,7 +216,7 @@ function loadFeaturedVideo() {
 }
 
 /* --------------------------------------------------------------------------
-   6. FILTER & SEARCH LOGIC
+   6. FILTER & SEARCH LOGIC (UPGRADED WITH MULTI-STAGE SECTOR CHECK)
    -------------------------------------------------------------------------- */
 
 function applyFilters() {
@@ -217,7 +236,11 @@ function applyFilters() {
 
     const matchSearch = term === "" || searchableText.includes(term);
 
-    return matchCategory && matchSearch;
+    // UPGRADE: Multi-stage video organization type sector filtering rules parser
+    const videoOrg = String(video.org_type || "none").toLowerCase().trim();
+    const matchSectors = selectedVideoSectors.length === 0 || selectedVideoSectors.includes(videoOrg);
+
+    return matchCategory && matchSearch && matchSectors;
   });
 
   renderVideos(filtered);
@@ -233,6 +256,17 @@ filterButtons.forEach(button => {
     button.classList.add("active");
 
     currentCategory = button.dataset.category || "all";
+    applyFilters();
+  });
+});
+
+// UPGRADE: Dynamic change registration listeners hooks for Video Sector Filter checkboxes
+videoSectorFilters.forEach(input => {
+  input.addEventListener("change", () => {
+    selectedVideoSectors = Array.from(videoSectorFilters)
+      .filter(item => item.checked)
+      .map(item => String(item.value || "").toLowerCase().trim());
+
     applyFilters();
   });
 });

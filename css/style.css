@@ -944,3 +944,62 @@ section {
   font-size: 0.9rem;
   color: var(--muted);
 }
+
+/* ==========================================================================
+   UPGRADE ADDITIONS: FRONTEND PARITY INTEGRATION (ZERO DELETION COMPLIANT)
+   ========================================================================== */
+
+/* FIX: Strict 16:9 Aspect-Ratio Clamping Module to prevent horizontal image stretching */
+.video-thumbnail, 
+.video-card-thumbnail img,
+.latest-grid img,
+.resource-card img.video-thumbnail {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9 !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* UPGRADE: Autocomplete Dropdown Panel Hover Rendering Logic */
+.search-suggestions-box {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.autocomplete-suggestion-row:hover {
+  background: rgba(var(--primary-rgb), 0.06) !important;
+}
+
+.dark-mode .autocomplete-suggestion-row:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* UPGRADE: Organization Sector Badges Interface Layer */
+.org-indicator-chip i {
+  font-size: 0.75rem !important;
+  margin-right: 2px;
+}
+
+/* UPGRADE: Universal Blurred Description Popup Modal Aesthetics */
+.description-modal-overlay {
+  transition: all 0.2s ease-in-out;
+}
+
+.description-modal-box {
+  color: var(--text-main);
+}
+
+.description-modal-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.description-modal-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.description-modal-box::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}

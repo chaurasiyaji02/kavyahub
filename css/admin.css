@@ -501,3 +501,167 @@
     flex-direction: column;
   }
 }
+
+/* ==========================================================================
+   UPGRADE ADDITIONS: INTEGRATION PATCH (ZERO DELETION COMPLIANT)
+   ========================================================================== */
+
+/* UPGRADE: Naye Explicit Provider Sector Rows Optimization Engine */
+.org-meta-inputs-row,
+.video-org-meta-inputs-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .org-meta-inputs-row,
+  .video-org-meta-inputs-row {
+    gap: 10px;
+  }
+}
+
+/* UPGRADE: Sidebar Theme Wrapper & Interactive Action Toggles UI */
+.sidebar-theme-wrapper .theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.sidebar-theme-wrapper .theme-toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. GLOBAL DYNAMIC LIGHT MODE ADAPTATION OVERRIDES
+   -------------------------------------------------------------------------- */
+html:not(.dark-mode) .admin-container {
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 35%), #f8fafc;
+}
+
+html:not(.dark-mode) .admin-sidebar {
+  background: #ffffff;
+  border-right: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+html:not(.dark-mode) .admin-logo h2 {
+  color: #0f172a;
+}
+
+html:not(.dark-mode) .sidebar-theme-wrapper button {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark-mode) .sidebar-theme-wrapper button:hover {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+
+html:not(.dark-mode) .menu-item {
+  color: #475569;
+}
+
+html:not(.dark-mode) .menu-item:hover {
+  background: rgba(15, 23, 42, 0.05);
+  color: #0f172a;
+}
+
+html:not(.dark-mode) .menu-item.active {
+  color: white;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  box-shadow: 0 12px 28px rgba(59, 130, 246, 0.15);
+}
+
+html:not(.dark-mode) .admin-section h1 {
+  color: #0f172a;
+}
+
+html:not(.dark-mode) .dashboard-card {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark-mode) .dashboard-card h3 {
+  color: #475569;
+}
+
+html:not(.dark-mode) .dashboard-card p {
+  color: #0f172a;
+}
+
+html:not(.dark-mode) .admin-section form,
+html:not(.dark-mode) .login-form {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark-mode) .admin-section input,
+html:not(.dark-mode) .admin-section textarea,
+html:not(.dark-mode) .admin-section select,
+html:not(.dark-mode) .login-form input {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+html:not(.dark-mode) .admin-section input:focus,
+html:not(.dark-mode) .admin-section textarea:focus,
+html:not(.dark-mode) .admin-section select:focus,
+html:not(.dark-mode) .login-form input:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+html:not(.dark-mode) .admin-section input::placeholder,
+html:not(.dark-mode) .admin-section textarea::placeholder,
+html:not(.dark-mode) .login-form input::placeholder {
+  color: #64748b;
+}
+
+html:not(.dark-mode) .admin-section label {
+  color: #334155;
+}
+
+html:not(.dark-mode) .tag-select-box {
+  background: #f1f5f9;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+html:not(.dark-mode) .tag-select-box p {
+  color: #0f172a;
+}
+
+html:not(.dark-mode) .tag-select-box label {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: #334155;
+}
+
+html:not(.dark-mode) .admin-list-card {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+html:not(.dark-mode) .admin-list-card h3 {
+  color: #0f172a;
+}
+
+html:not(.dark-mode) .admin-list-card p,
+html:not(.dark-mode) .admin-empty {
+  color: #334155;
+}
+
+html:not(.dark-mode) .admin-list-card .resource-description {
+  color: #475569;
+}
+
+html:not(.dark-mode) .login-box {
+  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.1), transparent 35%), #f8fafc;
+}
+
+html:not(.dark-mode) .login-form h2 {
+  color: #0f172a;
+}

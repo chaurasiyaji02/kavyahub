@@ -131,6 +131,19 @@
           <p>Find recent job openings, remote roles, and entry-level tech opportunities.</p>
         </a>
 
+        <!-- UPGRADE: New Premium Connected Category Deep-Link Cards -->
+        <a href="resources.html?search=hackathon" class="category-card">
+          <i class="fa-solid fa-laptop-code" style="color: #a855f7;"></i>
+          <h3>Hackathons</h3>
+          <p>Explore coding hackathons, team challenges, and developer competitions.</p>
+        </a>
+
+        <a href="resources.html?search=scholarship" class="category-card">
+          <i class="fa-solid fa-graduation-cap" style="color: #f59e0b;"></i>
+          <h3>Scholarships</h3>
+          <p>Find financial aid, college scholarships, and student fellowship programs.</p>
+        </a>
+
         <a href="videos.html" class="category-card">
           <i class="fa-solid fa-video"></i>
           <h3>YouTube Videos</h3>
@@ -210,6 +223,20 @@
 
       <button class="continue-btn" id="continueBtn">I Followed, Continue</button>
 
+    </div>
+  </div>
+
+  <!-- UPGRADE: Global Premium Detail Modal Popup Layout (For clean formatting and preventing grid stretching) -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
+    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
+      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Resource Title</h3>
+      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
+      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
+      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
     </div>
   </div>
 

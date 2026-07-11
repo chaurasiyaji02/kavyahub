@@ -321,3 +321,61 @@
     font-size: 0.9rem;
   }
 }
+
+/* ==========================================================================
+   UPGRADE ADDITIONS: RESPONSIVE INTEGRATION PATCH (ZERO DELETION COMPLIANT)
+   ========================================================================== */
+
+/* UPGRADE: Smart Suggestion Dropdown responsive containment tracking loops */
+@media (max-width: 768px) {
+  .search-suggestions-box {
+    width: calc(100% - 20px) !important;
+    left: 10px !important;
+    transform: none !important;
+    max-width: none !important;
+  }
+  
+  .video-sector-filters-wrapper,
+  .sector-filters-row {
+    justify-content: flex-start !important;
+    padding-left: 15px;
+    gap: 12px !important;
+  }
+}
+
+/* UPGRADE: Premium Universal Blurred Details popup modal responsiveness override */
+@media (max-width: 600px) {
+  .description-modal-overlay {
+    padding: 0 10px 10px !important;
+    align-items: flex-end !important; /* Seamlessly transforms modal to an intuitive bottom sheet on standard viewports */
+  }
+
+  .description-modal-box {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    border-radius: 24px 24px 0 0 !important;
+    padding: 25px 16px 20px !important;
+    max-height: 80vh !important;
+  }
+  
+  .modal-action-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .modal-action-row button,
+  .modal-action-row a {
+    width: 100% !important;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-sector-filters-wrapper {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    padding-left: 5px;
+  }
+}

@@ -13,6 +13,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- DYNAMIC CORE FLASH PROTECTOR: Automatically tracks theme preference on window instance launch -->
+  <script>
+    (function initAdminTheme() {
+      const savedTheme = localStorage.getItem("kavyahub-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add("dark-mode");
+      } else {
+        document.documentElement.classList.remove("dark-mode");
+      }
+    })();
+  </script>
 </head>
 
 <body>
@@ -32,6 +45,14 @@
       <div class="admin-logo">
         <h2>Kavya<span>Hub</span></h2>
       </div>
+      
+      <!-- ENHANCEMENT: Perfectly integrated Theme Toggle Switch matching sidebar parameters -->
+      <div class="sidebar-theme-wrapper" style="padding: 0 20px; margin-bottom: 12px;">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); font-size: 0.9rem; cursor: pointer; color: #fff; width: 100%; padding: 10px; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-weight: 500; transition: background 0.2s;">
+          <i class="fa-solid fa-moon"></i> <span>Toggle Dashboard View</span>
+        </button>
+      </div>
+
       <button id="logoutBtn" class="logout-btn">Logout</button>
 
       <ul class="admin-menu">
@@ -108,6 +129,8 @@
             <option value="ai-tool">AI Tool</option>
             <option value="job">Job</option>
             <option value="hackathon">Hackathon</option>
+            <!-- ENHANCEMENT: Dynamic Category Entry Node -->
+            <option value="scholarship">Scholarship</option>
           </select>
 
           <div class="job-meta-inputs-row" id="jobMetaRow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -146,6 +169,18 @@
             </div>
           </div>
 
+          <!-- ENHANCEMENT: Restored Sector Filter Options Structure For Resources Input Segment -->
+          <div class="org-meta-inputs-row" id="orgMetaRow" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Provider Sector Type (Govt / Private)</p>
+              <select id="resourceOrgType" style="margin-bottom: 0;">
+                <option value="private">Private (Company / Corporate Sector)</option>
+                <option value="government">Government (Sarkari / Public Sector)</option>
+                <option value="none">N/A / General Content</option>
+              </select>
+            </div>
+          </div>
+
           <div class="tag-select-box">
             <p>Select Tags</p>
             <label><input type="checkbox" class="resource-tag-check" value="certificate"> Certificate</label>
@@ -156,6 +191,8 @@
             <label><input type="checkbox" class="resource-tag-check" value="roadmap"> Roadmap</label>
             <label><input type="checkbox" class="resource-tag-check" value="job"> Job</label>
             <label><input type="checkbox" class="resource-tag-check" value="hackathon"> Hackathon</label>
+            <!-- ENHANCEMENT: Clean explicit Tag Selector node insertion -->
+            <label><input type="checkbox" class="resource-tag-check" value="scholarship"> Scholarship</label>
             <label><input type="checkbox" class="resource-tag-check" value="free"> Free</label>
             <label><input type="checkbox" class="resource-tag-check" value="beginner"> Beginner</label>
           </div>
@@ -189,6 +226,18 @@
             <option value="roadmap">Roadmap</option>
             <option value="job">Job</option>
           </select>
+
+          <!-- ENHANCEMENT: Explicit Sector Filter Selection Group For Videos Section Forms -->
+          <div class="video-org-meta-inputs-row" id="videoOrgMetaRow" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Opportunity Provider Sector (Govt / Private)</p>
+              <select id="videoOrgType" style="margin-bottom: 0;">
+                <option value="private">Private (Company / Corporate Sector)</option>
+                <option value="government">Government (Sarkari / Public Sector)</option>
+                <option value="none">N/A / General Content</option>
+              </select>
+            </div>
+          </div>
 
           <div class="tag-select-box">
             <p>Select Tags</p>

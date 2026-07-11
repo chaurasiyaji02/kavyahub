@@ -63,9 +63,13 @@ function createResourceCard(resource) {
   const descriptionText = resource.description || "";
   const isLongDescription = descriptionText.length > 120;
   
-  // Checking safely if calendar element is logged as a Job Opportunity
-  const isJob = String(resource.category).toLowerCase() === "job";
+  // UPGRADE: Normalized category comparison rules mapping parity trackers
+  const currentCategory = String(resource.category || "").trim().toLowerCase();
+  const isJob = currentCategory === "job" || currentCategory === "internship";
+  const isHackathon = currentCategory === "hackathon";
+  const isScholarship = currentCategory === "scholarship";
 
+  // A. JOB / INTERNSHIP METADATA BADGES INTERFACES
   let jobBadgesHTML = "";
   if (isJob) {
     const jobType = resource.job_type ? resource.job_type : "Remote";
@@ -84,15 +88,60 @@ function createResourceCard(resource) {
     `;
   }
 
+  // UPGRADE: B. HACKATHON METADATA CARD PILLS BUILDER
+  let hackathonBadgesHTML = "";
+  if (isHackathon) {
+    const hackathonMode = resource.job_type ? resource.job_type : "Online";
+    const isActive = resource.is_active !== false;
+
+    hackathonBadgesHTML = `
+      <div class="hackathon-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
+        <span class="hackathon-mode-badge" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; padding: 3px 8px; border-radius: 4px; font-weight: 500; text-transform: capitalize;">
+          <i class="fa-solid fa-laptop-code" style="font-size: 0.75rem; margin-right: 2px;"></i> ${hackathonMode}
+        </span>
+        <span class="hackathon-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
+          ${isActive ? 'Active' : 'Closed'}
+        </span>
+      </div>
+    `;
+  }
+
+  // UPGRADE: C. SCHOLARSHIP METADATA GOLD BADGE BUILDER
+  let scholarshipBadgesHTML = "";
+  if (isScholarship) {
+    scholarshipBadgesHTML = `
+      <div class="scholarship-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
+        <span class="scholarship-vip-badge" style="background: linear-gradient(135deg, #f59e0b, #e08e0b); color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.22);">
+          <i class="fa-solid fa-graduation-cap"></i> Verified Scholarship
+        </span>
+      </div>
+    `;
+  }
+
+  // UPGRADE: D. RESOURCE PROVIDER SECTOR BADGE (Govt vs Private marker tags setup)
+  let orgBadgeHTML = "";
+  if (resource.org_type && resource.org_type !== "none") {
+    const isGov = resource.org_type === "government";
+    orgBadgeHTML = `
+      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem; text-transform: capitalize;">
+        <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
+      </span>
+    `;
+  }
+
   return `
     <div class="resource-card">
-      <div class="tag-row" style="margin-bottom: 12px; display: block;">
-        <span class="tag" style="text-transform: capitalize;">${resource.category || "Resource"}</span>
+      <div class="tag-row" style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+        <span class="tag" style="text-transform: capitalize; margin: 0;">${resource.category || "Resource"}</span>
+        ${orgBadgeHTML}
       </div>
       
       <h3>${resource.title}</h3>
 
       ${jobBadgesHTML}
+      ${hackathonBadgesHTML}
+      ${scholarshipBadgesHTML}
 
       <p class="resource-description">${descriptionText}</p>
       ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
@@ -123,19 +172,31 @@ function createVideoCard(video) {
   const descriptionText = video.description || "";
   const isLongDescription = descriptionText.length > 120;
 
+  // UPGRADE: VIDEO OPPORTUNITY PROVIDER SECTOR BADGE SETUP
+  let orgBadgeHTML = "";
+  if (video.org_type && video.org_type !== "none") {
+    const isGov = video.org_type === "government";
+    orgBadgeHTML = `
+      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem; text-transform: capitalize; display: inline-flex; align-items: center; gap: 4px;">
+        <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
+      </span>
+    `;
+  }
+
   return `
     <div class="resource-card">
       <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
       
-      <div class="tag-row" style="margin: 12px 0; display: block;">
-        <span class="tag" style="text-transform: capitalize;">Video / ${video.category || "General"}</span>
+      <div class="tag-row" style="margin: 12px 0; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+        <span class="tag" style="text-transform: capitalize; margin: 0;">Video / ${video.category || "General"}</span>
+        ${orgBadgeHTML}
       </div>
 
       <h3>${video.title}</h3>
 
       <p class="resource-description">${descriptionText}</p>
       ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
-
+      
       <div style="margin-bottom: 12px; display: block;">
         <small><i class="fa-solid fa-calendar-days" style="font-size:0.75rem; margin-right:4px;"></i>${formatDate(video.upload_date)}</small>
       </div>

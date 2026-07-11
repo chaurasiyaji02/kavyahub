@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const popupClose = document.getElementById("popupClose");
   const continueBtn = document.getElementById("continueBtn");
 
+  // UPGRADE: Dynamic Premium Description Modal Selectors
+  const descriptionModalOverlay = document.getElementById("descriptionModalOverlay");
+  const descriptionModalClose = document.getElementById("descriptionModalClose");
+
   let currentResourceLink = ""; // Safe contextual register for lock screen routing
 
   /* ==========================================
@@ -66,14 +70,97 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // FEATURE 2: Global Clamping Toggler (.read-more-btn)
+    // FEATURE 2: Global Clamping Toggler (.read-more-btn) -> UPGRADED TO MODAL
     const readMoreBtn = e.target.closest(".read-more-btn");
     if (readMoreBtn) {
       e.preventDefault(); // Lock form/layout shifts
-      const description = readMoreBtn.previousElementSibling;
-      if (description && (description.classList.contains("resource-description") || description.tagName === "P")) {
-        description.classList.toggle("expanded");
-        readMoreBtn.textContent = description.classList.contains("expanded") ? "Read Less" : "Read More";
+      
+      const modalOverlay = document.getElementById("descriptionModalOverlay");
+      const card = readMoreBtn.closest(".category-card") || 
+                   readMoreBtn.closest(".latest-card") || 
+                   readMoreBtn.closest(".resource-card") || 
+                   readMoreBtn.closest(".video-card") || 
+                   readMoreBtn.closest("div[class*='card']");
+
+      if (modalOverlay && card) {
+        // Dynamic Node Extraction Engine
+        const titleEl = card.querySelector("h3") || card.querySelector(".card-title");
+        const descEl = card.querySelector(".resource-description") || card.querySelector("p");
+        
+        // 1. Parse Title
+        document.getElementById("modalTitle").textContent = titleEl ? titleEl.textContent : "Resource Details";
+        
+        // 2. Parse Description Content with formatting preservation
+        const modalDesc = document.getElementById("modalDescriptionContent");
+        if (modalDesc && descEl) {
+          // Extracts pristine raw text node layout strings
+          modalDesc.textContent = descEl.innerText || descEl.textContent;
+        }
+        
+        // 3. Sync Dynamic Badges & Categories Chips Row
+        const badgeRow = document.getElementById("modalBadgeRow");
+        if (badgeRow) {
+          badgeRow.innerHTML = "";
+          // Extract specific UI tag groups safely
+          const originalBadges = card.querySelectorAll(".card-badges span, .category-chip, .tag, .resource-tag");
+          originalBadges.forEach(badge => {
+            const clone = badge.cloneNode(true);
+            badgeRow.appendChild(clone);
+          });
+        }
+        
+        // 4. Sync Meta Indicators Row (Date, Real-time Views)
+        const metaRow = document.getElementById("modalMetaInfo");
+        if (metaRow) {
+          metaRow.innerHTML = "";
+          const originalMeta = card.querySelectorAll(".meta-info, .meta-text, .date, .views, span[style*='background']");
+          originalMeta.forEach(meta => {
+            // Skips duplicating interactive operational buttons elements
+            if (!meta.closest(".unlock-btn") && !meta.closest(".share-btn") && !meta.closest(".read-more-btn")) {
+              const clone = meta.cloneNode(true);
+              metaRow.appendChild(clone);
+            }
+          });
+          
+          // Layout adjustment for inline meta wrapper spacing
+          metaRow.style.display = "flex";
+          metaRow.style.flexWrap = "wrap";
+          metaRow.style.gap = "12px";
+          metaRow.style.fontSize = "0.85rem";
+          metaRow.style.color = "var(--text-muted, #666)";
+        }
+        
+        // 5. Sync Action Trigger Footprint Links Elements
+        const actionRow = document.getElementById("modalActionRow");
+        if (actionRow) {
+          actionRow.innerHTML = "";
+          const actionBtn = card.querySelector(".unlock-btn") || card.querySelector(".open-btn") || card.querySelector("a.btn");
+          const shareBtnEl = card.querySelector(".share-btn");
+          
+          if (actionBtn) {
+            const cloneBtn = actionBtn.cloneNode(true);
+            cloneBtn.style.flex = "1";
+            cloneBtn.style.textAlign = "center";
+            cloneBtn.style.display = "block";
+            actionRow.appendChild(cloneBtn);
+          }
+          
+          if (shareBtnEl) {
+            const cloneShare = shareBtnEl.cloneNode(true);
+            cloneShare.style.padding = "10px 15px";
+            actionRow.appendChild(cloneShare);
+          }
+        }
+        
+        // Open the upgraded dynamic modal popup screen loop
+        modalOverlay.style.display = "flex";
+      } else {
+        // Full backward compatible fallback logic stream if HTML node shell is missing
+        const description = readMoreBtn.previousElementSibling;
+        if (description && (description.classList.contains("resource-description") || description.tagName === "P")) {
+          description.classList.toggle("expanded");
+          readMoreBtn.textContent = description.classList.contains("expanded") ? "Read Less" : "Read More";
+        }
       }
       return;
     }
@@ -142,9 +229,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // UPGRADE: Dynamic Premium Description Modal Lifecycle Control Wireframe
+  if (descriptionModalClose) {
+    descriptionModalClose.addEventListener("click", () => {
+      if (descriptionModalOverlay) descriptionModalOverlay.style.display = "none";
+    });
+  }
+
+  if (descriptionModalOverlay) {
+    descriptionModalOverlay.addEventListener("click", (e) => {
+      if (e.target === descriptionModalOverlay) {
+        descriptionModalOverlay.style.display = "none";
+      }
+    });
+  }
+
+  // Global escape wire binding registry
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && popupOverlay && popupOverlay.classList.contains("active")) {
-      popupOverlay.classList.remove("active");
+    if (e.key === "Escape") {
+      if (popupOverlay && popupOverlay.classList.contains("active")) {
+        popupOverlay.classList.remove("active");
+      }
+      if (descriptionModalOverlay) {
+        descriptionModalOverlay.style.display = "none";
+      }
     }
   });
 
