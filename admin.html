@@ -14,6 +14,18 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+  <!-- ==========================================================================
+     🔒 AUTHENTICATION SECURE PIPELINE: CRITICAL LOADING PRIORITY 
+     ========================================================================== -->
+  <!-- 1. Supabase SDK Core Library (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- 2. Tumhari Database Configuration Credentials -->
+  <script src="supabase/config.js"></script> 
+  
+  <!-- 3. Admin dashboard core execution file (Gatekeeper check executes immediately) -->
+  <script src="js/admin.js" defer></script>
+
   <!-- DYNAMIC CORE FLASH PROTECTOR: Automatically tracks theme preference on window instance launch -->
   <script>
     (function initAdminTheme() {
@@ -30,16 +42,18 @@
 
 <body>
 
-  <div class="login-box" id="loginBox" style="display:none;">
+  <!-- ENHANCEMENT: DEACTIVATED LOCAL INLINE LOGIN IN FAVOR OF AIRTIGHT ROUTING GATEKEEPER -->
+  <!-- <div class="login-box" id="loginBox" style="display:none;">
     <form id="loginForm" class="login-form">
       <h2>Admin Login</h2>
       <input type="email" id="adminEmail" placeholder="Admin Email" required>
       <input type="password" id="adminPassword" placeholder="Password" required>
       <button type="submit">Login</button>
     </form>
-  </div>
+  </div> -->
 
-  <div class="admin-container" style="display:none;">
+  <!-- Note: This dynamic dashboard layer container wrapper is controlled directly via js/admin.js post-auth checks -->
+  <div class="admin-container">
 
     <aside class="admin-sidebar">
       <div class="admin-logo">
@@ -328,10 +342,6 @@
 
     </main>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase/config.js"></script>
-  <script src="js/admin.js"></script>
 
 </body>
 </html>

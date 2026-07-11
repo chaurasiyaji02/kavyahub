@@ -2,6 +2,21 @@
    KAVYAHUB - ADMIN DASHBOARD CONTROLLER (RE-AUDITED & BUGLOCK RESOLVED)
    ========================================================================== */
 
+// SECURE GATEKEEPER CHECK: Redirects unauthorized visitors instantly before rendering components
+(async function checkAdminSession() {
+  try {
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    
+    if (error || !session) {
+      console.log("No active session found, redirecting to login page...");
+      window.location.replace("login.html");
+    }
+  } catch (err) {
+    console.error("Auth gatekeeper runtime exception:", err);
+    window.location.replace("login.html");
+  }
+})();
+
 const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
 
 const loginBox = document.getElementById("loginBox");
@@ -108,7 +123,7 @@ async function checkAdminLogin() {
 
   if (!data.user || data.user.email !== ADMIN_EMAIL) {
     if (adminContainer) adminContainer.style.display = "none";
-    if (loginBox) loginBox.style.display = "flex";
+    window.location.replace("login.html");
     return;
   }
 
@@ -156,7 +171,7 @@ async function adminLogin(e) {
 
 async function adminLogout() {
   await supabaseClient.auth.signOut();
-  checkAdminLogin();
+  window.location.replace("login.html");
 }
 
 document.getElementById("loginForm")?.addEventListener("submit", adminLogin);
@@ -480,7 +495,7 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   e.target.reset();
   clearCheckedTags("video-tag-check");
   document.getElementById("videoOrgType").value = "none"; 
-  toggleMetaRows(); // ENHANCEMENT: Reset video metadata row display view instantly
+  toggleMetaRows(); 
   updateVideoButtonText();
 
   loadVideosList();
@@ -514,7 +529,7 @@ async function editVideo(id) {
   document.getElementById("videoCategory").value = data.category || "certificate";
   document.getElementById("videoOrgType").value = data.org_type || "none";
   
-  toggleMetaRows(); // ENHANCEMENT: Ensure correct context displays during initial hydration
+  toggleMetaRows(); 
   
   setCheckedTags("video-tag-check", data.tags);
   document.getElementById("youtubeLink").value = data.youtube_link || "";
@@ -532,7 +547,7 @@ function cancelVideoEdit() {
   document.getElementById("videoForm")?.reset();
   clearCheckedTags("video-tag-check");
   document.getElementById("videoOrgType").value = "none";
-  toggleMetaRows(); // ENHANCEMENT: Clear layouts rows seamlessly
+  toggleMetaRows(); 
   updateVideoButtonText();
 }
 
