@@ -1003,3 +1003,5 @@ section {
   background: var(--border);
   border-radius: 999px;
 }
+
+.policy-card-container a { color: var(--primary-color); text-decoration: underline; }
