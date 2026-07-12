@@ -5,30 +5,47 @@
     <lastmod>2026-07-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-</url>
-<url>
+  </url>
+  <url>
     <loc>https://kavyahub.vercel.app/resources.html</loc>
     <lastmod>2026-07-12</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-</url>
-
+  </url>
   <url>
-    <loc>https://kavyahub.com/about.html</loc>
+    <loc>https://kavyahub.vercel.app/videos.html</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kavyahub.vercel.app/calendar.html</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kavyahub.vercel.app/about.html</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://kavyahub.com/privacy.html</loc>
+    <loc>https://kavyahub.vercel.app/contact.html</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://kavyahub.vercel.app/privacy.html</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://kavyahub.com/terms.html</loc>
+    <loc>https://kavyahub.vercel.app/terms.html</loc>
     <lastmod>2026-07-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
-  <!-- Baki pages (contact, videos, etc.) bhi aise hi add kar dena -->
 </urlset>
