@@ -2,7 +2,7 @@
    KAVYAHUB - UNIFIED GLOBAL CORE ENGINE (MOBILE & PC OPTIMIZED)
    ========================================================================== */
 
-// 1. IMMEDIATE THEME INITIALIZER (Prevents annoying white screen flashes on load)
+// 1. IMMEDIATE THEME INITIALIZER (Prevents white screen flash on load)
 (function initTheme() {
   const savedTheme = localStorage.getItem("kavyahub-theme");
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -26,173 +26,139 @@ document.addEventListener("DOMContentLoaded", () => {
   const popupClose = document.getElementById("popupClose");
   const continueBtn = document.getElementById("continueBtn");
 
-  // UPGRADE: Dynamic Premium Description Modal Selectors
   const descriptionModalOverlay = document.getElementById("descriptionModalOverlay");
   const descriptionModalClose = document.getElementById("descriptionModalClose");
 
-  let currentResourceLink = ""; // Safe contextual register for lock screen routing
+  let currentResourceLink = "";
 
   /* ==========================================
-     B. TOAST NOTIFICATION UTILITY (Cross-Platform Safe)
+     B. HELPER FUNCTIONS
      ========================================== */
-  function showToast(message) {
-    // Remove existing toast if any to prevent cluttering mobile screen
+  function showToast(message, icon = "fa-circle-check") {
     const oldToast = document.querySelector(".kavyahub-toast");
     if (oldToast) oldToast.remove();
 
     const toast = document.createElement("div");
     toast.className = "kavyahub-toast";
-    toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${message}`;
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
     document.body.appendChild(toast);
 
-    // Dynamic clean removal cycle
     setTimeout(() => toast.classList.add("show"), 10);
     setTimeout(() => {
       toast.classList.remove("show");
       setTimeout(() => toast.remove(), 400);
-    }, 2500);
+    }, 2800);
+  }
+
+  function escapeHTML(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatStructuredText(text) {
+    if (!text) return "";
+    const escaped = escapeHTML(text);
+    return escaped
+      .split("\n")
+      .map(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
+          return `<div class="formatted-bullet">• ${trimmed.substring(2)}</div>`;
+        }
+        return trimmed ? `<p class="formatted-paragraph">${trimmed}</p>` : `<div class="formatted-spacer"></div>`;
+      })
+      .join("");
   }
 
   /* ==========================================
-     C. UNIFIED EVENT DELEGATION PIPELINE (RAM & Battery Safe)
+     C. UNIFIED EVENT DELEGATION PIPELINE
      ========================================== */
   document.addEventListener("click", (e) => {
     
-    // FEATURE 1: Resource Unlock Trigger (.unlock-btn)
+    // 1. Resource Unlock Modal Trigger (.unlock-btn)
     const unlockButton = e.target.closest(".unlock-btn");
     if (unlockButton) {
       currentResourceLink = unlockButton.getAttribute("data-link");
       if (!currentResourceLink || currentResourceLink === "#") {
-        alert("Resource link not added yet.");
+        showToast("Resource link not available yet.", "fa-circle-exclamation");
         return;
       }
-      if (popupOverlay) popupOverlay.classList.add("active");
-      return;
-    }
-
-    // FEATURE 2: Global Clamping Toggler (.read-more-btn) -> UPGRADED TO MODAL
-    const readMoreBtn = e.target.closest(".read-more-btn");
-    if (readMoreBtn) {
-      e.preventDefault(); // Lock form/layout shifts
-      
-      const modalOverlay = document.getElementById("descriptionModalOverlay");
-      const card = readMoreBtn.closest(".category-card") || 
-                   readMoreBtn.closest(".latest-card") || 
-                   readMoreBtn.closest(".resource-card") || 
-                   readMoreBtn.closest(".video-card") || 
-                   readMoreBtn.closest("div[class*='card']");
-
-      if (modalOverlay && card) {
-        // Dynamic Node Extraction Engine
-        const titleEl = card.querySelector("h3") || card.querySelector(".card-title");
-        const descEl = card.querySelector(".resource-description") || card.querySelector("p");
-        
-        // 1. Parse Title
-        document.getElementById("modalTitle").textContent = titleEl ? titleEl.textContent : "Resource Details";
-        
-        // 2. Parse Description Content with formatting preservation
-        const modalDesc = document.getElementById("modalDescriptionContent");
-        if (modalDesc && descEl) {
-          // Extracts pristine raw text node layout strings
-          modalDesc.textContent = descEl.innerText || descEl.textContent;
-        }
-        
-        // 3. Sync Dynamic Badges & Categories Chips Row
-        const badgeRow = document.getElementById("modalBadgeRow");
-        if (badgeRow) {
-          badgeRow.innerHTML = "";
-          // Extract specific UI tag groups safely
-          const originalBadges = card.querySelectorAll(".card-badges span, .category-chip, .tag, .resource-tag");
-          originalBadges.forEach(badge => {
-            const clone = badge.cloneNode(true);
-            badgeRow.appendChild(clone);
-          });
-        }
-        
-        // 4. Sync Meta Indicators Row (Date, Real-time Views)
-        const metaRow = document.getElementById("modalMetaInfo");
-        if (metaRow) {
-          metaRow.innerHTML = "";
-          const originalMeta = card.querySelectorAll(".meta-info, .meta-text, .date, .views, span[style*='background']");
-          originalMeta.forEach(meta => {
-            // Skips duplicating interactive operational buttons elements
-            if (!meta.closest(".unlock-btn") && !meta.closest(".share-btn") && !meta.closest(".read-more-btn")) {
-              const clone = meta.cloneNode(true);
-              metaRow.appendChild(clone);
-            }
-          });
-          
-          // Layout adjustment for inline meta wrapper spacing
-          metaRow.style.display = "flex";
-          metaRow.style.flexWrap = "wrap";
-          metaRow.style.gap = "12px";
-          metaRow.style.fontSize = "0.85rem";
-          metaRow.style.color = "var(--text-muted, #666)";
-        }
-        
-        // 5. Sync Action Trigger Footprint Links Elements
-        const actionRow = document.getElementById("modalActionRow");
-        if (actionRow) {
-          actionRow.innerHTML = "";
-          const actionBtn = card.querySelector(".unlock-btn") || card.querySelector(".open-btn") || card.querySelector("a.btn");
-          const shareBtnEl = card.querySelector(".share-btn");
-          
-          if (actionBtn) {
-            const cloneBtn = actionBtn.cloneNode(true);
-            cloneBtn.style.flex = "1";
-            cloneBtn.style.textAlign = "center";
-            cloneBtn.style.display = "block";
-            actionRow.appendChild(cloneBtn);
-          }
-          
-          if (shareBtnEl) {
-            const cloneShare = shareBtnEl.cloneNode(true);
-            cloneShare.style.padding = "10px 15px";
-            actionRow.appendChild(cloneShare);
-          }
-        }
-        
-        // Open the upgraded dynamic modal popup screen loop
-        modalOverlay.style.display = "flex";
-      } else {
-        // Full backward compatible fallback logic stream if HTML node shell is missing
-        const description = readMoreBtn.previousElementSibling;
-        if (description && (description.classList.contains("resource-description") || description.tagName === "P")) {
-          description.classList.toggle("expanded");
-          readMoreBtn.textContent = description.classList.contains("expanded") ? "Read Less" : "Read More";
-        }
+      if (popupOverlay) {
+        popupOverlay.classList.add("active");
+        document.body.style.overflow = "hidden";
       }
       return;
     }
 
-    // FEATURE 3: Smart Quick Link Copy Controller (.share-btn)
+    // 2. Global About / Card Clamping Modal Handler (.about-modal-trigger / fallback)
+    const aboutModalBtn = e.target.closest(".about-modal-trigger");
+    if (aboutModalBtn) {
+      e.preventDefault();
+      const card = aboutModalBtn.closest(".about-card");
+      if (card && descriptionModalOverlay) {
+        const title = card.getAttribute("data-title") || "About Section";
+        const desc = card.getAttribute("data-desc") || "";
+        const badge = card.getAttribute("data-badge") || "Info";
+
+        const mTitle = document.getElementById("modalTitle");
+        const mDesc = document.getElementById("modalDescriptionContent");
+        const mBadge = document.getElementById("modalBadgeRow");
+        const mMeta = document.getElementById("modalMetaInfo");
+        const mAction = document.getElementById("modalActionRow");
+
+        if (mTitle) mTitle.textContent = title;
+        if (mDesc) mDesc.innerHTML = formatStructuredText(desc);
+        if (mBadge) mBadge.innerHTML = `<span class="badge-pill primary-pill">${badge}</span>`;
+        if (mMeta) mMeta.innerHTML = "";
+        if (mAction) mAction.innerHTML = "";
+
+        descriptionModalOverlay.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+      return;
+    }
+
+    // 3. Smart Share Button Controller (.share-btn)
     const shareBtn = e.target.closest(".share-btn");
     if (shareBtn) {
       e.preventDefault();
-      const rawLink = shareBtn.getAttribute("data-link");
-      if (rawLink && rawLink !== "#") {
-        navigator.clipboard.writeText(rawLink)
-          .then(() => showToast("Link Copied to Clipboard! 📋"))
-          .catch(() => alert("Failed to copy link. Please manually copy the URL."));
+      const rawLink = shareBtn.getAttribute("data-link") || window.location.href;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: "Check this out on KavyaHub",
+          url: rawLink
+        }).catch(() => {});
       } else {
-        showToast("No active link available to share!");
+        if (rawLink && rawLink !== "#") {
+          navigator.clipboard.writeText(rawLink)
+            .then(() => showToast("Link Copied to Clipboard! 📋"))
+            .catch(() => showToast("Failed to copy link.", "fa-circle-xmark"));
+        } else {
+          showToast("No shareable link found!", "fa-circle-exclamation");
+        }
       }
       return;
     }
 
-    // FEATURE 4: Dark Mode Click Listener (.theme-toggle-btn / #themeToggleBtn)
+    // 4. Dark / Light Theme Toggle Listener
     const themeBtn = e.target.closest(".theme-toggle-btn") || e.target.closest("#themeToggleBtn");
     if (themeBtn) {
       e.preventDefault();
       const isDark = document.documentElement.classList.toggle("dark-mode");
       localStorage.setItem("kavyahub-theme", isDark ? "dark" : "light");
-      showToast(`${isDark ? "Dark Theme" : "Light Theme"} Activated!`);
+      showToast(`${isDark ? "Dark" : "Light"} Mode Enabled!`, isDark ? "fa-moon" : "fa-sun");
       return;
     }
   });
 
   /* ==========================================
-     D. MOBILE SIDEBAR NAVIGATION MANAGEMENT
+     D. MOBILE SIDEBAR NAVIGATION
      ========================================== */
   if (menuIcon && navLinks) {
     menuIcon.addEventListener("click", (e) => {
@@ -210,9 +176,14 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================
      E. OVERLAY POPUP SUBSCRIPTION ROUTING
      ========================================== */
+  function closeUnlockPopup() {
+    if (popupOverlay) popupOverlay.classList.remove("active");
+    document.body.style.overflow = "auto";
+  }
+
   if (continueBtn) {
     continueBtn.addEventListener("click", () => {
-      if (popupOverlay) popupOverlay.classList.remove("active");
+      closeUnlockPopup();
       if (currentResourceLink && currentResourceLink !== "#") {
         window.open(currentResourceLink, "_blank", "noopener,noreferrer");
       }
@@ -220,53 +191,50 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (popupClose) {
-    popupClose.addEventListener("click", () => popupOverlay.classList.remove("active"));
+    popupClose.addEventListener("click", closeUnlockPopup);
   }
 
   if (popupOverlay) {
     popupOverlay.addEventListener("click", (e) => {
-      if (e.target === popupOverlay) popupOverlay.classList.remove("active");
+      if (e.target === popupOverlay) closeUnlockPopup();
     });
   }
 
-  // UPGRADE: Dynamic Premium Description Modal Lifecycle Control Wireframe
+  /* ==========================================
+     F. DESCRIPTION MODAL LIFECYCLE
+     ========================================== */
+  function closeUniversalModal() {
+    if (descriptionModalOverlay) descriptionModalOverlay.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+
   if (descriptionModalClose) {
-    descriptionModalClose.addEventListener("click", () => {
-      if (descriptionModalOverlay) descriptionModalOverlay.style.display = "none";
-    });
+    descriptionModalClose.addEventListener("click", closeUniversalModal);
   }
 
   if (descriptionModalOverlay) {
     descriptionModalOverlay.addEventListener("click", (e) => {
-      if (e.target === descriptionModalOverlay) {
-        descriptionModalOverlay.style.display = "none";
-      }
+      if (e.target === descriptionModalOverlay) closeUniversalModal();
     });
   }
 
-  // Global escape wire binding registry
+  // Escape key closer
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      if (popupOverlay && popupOverlay.classList.contains("active")) {
-        popupOverlay.classList.remove("active");
-      }
-      if (descriptionModalOverlay) {
-        descriptionModalOverlay.style.display = "none";
-      }
+      closeUnlockPopup();
+      closeUniversalModal();
     }
   });
 
   /* ==========================================
-     F. INTELLIGENT NAVIGATION PATH LIGHTING
+     G. INTELLIGENT NAVIGATION PATH LIGHTING
      ========================================== */
   const currentPath = window.location.pathname;
-  const currentPage = currentPath.split("/").pop();
+  const currentPage = currentPath.split("/").pop() || "index.html";
 
   document.querySelectorAll(".nav-links a").forEach(link => {
     const href = link.getAttribute("href");
-    if (href === currentPage || 
-        (currentPath === "/" && (href === "index.html" || href === "/")) ||
-        (href && currentPath.endsWith(href))) {
+    if (href === currentPage || (currentPage === "" && href === "index.html")) {
       link.classList.add("active");
     }
   });

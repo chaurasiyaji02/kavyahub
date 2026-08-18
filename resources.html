@@ -2,38 +2,50 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <title>Resources | KavyaHub</title>
-  <meta name="description" content="Explore free certificates, courses, internships, roadmaps, notes, and useful tech resources on KavyaHub." />
+  <title>Free Resources | KavyaHub - Courses, Internships & Scholarships</title>
+  <meta name="description" content="Explore free certificates, courses, internships, scholarships, hackathons, roadmaps, and tech resources on KavyaHub." />
+  <meta name="keywords" content="free certifications, student scholarships, remote internships, developer roadmaps, coding notes, KavyaHub" />
 
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Free Resources & Student Opportunities | KavyaHub" />
+  <meta property="og:description" content="Explore curated free certificates, courses, internships, and scholarships." />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
+
       <div class="logo">
         <a href="index.html">Kavya<span>Hub</span></a>
       </div>
 
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
-        <li><a href="resources.html">Resources</a></li>
+        <li><a href="resources.html" class="active">Resources</a></li>
         <li><a href="videos.html">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
         <li><a href="about.html">About</a></li>
@@ -41,12 +53,12 @@
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
         
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -55,135 +67,164 @@
 
   <main>
     
+    <!-- Hero Header -->
     <section class="resources-hero">
       <div class="section-heading">
-        <h1>Free Resources</h1>
-        <p>Explore free certificates, courses, internships, roadmaps, notes, and useful tech opportunities.</p>
+        <h1>Free Student & Career Resources</h1>
+        <p>Discover verified courses, certificates, internships, hackathons, and financial scholarships.</p>
       </div>
     </section>
 
-    <!-- UPGRADE: Enhanced Search Section Frame incorporating dynamic absolute drop suggestions container anchor -->
-    <section class="search-section" style="position: relative;">
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input
-          type="text"
-          id="resourceSearch"
-          placeholder="Search by title, description, category or tags..."
-          autocomplete="off"
-        />
-        <button class="filter-toggle-btn" id="filterToggleBtn" type="button">
-          <i class="fa-solid fa-sliders"></i> Filters
-        </button>
+    <!-- Search Section & Autocomplete -->
+    <section class="search-section">
+      <div class="search-box-wrapper">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="resourceSearch"
+            placeholder="Search by title, category, company, or skills..."
+            autocomplete="off"
+          />
+          <button type="button" id="clearResourceSearch" class="clear-search-btn" style="display: none;" aria-label="Clear Search">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+          <button class="filter-toggle-btn" id="filterToggleBtn" type="button">
+            <i class="fa-solid fa-sliders"></i> Filters <span id="filterCountBadge" class="filter-count-badge" style="display: none;">0</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Autocomplete Suggestions -->
+        <div id="searchSuggestions" class="search-suggestions-box" style="display: none;"></div>
       </div>
 
-      <!-- ENHANCEMENT: Autocomplete Dropdown suggestions layer template container -->
-      <div id="searchSuggestions" class="search-suggestions-box" style="display: none; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden;"></div>
-
-      <div class="trending-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; justify-content: center; align-items: center;">
-        <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">Trending:</span>
-        <button type="button" class="trending-chip" data-tag="course" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Courses</button>
-        <button type="button" class="trending-chip" data-tag="notes" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Notes</button>
-        <button type="button" class="trending-chip" data-tag="internship" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Internships</button>
-        <button type="button" class="trending-chip" data-tag="job" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Jobs</button>
-        <button type="button" class="trending-chip" data-tag="hackathon" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Hackathons</button>
-        <!-- ENHANCEMENT: Newly added tracking category entry selector chip -->
-        <button type="button" class="trending-chip" data-tag="scholarship" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; cursor: pointer; color: var(--text-main); transition: all 0.2s;">#Scholarships</button>
+      <!-- Quick Trending Filter Chips -->
+      <div class="trending-chips-container">
+        <span class="trending-label"><i class="fa-solid fa-fire"></i> Trending:</span>
+        <button type="button" class="trending-chip" data-tag="course">#Courses</button>
+        <button type="button" class="trending-chip" data-tag="certificate">#Certificates</button>
+        <button type="button" class="trending-chip" data-tag="internship">#Internships</button>
+        <button type="button" class="trending-chip" data-tag="job">#Jobs</button>
+        <button type="button" class="trending-chip" data-tag="hackathon">#Hackathons</button>
+        <button type="button" class="trending-chip" data-tag="scholarship">#Scholarships</button>
+        <button type="button" class="trending-chip" data-tag="notes">#Notes</button>
       </div>
     </section>
 
-    <section class="filter-panel-section" id="filterPanel" style="display:none;">
+    <!-- Advanced Granular Multi-Filter Drawer / Panel -->
+    <section class="filter-panel-section" id="filterPanel" style="display: none;">
       <div class="filter-panel">
+        
         <div class="filter-panel-header">
-          <h3>Filter Resources</h3>
-          <button type="button" id="clearFiltersBtn">Clear</button>
+          <h3><i class="fa-solid fa-filter"></i> Advanced Filters</h3>
+          <button type="button" id="clearFiltersBtn" class="clear-filters-link">
+            <i class="fa-solid fa-rotate-left"></i> Reset All
+          </button>
         </div>
 
-        <div class="filter-options">
-          <label>
-            <input type="checkbox" class="tag-filter" value="certificate"> Certificates
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="course"> Courses
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="notes"> Notes
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="internship"> Internships
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="ai-tool"> AI Tools
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="roadmap"> Roadmaps
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="job"> Jobs
-          </label>
-          <label>
-            <input type="checkbox" class="tag-filter" value="hackathon"> Hackathons
-          </label>
-          <!-- ENHANCEMENT: Integrated Filter Target Box entry node for scholarships -->
-          <label>
-            <input type="checkbox" class="tag-filter" value="scholarship"> Scholarships
-          </label>
+        <!-- 1. Category Filter Options -->
+        <div class="filter-group">
+          <div class="filter-group-title">Categories</div>
+          <div class="filter-options-grid">
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="certificate"> Certificates
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="course"> Courses
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="notes"> Notes & Cheatsheets
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="internship"> Internships
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="job"> Jobs
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="hackathon"> Hackathons
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="scholarship"> Scholarships
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="ai-tool"> AI Tools
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="tag-filter" value="roadmap"> Roadmaps
+            </label>
+          </div>
         </div>
 
-        <!-- UPGRADE: Secondary Filter Section Group explicitly rendering Organization Sectors parameters (Govt vs Private) -->
-        <div class="filter-panel-divider" style="height: 1px; background: var(--border-color); margin: 15px 0;"></div>
-        <div class="filter-subtitle" style="font-size: 0.95rem; font-weight: 600; margin-bottom: 10px; color: var(--text-main); text-align: left;">Provider Sector</div>
-        <div class="filter-options sector-filters-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="checkbox" class="sector-filter" value="government"> Government (Sarkari)
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="checkbox" class="sector-filter" value="private"> Private (Corporate)
-          </label>
+        <!-- 2. Provider Sector (Govt vs Private) -->
+        <div class="filter-group">
+          <div class="filter-group-title">Provider Sector</div>
+          <div class="filter-options-row">
+            <label class="filter-check-label">
+              <input type="checkbox" class="sector-filter" value="government"> <i class="fa-solid fa-building-shield"></i> Government (Sarkari)
+            </label>
+            <label class="filter-check-label">
+              <input type="checkbox" class="sector-filter" value="private"> <i class="fa-solid fa-building"></i> Private / Corporate
+            </label>
+          </div>
         </div>
 
-        <div class="active-filters" id="activeFilters"></div>
+        <!-- 3. Active Filters Chips Container -->
+        <div class="active-filters-wrapper" id="activeFiltersWrapper" style="display: none;">
+          <div class="filter-group-title">Active Filters:</div>
+          <div class="active-filters" id="activeFilters"></div>
+        </div>
+
       </div>
     </section>
 
-    <section class="featured-resource">
+    <!-- Featured Highlight Resource -->
+    <section class="featured-resource" id="featuredResourceSection" style="display: none;">
       <div class="featured-card">
-        <div class="featured-badge">⭐ Featured Resource</div>
+        <div class="featured-badge"><i class="fa-solid fa-star"></i> Featured Resource</div>
         <h2 id="featuredTitle">Loading...</h2>
-        <p id="featuredDescription">Discover this featured learning resource.</p>
-        <button class="unlock-btn" id="featuredButton">Unlock Resource</button>
+        <p id="featuredDescription">Discover this handpicked opportunity.</p>
+        <button type="button" class="unlock-btn" id="featuredButton">Unlock Resource</button>
       </div>
     </section>
 
+    <!-- Count Summary -->
     <section class="resource-count-section">
       <h3>Available Resources: <span id="resourceCount">0</span></h3>
     </section>
 
+    <!-- Resource Cards Grid -->
     <section class="resources-grid-section">
       <div class="resources-grid" id="resourcesContainer"></div>
 
-      <div id="emptyState" class="empty-state" style="display:none;">
+      <!-- Zero-Result Feedback Box -->
+      <div id="emptyState" class="empty-state" style="display: none;">
         <i class="fa-solid fa-folder-open"></i>
-        <h3>No Resources Found</h3>
-        <p>Try a different keyword or filter option.</p>
+        <h3>No Matching Resources Found</h3>
+        <p>Try adjusting your search terms, changing filters, or clear all filters.</p>
+        <button type="button" id="resetFiltersEmptyBtn" class="btn secondary-btn" style="margin-top: 15px;">
+          <i class="fa-solid fa-rotate-left"></i> Clear All Filters
+        </button>
       </div>
     </section>
 
   </main>
 
+  <!-- Social Link Unlock Modal -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup-box">
       <button class="popup-close" id="popupClose" aria-label="Close Popup">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h2>Unlock Resource</h2>
-      <p>Please support by subscribing on YouTube and following on Instagram before accessing this resource.</p>
+      <h2>Unlock Resource Link</h2>
+      <p>Please subscribe on YouTube and follow on Instagram to support us before accessing this link.</p>
 
       <div class="popup-buttons">
         <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" class="popup-social-btn youtube-btn" target="_blank" rel="noopener noreferrer">
           <i class="fa-brands fa-youtube"></i> Subscribe
         </a>
+
         <a href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx" class="popup-social-btn insta-btn" target="_blank" rel="noopener noreferrer">
           <i class="fa-brands fa-instagram"></i> Follow
         </a>
@@ -193,20 +234,21 @@
     </div>
   </div>
 
-  <!-- UPGRADE: Premium Universal Blurred Description Container Modal Hook (Sync with main.js event delegates engine) -->
-  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+  <!-- Resource Detail Read More Modal (Structured Content & Line-breaks) -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay">
+    <div class="description-modal-box">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Details Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
-      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Resource Title</h3>
-      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
-      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
-      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
+      <div class="modal-badge-row" id="modalBadgeRow"></div>
+      <h3 id="modalTitle">Resource Title</h3>
+      <div class="modal-meta-info" id="modalMetaInfo"></div>
+      <div class="modal-description-content" id="modalDescriptionContent"></div>
+      <div class="modal-action-row" id="modalActionRow"></div>
     </div>
   </div>
 
+  <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
@@ -227,6 +269,7 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase/config.js"></script>
   <script src="js/main.js"></script>

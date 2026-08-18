@@ -2,29 +2,43 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <title>About | KavyaHub</title>
+  <title>About | KavyaHub - Empowering Students & Tech Learners</title>
   <meta name="description" content="Learn more about KavyaHub, why it exists, what you can find here, and details about the creator." />
+  <meta name="keywords" content="about KavyaHub, free student hub, tech career roadmaps, Kavya Chaurasiya" />
 
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="About KavyaHub | Student Learning & Career Hub" />
+  <meta property="og:description" content="Empowering students with verified free courses, certifications, internships, and roadmaps." />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
+
       <div class="logo">
         <a href="index.html">Kavya<span>Hub</span></a>
       </div>
@@ -34,17 +48,17 @@
         <li><a href="resources.html">Resources</a></li>
         <li><a href="videos.html">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
-        <li><a href="about.html">About</a></li>
+        <li><a href="about.html" class="active">About</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
         
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -53,82 +67,107 @@
 
   <main>
 
+    <!-- Hero Header -->
     <section class="resources-hero">
       <div class="section-heading">
         <h1>About KavyaHub</h1>
-        <p>KavyaHub is a simple learning hub for free courses, certificates, internships, notes, videos, and useful tech resources.</p>
+        <p>A dedicated discovery platform connecting learners to high-value free education, verified certifications, internships, and opportunities.</p>
       </div>
     </section>
 
+    <!-- Core Pillars Grid -->
     <section class="latest-section">
       <div class="latest-grid">
         
-        <div class="resource-card">
-          <span class="tag">Purpose</span>
-          <h3>Why KavyaHub Exists</h3>
+        <div class="resource-card about-card" 
+             data-badge="Mission" 
+             data-title="Why KavyaHub Exists" 
+             data-desc="The core goal of KavyaHub is to simplify student discovery. Millions of students and early-stage professionals waste hours searching for genuine free courses, internships, and government-backed fellowships. We curate, verify, and present these resources in an accessible, categorized layout without paywalls.">
+          <div class="tag-row">
+            <span class="badge-pill primary-pill"><i class="fa-solid fa-bullseye"></i> Mission</span>
+          </div>
+          <h3 class="card-title">Why KavyaHub Exists</h3>
           <p class="resource-description">The goal of KavyaHub is to collect useful learning opportunities in one place, so students and beginners can easily find free resources without wasting time.</p>
-          <button type="button" class="read-more-btn">Read More</button>
+          <button type="button" class="read-more-btn about-modal-trigger">Read More</button>
         </div>
 
-        <div class="resource-card">
-          <span class="tag">Content</span>
-          <h3>What You Can Find</h3>
-          <p class="resource-description">You can explore free certificates, courses, internships, roadmaps, notes, YouTube videos, AI tools, and career-related learning resources.</p>
-          <button type="button" class="read-more-btn">Read More</button>
+        <div class="resource-card about-card" 
+             data-badge="Ecosystem" 
+             data-title="What You Can Find" 
+             data-desc="KavyaHub houses a constantly updated repository of:
+- 100% Free Certifications from global organizations (Google, Microsoft, IBM, NPTEL)
+- Career Roadmaps & Tech Interview Notes
+- Verified Summer/Winter Internships & Freshers Job Drives
+- Financial Grants & Government Scholarships
+- Step-by-step Video Application Guides">
+          <div class="tag-row">
+            <span class="badge-pill purple-pill"><i class="fa-solid fa-layer-group"></i> Ecosystem</span>
+          </div>
+          <h3 class="card-title">What You Can Find</h3>
+          <p class="resource-description">Explore free certificates, courses, internships, roadmaps, notes, YouTube tutorials, AI tools, and career-related resources.</p>
+          <button type="button" class="read-more-btn about-modal-trigger">Read More</button>
         </div>
 
-        <div class="resource-card">
-          <span class="tag">Creator</span>
-          <h3>About Kavya</h3>
-          <p class="resource-description">I share useful tech, career, certificate, internship, and learning updates through YouTube, Instagram, and this website.</p>
-          <button type="button" class="read-more-btn">Read More</button>
+        <div class="resource-card about-card" 
+             data-badge="Creator" 
+             data-title="About The Creator" 
+             data-desc="Created by Kavya Chaurasiya, a passionate tech advocate and content creator focused on democratizing career awareness for engineering and college students. Kavya shares real-time updates and walkthroughs across YouTube, Instagram, and this platform.">
+          <div class="tag-row">
+            <span class="badge-pill gold-pill"><i class="fa-solid fa-user-check"></i> Creator</span>
+          </div>
+          <h3 class="card-title">About The Creator</h3>
+          <p class="resource-description">I share useful tech, career, certificate, internship, and learning updates through YouTube, Instagram, and this centralized platform.</p>
+          <button type="button" class="read-more-btn about-modal-trigger">Read More</button>
         </div>
+
       </div>
     </section>
 
+    <!-- Platform Highlights Section -->
     <section class="category-section">
       <div class="section-heading">
         <h2>Explore the Platform</h2>
-        <p>Start with resources, videos, or date-wise uploads.</p>
+        <p>Start discovering tailored materials across our core channels.</p>
       </div>
 
       <div class="category-grid">
         <a href="resources.html" class="category-card">
           <i class="fa-solid fa-folder-open"></i>
-          <h3>Resources</h3>
-          <p>Browse free courses, certificates, internships, and notes.</p>
+          <h3>Resources Engine</h3>
+          <p>Filter courses, notes, hackathons, and certifications dynamically.</p>
         </a>
 
         <a href="videos.html" class="category-card">
-          <i class="fa-solid fa-video"></i>
-          <h3>Videos</h3>
-          <p>Watch useful YouTube videos and learning updates.</p>
+          <i class="fa-solid fa-video" style="color: #ef4444;"></i>
+          <h3>Video Tutorials</h3>
+          <p>Watch step-by-step application walkthroughs and roadmaps.</p>
         </a>
 
         <a href="calendar.html" class="category-card">
-          <i class="fa-solid fa-calendar-days"></i>
-          <h3>Calendar</h3>
-          <p>View resources and videos based on upload dates.</p>
+          <i class="fa-solid fa-calendar-days" style="color: #06b6d4;"></i>
+          <h3>Timeline Calendar</h3>
+          <p>Track uploads, application deadlines, and exam schedules.</p>
         </a>
       </div>
     </section>
 
   </main>
 
-  <!-- UPGRADE: Premium Universal Blurred Description Container Modal Hook (Sync with main.js event handlers) -->
-  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+  <!-- Universal Modal for About Read More Content -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay">
+    <div class="description-modal-box">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Details Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
-      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Details</h3>
-      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
-      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
-      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
+      <div class="modal-badge-row" id="modalBadgeRow"></div>
+      <h3 id="modalTitle">About Section</h3>
+      <div class="modal-meta-info" id="modalMetaInfo"></div>
+      <div class="modal-description-content" id="modalDescriptionContent"></div>
+      <div class="modal-action-row" id="modalActionRow"></div>
     </div>
   </div>
 
+  <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
@@ -149,6 +188,7 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="js/main.js"></script>
 
 </body>

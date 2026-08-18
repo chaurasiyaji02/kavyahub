@@ -1,6 +1,14 @@
 /* ==========================================================================
-   KAVYAHUB - ADMIN DASHBOARD CONTROLLER (RE-AUDITED & BUGLOCK RESOLVED)
+   KAVYAHUB - ADMIN DASHBOARD CONTROLLER (OPTIMIZED, FORMATTED & SECURE)
    ========================================================================== */
+
+const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
+
+const loginBox = document.getElementById("loginBox");
+const adminContainer = document.querySelector(".admin-container");
+
+let editingResourceId = null;
+let editingVideoId = null;
 
 // SECURE GATEKEEPER CHECK: Redirects unauthorized visitors instantly before rendering components
 (async function checkAdminSession() {
@@ -10,20 +18,21 @@
     if (error || !session) {
       console.log("No active session found, redirecting to login page...");
       window.location.replace("login.html");
+      return;
     }
+
+    if (session.user?.email !== ADMIN_EMAIL) {
+      await supabaseClient.auth.signOut();
+      window.location.replace("login.html");
+      return;
+    }
+
+    checkAdminLogin();
   } catch (err) {
     console.error("Auth gatekeeper runtime exception:", err);
     window.location.replace("login.html");
   }
 })();
-
-const ADMIN_EMAIL = "kavyachaurasiya02@gmail.com";
-
-const loginBox = document.getElementById("loginBox");
-const adminContainer = document.querySelector(".admin-container");
-
-let editingResourceId = null;
-let editingVideoId = null;
 
 /* --------------------------------------------------------------------------
    1. STRING & TAG UTILITIES
@@ -43,13 +52,13 @@ function tagsToText(tags) {
 
 function getCheckedTags(className) {
   return Array.from(document.querySelectorAll(`.${className}:checked`))
-    .map(input => input.value);
+    .map(input => input.value.trim().toLowerCase());
 }
 
 function setCheckedTags(className, tags) {
-  const selectedTags = Array.isArray(tags) ? tags : [];
+  const selectedTags = Array.isArray(tags) ? tags.map(t => String(t).toLowerCase()) : [];
   document.querySelectorAll(`.${className}`).forEach(input => {
-    input.checked = selectedTags.includes(input.value);
+    input.checked = selectedTags.includes(input.value.toLowerCase());
   });
 }
 
@@ -59,8 +68,13 @@ function clearCheckedTags(className) {
   });
 }
 
+function sanitizeTextarea(value) {
+  if (!value) return "";
+  return value.trim();
+}
+
 /* --------------------------------------------------------------------------
-   1B. FIXED: DYNAMIC METADATA ROW VISIBILITY MANAGER
+   1B. DYNAMIC METADATA ROW VISIBILITY MANAGER
    -------------------------------------------------------------------------- */
 
 function toggleMetaRows() {
@@ -72,27 +86,27 @@ function toggleMetaRows() {
   const orgRow = document.getElementById("orgMetaRow");
   const videoOrgRow = document.getElementById("videoOrgMetaRow");
 
-  // FIX: Job/Internship Metadata visible status conditional routing loops
+  // Job & Internship
   if (jobRow) {
     jobRow.style.display = (category === "job" || category === "internship") ? "grid" : "none";
   }
   
+  // Hackathon
   if (hackathonRow) {
     hackathonRow.style.display = (category === "hackathon") ? "grid" : "none";
   }
   
-  // FIX: Ensure Government/Private select displays for all inbound operational categories
+  // Organization Sector (Govt vs Private)
   if (orgRow) {
-    orgRow.style.display = (category === "job" || category === "internship" || category === "hackathon" || category === "scholarship") ? "grid" : "none";
+    orgRow.style.display = (category === "job" || category === "internship" || category === "hackathon" || category === "scholarship" || category === "certificate" || category === "course") ? "grid" : "none";
   }
   
+  // Video Org Sector
   if (videoOrgRow) {
-    // Sync video metadata sector routing blocks
-    videoOrgRow.style.display = (videoCategory === "job" || videoCategory === "career" || videoCategory === "course" || videoCategory === "certificate") ? "grid" : "none";
+    videoOrgRow.style.display = (videoCategory === "job" || videoCategory === "career" || videoCategory === "course" || videoCategory === "certificate" || videoCategory === "scholarship") ? "grid" : "none";
   }
 }
 
-// Attach listeners correctly
 document.getElementById("resourceCategory")?.addEventListener("change", toggleMetaRows);
 document.getElementById("videoCategory")?.addEventListener("change", toggleMetaRows);
 
@@ -139,56 +153,24 @@ async function checkAdminLogin() {
   loadAccountsList();
 }
 
-async function adminLogin(e) {
-  e.preventDefault();
-  
-  const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true;
-
-  const email = document.getElementById("adminEmail").value;
-  const password = document.getElementById("adminPassword").value;
-
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    alert("Login failed: " + error.message);
-    if (submitBtn) submitBtn.disabled = false;
-    return;
-  }
-
-  if (data.user.email !== ADMIN_EMAIL) {
-    await supabaseClient.auth.signOut();
-    alert("You are not allowed to access admin panel.");
-    if (submitBtn) submitBtn.disabled = false;
-    return;
-  }
-
-  await checkAdminLogin();
-}
-
 async function adminLogout() {
   await supabaseClient.auth.signOut();
   window.location.replace("login.html");
 }
 
-document.getElementById("loginForm")?.addEventListener("submit", adminLogin);
 document.getElementById("logoutBtn")?.addEventListener("click", adminLogout);
 
-checkAdminLogin();
-
 /* --------------------------------------------------------------------------
-   4. STORAGE MANAGEMENT
+   4. STORAGE MANAGEMENT (PROFILE IMAGE)
    -------------------------------------------------------------------------- */
 
 async function uploadProfileImage(file) {
-  const fileName = `${Date.now()}-${file.name}`;
+  const fileExt = file.name.split('.').pop();
+  const fileName = `profile-${Date.now()}.${fileExt}`;
 
   const { error } = await supabaseClient.storage
     .from("profile-images")
-    .upload(fileName, file);
+    .upload(fileName, file, { upsert: true });
 
   if (error) {
     alert("Image Upload Error: " + error.message);
@@ -203,7 +185,7 @@ async function uploadProfileImage(file) {
 }
 
 /* --------------------------------------------------------------------------
-   5. DASHBOARD STATS
+   5. DASHBOARD STATS CALCULATION
    -------------------------------------------------------------------------- */
 
 async function loadDashboardData() {
@@ -224,18 +206,29 @@ async function loadDashboardData() {
       supabaseClient.from("videos").select("title, views").order("views", { ascending: false }).limit(1).maybeSingle()
     ]);
 
-    document.getElementById("totalResources").textContent = resCountResult.count || 0;
-    document.getElementById("totalVideos").textContent = vidCountResult.count || 0;
-    document.getElementById("featuredResource").textContent = featuredResult.data?.title || "None";
-    document.getElementById("latestUpload").textContent = latestResult.data?.title || "None";
+    const resEl = document.getElementById("totalResources");
+    const vidEl = document.getElementById("totalVideos");
+    const featEl = document.getElementById("featuredResource");
+    const latestEl = document.getElementById("latestUpload");
+    const topResEl = document.getElementById("mostViewedResource");
+    const topVidEl = document.getElementById("mostViewedVideo");
 
-    document.getElementById("mostViewedResource").textContent = topResResult.data
-      ? `${topResResult.data.title} (${topResResult.data.views || 0})`
-      : "None";
+    if (resEl) resEl.textContent = resCountResult.count || 0;
+    if (vidEl) vidEl.textContent = vidCountResult.count || 0;
+    if (featEl) featEl.textContent = featuredResult.data?.title || "None";
+    if (latestEl) latestEl.textContent = latestResult.data?.title || "None";
 
-    document.getElementById("mostViewedVideo").textContent = topVidResult.data
-      ? `${topVidResult.data.title} (${topVidResult.data.views || 0})`
-      : "None";
+    if (topResEl) {
+      topResEl.textContent = topResResult.data
+        ? `${topResResult.data.title} (${topResResult.data.views || 0})`
+        : "None";
+    }
+
+    if (topVidEl) {
+      topVidEl.textContent = topVidResult.data
+        ? `${topVidResult.data.title} (${topVidResult.data.views || 0})`
+        : "None";
+    }
   } catch (err) {
     console.error("Dashboard calculation error:", err);
   }
@@ -249,33 +242,35 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
   e.preventDefault();
   
   const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = editingResourceId ? "Updating..." : "Saving...";
+  }
 
   const categoryValue = document.getElementById("resourceCategory").value;
   let finalJobType = "remote";
   let finalIsActive = true;
 
-  // FIX: Support extraction payloads mapping perfectly for job AND internship
   if (categoryValue === "job" || categoryValue === "internship") {
-    finalJobType = document.getElementById("resourceJobType").value;
-    finalIsActive = document.getElementById("resourceJobStatus").value === "active";
+    finalJobType = document.getElementById("resourceJobType")?.value || "remote";
+    finalIsActive = document.getElementById("resourceJobStatus")?.value === "active";
   } else if (categoryValue === "hackathon") {
-    finalJobType = document.getElementById("resourceHackathonMode").value;
-    finalIsActive = document.getElementById("resourceHackathonStatus").value === "active";
+    finalJobType = document.getElementById("resourceHackathonMode")?.value || "online";
+    finalIsActive = document.getElementById("resourceHackathonStatus")?.value === "active";
   } else if (categoryValue === "scholarship") {
-    finalJobType = "general";
+    finalJobType = "scholarship";
     finalIsActive = true; 
   }
 
   const resource = {
-    title: document.getElementById("resourceTitle").value,
-    description: document.getElementById("resourceDescription").value,
+    title: document.getElementById("resourceTitle").value.trim(),
+    description: sanitizeTextarea(document.getElementById("resourceDescription").value),
     category: categoryValue,
     job_type: finalJobType,
     is_active: finalIsActive,
-    org_type: document.getElementById("resourceOrgType").value,
+    org_type: document.getElementById("resourceOrgType")?.value || "none",
     tags: getCheckedTags("resource-tag-check"),
-    link: document.getElementById("resourceLink").value,
+    link: document.getElementById("resourceLink").value.trim(),
     upload_date: document.getElementById("resourceDate").value,
     featured: document.getElementById("resourceFeatured").checked
   };
@@ -296,23 +291,30 @@ document.getElementById("resourceForm")?.addEventListener("submit", async (e) =>
   }
 
   if (error) {
-    alert("Error: " + error.message);
-    if (submitBtn) submitBtn.disabled = false;
+    alert("Error saving resource: " + error.message);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = editingResourceId ? "Update Resource" : "Save Resource";
+    }
     return;
   }
 
-  alert(editingResourceId ? "Resource updated ✅" : "Resource saved ✅");
+  alert(editingResourceId ? "Resource updated successfully! ✅" : "Resource saved successfully! ✅");
 
   editingResourceId = null;
   e.target.reset();
   clearCheckedTags("resource-tag-check");
-  document.getElementById("resourceOrgType").value = "none"; 
+  const orgEl = document.getElementById("resourceOrgType");
+  if (orgEl) orgEl.value = "none"; 
   toggleMetaRows(); 
   updateResourceButtonText();
 
   loadResourcesList();
   loadDashboardData();
-  if (submitBtn) submitBtn.disabled = false;
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Save Resource";
+  }
 });
 
 function updateResourceButtonText() {
@@ -330,7 +332,7 @@ async function editResource(id) {
     .single();
 
   if (error) {
-    alert("Error: " + error.message);
+    alert("Error fetching resource: " + error.message);
     return;
   }
 
@@ -341,17 +343,19 @@ async function editResource(id) {
   document.getElementById("resourceCategory").value = data.category || "certificate";
   document.getElementById("resourceOrgType").value = data.org_type || "none";
 
-  // FIX: Restore logic data binding values hydration engine cleanly
   if (data.category === "job" || data.category === "internship") {
-    document.getElementById("resourceJobType").value = data.job_type || "remote";
-    document.getElementById("resourceJobStatus").value = data.is_active ? "active" : "expired";
+    const jt = document.getElementById("resourceJobType");
+    const js = document.getElementById("resourceJobStatus");
+    if (jt) jt.value = data.job_type || "remote";
+    if (js) js.value = data.is_active ? "active" : "expired";
   } else if (data.category === "hackathon") {
-    document.getElementById("resourceHackathonMode").value = data.job_type || "online";
-    document.getElementById("resourceHackathonStatus").value = data.is_active ? "active" : "closed";
+    const hm = document.getElementById("resourceHackathonMode");
+    const hs = document.getElementById("resourceHackathonStatus");
+    if (hm) hm.value = data.job_type || "online";
+    if (hs) hs.value = data.is_active ? "active" : "closed";
   }
 
   toggleMetaRows(); 
-  
   setCheckedTags("resource-tag-check", data.tags);
   document.getElementById("resourceLink").value = data.link || "";
   document.getElementById("resourceDate").value = data.upload_date || "";
@@ -366,13 +370,14 @@ function cancelResourceEdit() {
   editingResourceId = null;
   document.getElementById("resourceForm")?.reset();
   clearCheckedTags("resource-tag-check");
-  document.getElementById("resourceOrgType").value = "none";
+  const orgEl = document.getElementById("resourceOrgType");
+  if (orgEl) orgEl.value = "none";
   toggleMetaRows();
   updateResourceButtonText();
 }
 
 async function deleteResource(id) {
-  if (!confirm("Delete this resource?")) return;
+  if (!confirm("Are you sure you want to permanently delete this resource?")) return;
 
   const { error } = await supabaseClient
     .from("resources")
@@ -380,7 +385,7 @@ async function deleteResource(id) {
     .eq("id", id);
 
   if (error) {
-    alert("Error: " + error.message);
+    alert("Error deleting resource: " + error.message);
     return;
   }
 
@@ -402,23 +407,23 @@ async function loadResourcesList() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Resources fetch error:", error);
     return;
   }
 
   if (!data || data.length === 0) {
-    list.innerHTML = `<p class="admin-empty">No resources added yet.</p>`;
+    list.innerHTML = `<p class="admin-empty">No resources found in database.</p>`;
     return;
   }
 
   list.innerHTML = data.map(item => {
     let specializedBadge = "";
     if (item.category === "job" || item.category === "internship") {
-      specializedBadge = ` • <span style="color:#10b981;">[${item.category.toUpperCase()}: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'EXPIRED'}]</span>`;
+      specializedBadge = ` • <span style="color:#10b981; font-weight:600;">[${item.category.toUpperCase()}: ${(item.job_type || "REMOTE").toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'EXPIRED'}]</span>`;
     } else if (item.category === "hackathon") {
-      specializedBadge = ` • <span style="color:#a855f7;">[Hackathon: ${item.job_type.toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'CLOSED'}]</span>`;
+      specializedBadge = ` • <span style="color:#a855f7; font-weight:600;">[HACKATHON: ${(item.job_type || "ONLINE").toUpperCase()} - ${item.is_active ? 'ACTIVE' : 'CLOSED'}]</span>`;
     } else if (item.category === "scholarship") {
-      specializedBadge = ` • <span style="color:#f59e0b;">[Scholarship: ACTIVE]</span>`;
+      specializedBadge = ` • <span style="color:#f59e0b; font-weight:600;">[SCHOLARSHIP]</span>`;
     }
 
     if (item.org_type && item.org_type !== "none") {
@@ -429,17 +434,17 @@ async function loadResourcesList() {
       <div class="admin-list-card">
         <div style="flex: 1; min-width: 0;">
           <h3>${item.title}</h3>
-          <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
-            ${item.category || "Resource"}${specializedBadge} • ${item.upload_date || ""}
+          <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted); font-size: 0.85rem;">
+            ${item.category || "Resource"}${specializedBadge} • ${item.upload_date || "No Date"} • 👁 ${item.views || 0} views
           </p>
-          <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
+          <p class="resource-description" style="margin-bottom: 6px; white-space: pre-line;">${item.description || "No description available."}</p>
           <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
           <br>
-          <small>Tags: ${tagsToText(item.tags) || "None"}</small>
+          <small style="color: var(--text-muted);">Tags: ${tagsToText(item.tags) || "None"}</small>
         </div>
         <div class="admin-actions">
-          <button type="button" class="toggle-btn" onclick="editResource(${item.id})">Edit</button>
-          <button type="button" class="delete-btn" onclick="deleteResource(${item.id})">Delete</button>
+          <button type="button" class="toggle-btn" onclick="editResource(${item.id})"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button type="button" class="delete-btn" onclick="deleteResource(${item.id})"><i class="fa-solid fa-trash"></i> Delete</button>
         </div>
       </div>
     `;
@@ -454,16 +459,19 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   
   const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = editingVideoId ? "Updating..." : "Saving...";
+  }
 
   const video = {
-    title: document.getElementById("videoTitle").value,
-    description: document.getElementById("videoDescription").value,
+    title: document.getElementById("videoTitle").value.trim(),
+    description: sanitizeTextarea(document.getElementById("videoDescription").value),
     category: document.getElementById("videoCategory").value,
-    org_type: document.getElementById("videoOrgType").value,
+    org_type: document.getElementById("videoOrgType")?.value || "none",
     tags: getCheckedTags("video-tag-check"),
-    youtube_link: document.getElementById("youtubeLink").value,
-    resource_link: document.getElementById("videoResourceLink").value,
+    youtube_link: document.getElementById("youtubeLink").value.trim(),
+    resource_link: document.getElementById("videoResourceLink").value.trim(),
     upload_date: document.getElementById("videoDate").value,
     featured: document.getElementById("videoFeatured").checked
   };
@@ -484,23 +492,30 @@ document.getElementById("videoForm")?.addEventListener("submit", async (e) => {
   }
 
   if (error) {
-    alert("Error: " + error.message);
-    if (submitBtn) submitBtn.disabled = false;
+    alert("Error saving video: " + error.message);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = editingVideoId ? "Update Video" : "Save Video";
+    }
     return;
   }
 
-  alert(editingVideoId ? "Video updated ✅" : "Video saved ✅");
+  alert(editingVideoId ? "Video updated successfully! ✅" : "Video saved successfully! ✅");
 
   editingVideoId = null;
   e.target.reset();
   clearCheckedTags("video-tag-check");
-  document.getElementById("videoOrgType").value = "none"; 
+  const videoOrgEl = document.getElementById("videoOrgType");
+  if (videoOrgEl) videoOrgEl.value = "none"; 
   toggleMetaRows(); 
   updateVideoButtonText();
 
   loadVideosList();
   loadDashboardData();
-  if (submitBtn) submitBtn.disabled = false;
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Save Video";
+  }
 });
 
 function updateVideoButtonText() {
@@ -518,7 +533,7 @@ async function editVideo(id) {
     .single();
 
   if (error) {
-    alert("Error: " + error.message);
+    alert("Error fetching video: " + error.message);
     return;
   }
 
@@ -530,7 +545,6 @@ async function editVideo(id) {
   document.getElementById("videoOrgType").value = data.org_type || "none";
   
   toggleMetaRows(); 
-  
   setCheckedTags("video-tag-check", data.tags);
   document.getElementById("youtubeLink").value = data.youtube_link || "";
   document.getElementById("videoResourceLink").value = data.resource_link || "";
@@ -546,13 +560,14 @@ function cancelVideoEdit() {
   editingVideoId = null;
   document.getElementById("videoForm")?.reset();
   clearCheckedTags("video-tag-check");
-  document.getElementById("videoOrgType").value = "none";
+  const videoOrgEl = document.getElementById("videoOrgType");
+  if (videoOrgEl) videoOrgEl.value = "none";
   toggleMetaRows(); 
   updateVideoButtonText();
 }
 
 async function deleteVideo(id) {
-  if (!confirm("Delete this video?")) return;
+  if (!confirm("Are you sure you want to permanently delete this video?")) return;
 
   const { error } = await supabaseClient
     .from("videos")
@@ -560,7 +575,7 @@ async function deleteVideo(id) {
     .eq("id", id);
 
   if (error) {
-    alert("Error: " + error.message);
+    alert("Error deleting video: " + error.message);
     return;
   }
 
@@ -582,12 +597,12 @@ async function loadVideosList() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Videos fetch error:", error);
     return;
   }
 
   if (!data || data.length === 0) {
-    list.innerHTML = `<p class="admin-empty">No videos added yet.</p>`;
+    list.innerHTML = `<p class="admin-empty">No videos found in database.</p>`;
     return;
   }
 
@@ -601,17 +616,17 @@ async function loadVideosList() {
       <div class="admin-list-card">
         <div style="flex: 1; min-width: 0;">
           <h3>${item.title}</h3>
-          <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted);">
-            ${item.category || "Video"}${specializedBadge} • ${item.upload_date || ""}
+          <p style="margin: 4px 0; font-weight: 600; text-transform: capitalize; color: var(--text-muted); font-size: 0.85rem;">
+            ${item.category || "Video"}${specializedBadge} • ${item.upload_date || "No Date"} • 👁 ${item.views || 0} views
           </p>
-          <p class="resource-description" style="margin-bottom: 6px;">${item.description || "No description available."}</p>
+          <p class="resource-description" style="margin-bottom: 6px; white-space: pre-line;">${item.description || "No description available."}</p>
           <button type="button" class="read-more-btn" style="font-size: 0.8rem; padding: 2px 6px; margin-bottom: 8px;">Read More</button>
           <br>
-          <small>Tags: ${tagsToText(item.tags) || "None"}</small>
+          <small style="color: var(--text-muted);">Tags: ${tagsToText(item.tags) || "None"}</small>
         </div>
         <div class="admin-actions">
-          <button type="button" class="toggle-btn" onclick="editVideo(${item.id})">Edit</button>
-          <button type="button" class="delete-btn" onclick="deleteVideo(${item.id})">Delete</button>
+          <button type="button" class="toggle-btn" onclick="editVideo(${item.id})"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button type="button" class="delete-btn" onclick="deleteVideo(${item.id})"><i class="fa-solid fa-trash"></i> Delete</button>
         </div>
       </div>
     `;
@@ -630,7 +645,7 @@ async function loadProfile() {
     .maybeSingle();
 
   if (error) {
-    console.error(error);
+    console.error("Profile load error:", error);
     return;
   }
 
@@ -650,28 +665,35 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   e.preventDefault();
   
   const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Updating Profile...";
+  }
 
   let imageUrl = document.getElementById("profileImage").value;
-  const imageFile = document.getElementById("profileImageFile").files[0];
+  const imageFileInput = document.getElementById("profileImageFile");
+  const imageFile = imageFileInput ? imageFileInput.files[0] : null;
 
   if (imageFile) {
     imageUrl = await uploadProfileImage(imageFile);
     if (!imageUrl) {
-      if (submitBtn) submitBtn.disabled = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Save Profile";
+      }
       return;
     }
   }
 
   const profile = {
-    name: document.getElementById("profileName").value,
-    bio: document.getElementById("profileBio").value,
+    name: document.getElementById("profileName").value.trim(),
+    bio: sanitizeTextarea(document.getElementById("profileBio").value),
     profile_image: imageUrl,
-    youtube: document.getElementById("youtubeUrl").value,
-    instagram: document.getElementById("instagramUrl").value,
-    telegram: document.getElementById("telegramUrl").value,
-    linkedin: document.getElementById("linkedinUrl").value,
-    whatsapp: document.getElementById("whatsappUrl").value,
+    youtube: document.getElementById("youtubeUrl").value.trim(),
+    instagram: document.getElementById("instagramUrl").value.trim(),
+    telegram: document.getElementById("telegramUrl").value.trim(),
+    linkedin: document.getElementById("linkedinUrl").value.trim(),
+    whatsapp: document.getElementById("whatsappUrl").value.trim(),
     updated_at: new Date().toISOString()
   };
 
@@ -697,14 +719,20 @@ document.getElementById("profileForm")?.addEventListener("submit", async (e) => 
   }
 
   if (error) {
-    alert("Error: " + error.message);
-    if (submitBtn) submitBtn.disabled = false;
+    alert("Error updating profile: " + error.message);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Save Profile";
+    }
     return;
   }
 
-  alert("Profile saved ✅");
-  document.getElementById("profileImageFile").value = "";
-  if (submitBtn) submitBtn.disabled = false;
+  alert("Profile updated successfully! ✅");
+  if (imageFileInput) imageFileInput.value = "";
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Save Profile";
+  }
 });
 
 /* --------------------------------------------------------------------------
@@ -715,13 +743,16 @@ document.getElementById("accountForm")?.addEventListener("submit", async (e) => 
   e.preventDefault();
   
   const submitBtn = e.target.querySelector("button[type='submit']");
-  if (submitBtn) submitBtn.disabled = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Saving Account...";
+  }
 
   const account = {
-    account_name: document.getElementById("accountName").value,
+    account_name: document.getElementById("accountName").value.trim(),
     platform: document.getElementById("accountPlatform").value,
-    description: document.getElementById("accountDescription").value,
-    url: document.getElementById("accountUrl").value,
+    description: sanitizeTextarea(document.getElementById("accountDescription").value),
+    url: document.getElementById("accountUrl").value.trim(),
     is_active: document.getElementById("accountActive").checked
   };
 
@@ -730,16 +761,22 @@ document.getElementById("accountForm")?.addEventListener("submit", async (e) => 
     .insert([account]);
 
   if (error) {
-    alert("Error: " + error.message);
-    if (submitBtn) submitBtn.disabled = false;
+    alert("Error adding account: " + error.message);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Add Account";
+    }
     return;
   }
 
-  alert("Account saved ✅");
+  alert("Channel / Account added successfully! ✅");
   e.target.reset();
 
   loadAccountsList();
-  if (submitBtn) submitBtn.disabled = false;
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Add Account";
+  }
 });
 
 async function loadAccountsList() {
@@ -752,7 +789,7 @@ async function loadAccountsList() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Accounts fetch error:", error);
     return;
   }
 
@@ -765,13 +802,15 @@ async function loadAccountsList() {
     <div class="admin-list-card">
       <div>
         <h3>${item.account_name}</h3>
-        <p>${item.platform || "Account"} • ${item.is_active ? "Visible" : "Hidden"}</p>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">${item.platform || "Account"} • Status: <strong>${item.is_active ? "Visible" : "Hidden"}</strong></p>
       </div>
       <div class="admin-actions">
         <button type="button" class="toggle-btn" onclick="toggleAccount(${item.id}, ${item.is_active})">
           ${item.is_active ? "Hide" : "Show"}
         </button>
-        <button type="button" class="delete-btn" onclick="deleteAccount(${item.id})">Delete</button>
+        <button type="button" class="delete-btn" onclick="deleteAccount(${item.id})">
+          <i class="fa-solid fa-trash"></i> Delete
+        </button>
       </div>
     </div>
   `).join("");
@@ -784,7 +823,7 @@ async function toggleAccount(id, currentStatus) {
     .eq("id", id);
 
   if (error) {
-    alert("Error: " + error.message);
+    alert("Error updating account status: " + error.message);
     return;
   }
 
@@ -792,7 +831,7 @@ async function toggleAccount(id, currentStatus) {
 }
 
 async function deleteAccount(id) {
-  if (!confirm("Delete this account?")) return;
+  if (!confirm("Are you sure you want to delete this account link?")) return;
 
   const { error } = await supabaseClient
     .from("other_accounts")
@@ -800,7 +839,7 @@ async function deleteAccount(id) {
     .eq("id", id);
 
   if (error) {
-    alert("Error: " + error.message);
+    alert("Error deleting account: " + error.message);
     return;
   }
 
@@ -808,7 +847,7 @@ async function deleteAccount(id) {
 }
 
 /* --------------------------------------------------------------------------
-   10. MODULE ENGINE DELEGATION & LOCAL CLAMPING ACTIONS (MOBILE SAFE)
+   10. GLOBAL ACTIONS & EXPOSURES
    -------------------------------------------------------------------------- */
 
 document.addEventListener("click", (e) => {
@@ -831,14 +870,14 @@ document.addEventListener("click", (e) => {
   }
 });
 
+// Explicit Global Window Bindings for Inline HTML Handlers
 window.editResource = editResource;
+window.cancelResourceEdit = cancelResourceEdit;
 window.deleteResource = deleteResource;
+
 window.editVideo = editVideo;
+window.cancelVideoEdit = cancelVideoEdit;
 window.deleteVideo = deleteVideo;
+
 window.toggleAccount = toggleAccount;
 window.deleteAccount = deleteAccount;
-
-document.getElementById("settingsForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  alert("Settings system next phase me connect karenge ✅");
-});

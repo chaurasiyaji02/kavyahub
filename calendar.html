@@ -2,30 +2,43 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <title>Calendar | KavyaHub</title>
+  <title>Upload Timeline & Calendar | KavyaHub</title>
   <meta name="description" content="Select a date to view resources, videos, certificates, and internships uploaded on that specific day on KavyaHub." />
+  <meta name="keywords" content="upload timeline, resource tracker, daily tech opportunities, exam deadlines, KavyaHub" />
 
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Upload Calendar & Timeline | KavyaHub" />
+  <meta property="og:description" content="Track daily uploaded resources, video guides, and opportunity deadlines." />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
+
       <div class="logo">
         <a href="index.html">Kavya<span>Hub</span></a>
       </div>
@@ -34,18 +47,18 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="resources.html">Resources</a></li>
         <li><a href="videos.html">Videos</a></li>
-        <li><a href="calendar.html">Calendar</a></li>
+        <li><a href="calendar.html" class="active">Calendar</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
         
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -54,54 +67,87 @@
 
   <main>
 
+    <!-- Hero Header -->
     <section class="resources-hero">
       <div class="section-heading">
-        <h1>Upload Calendar</h1>
-        <p>Select a date to view resources, videos, certificates, and internships uploaded on that day.</p>
+        <h1>Upload Timeline & Calendar</h1>
+        <p>Explore opportunities, tutorials, and materials categorized chronologically by upload date.</p>
       </div>
     </section>
 
+    <!-- Date Picker & Quick Filter Presets -->
     <section class="search-section">
-      <div class="search-box">
-        <i class="fa-solid fa-calendar-days"></i>
-        <input type="date" id="calendarDate" />
+      <div class="search-box-wrapper calendar-search-wrapper">
+        <div class="search-box calendar-box">
+          <i class="fa-solid fa-calendar-days"></i>
+          <input type="date" id="calendarDate" aria-label="Select Upload Date" />
+          <button type="button" id="todayPresetBtn" class="filter-toggle-btn">
+            <i class="fa-solid fa-bolt"></i> Today
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Timeline Presets -->
+      <div class="trending-chips-container" style="margin-top: 15px;">
+        <span class="trending-label"><i class="fa-solid fa-clock-rotate-left"></i> Quick Select:</span>
+        <button type="button" class="trending-chip" id="presetToday">Today</button>
+        <button type="button" class="trending-chip" id="presetYesterday">Yesterday</button>
+        <button type="button" class="trending-chip" id="presetWeek">This Week</button>
+        <button type="button" class="trending-chip" id="presetAll">Show Latest</button>
       </div>
     </section>
 
-    <section class="resource-count-section">
-      <h3>Uploads on Selected Date: <span id="calendarCount">0</span></h3>
+    <!-- Type Switcher Pills (All vs Resources vs Videos) -->
+    <section class="filter-section" style="margin-top: 10px;">
+      <div class="filter-container" id="calendarTypeFilters">
+        <button class="video-filter-btn active" data-filter="all">All Uploads</button>
+        <button class="video-filter-btn" data-filter="resource"><i class="fa-solid fa-folder-open"></i> Resources Only</button>
+        <button class="video-filter-btn" data-filter="video"><i class="fa-solid fa-video"></i> Videos Only</button>
+      </div>
     </section>
 
+    <!-- Upload Summary Counter -->
+    <section class="resource-count-section">
+      <h3>Uploads on Selected Timeline: <span id="calendarCount">0</span></h3>
+    </section>
+
+    <!-- Timeline Grid Display -->
     <section class="resources-grid-section">
       <div class="section-heading">
         <h2 id="selectedDateTitle">Select a Date</h2>
-        <p>All resources and videos from the selected date will appear here.</p>
+        <p id="selectedDateSub">Materials and video tutorials from the timeline will appear below.</p>
       </div>
 
       <div class="resources-grid" id="calendarContainer"></div>
 
-      <div id="calendarEmptyState" class="empty-state" style="display:none;">
+      <!-- Empty State -->
+      <div id="calendarEmptyState" class="empty-state" style="display: none;">
         <i class="fa-solid fa-calendar-xmark"></i>
         <h3>No Uploads Found</h3>
-        <p>No resources or videos were uploaded on this date.</p>
+        <p>No resources or videos were published on this specific date. Try selecting another date or check recent uploads.</p>
+        <button type="button" id="resetToRecentBtn" class="btn secondary-btn" style="margin-top: 15px;">
+          <i class="fa-solid fa-rotate-left"></i> View Recent Uploads
+        </button>
       </div>
     </section>
 
   </main>
 
+  <!-- Social Link Unlock Modal -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup-box">
       <button class="popup-close" id="popupClose" aria-label="Close Popup">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h2>Unlock Resource</h2>
-      <p>Please support by subscribing on YouTube and following on Instagram before accessing this resource.</p>
+      <h2>Unlock Resource Link</h2>
+      <p>Please subscribe on YouTube and follow on Instagram before accessing this resource link.</p>
 
       <div class="popup-buttons">
         <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" class="popup-social-btn youtube-btn" target="_blank" rel="noopener noreferrer">
           <i class="fa-brands fa-youtube"></i> Subscribe
         </a>
+
         <a href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx" class="popup-social-btn insta-btn" target="_blank" rel="noopener noreferrer">
           <i class="fa-brands fa-instagram"></i> Follow
         </a>
@@ -111,24 +157,25 @@
     </div>
   </div>
 
-  <!-- UPGRADE: Premium Universal Blurred Description Container Modal Hook (Sync with main.js event delegates engine for zero grid shifting) -->
-  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+  <!-- Detail Modal Popup -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay">
+    <div class="description-modal-box">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
-      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Upload Details</h3>
-      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
-      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
-      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
+      <div class="modal-badge-row" id="modalBadgeRow"></div>
+      <h3 id="modalTitle">Upload Details</h3>
+      <div class="modal-meta-info" id="modalMetaInfo"></div>
+      <div class="modal-description-content" id="modalDescriptionContent"></div>
+      <div class="modal-action-row" id="modalActionRow"></div>
     </div>
   </div>
 
+  <!-- Main Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
-      <p>Browse free resources, certificates, internships, and videos by date.</p>
+      <p>A simple hub for free resources, courses, certificates, internships, and learning videos.</p>
 
       <div class="footer-links">
         <a href="index.html">Home</a>
@@ -145,6 +192,7 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase/config.js"></script>
   <script src="js/main.js"></script>

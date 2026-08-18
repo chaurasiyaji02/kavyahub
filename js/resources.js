@@ -1,46 +1,61 @@
 /* ==========================================================================
-   KAVYAHUB - RESOURCES CONTROLLER (AUDITED & DEEP-LINK POWERED)
+   KAVYAHUB - RESOURCES CONTROLLER (GRANULAR FILTER ENGINE & MODAL PARSER)
    ========================================================================== */
 
 let resources = [];
 let selectedTags = [];
-// UPGRADE: New dynamic register for tracking Organization Type sectors filter state
 let selectedSectors = [];
 let currentFilteredResources = [];
+let searchDebounceTimer = null;
 
 // DOM Elements Selection
 const resourcesContainer = document.getElementById("resourcesContainer");
 const searchInput = document.getElementById("resourceSearch");
+const clearResourceSearch = document.getElementById("clearResourceSearch");
 const resourceCount = document.getElementById("resourceCount");
 const emptyState = document.getElementById("emptyState");
+const resetFiltersEmptyBtn = document.getElementById("resetFiltersEmptyBtn");
 
+const featuredResourceSection = document.getElementById("featuredResourceSection");
 const featuredTitle = document.getElementById("featuredTitle");
 const featuredDescription = document.getElementById("featuredDescription");
 const featuredButton = document.getElementById("featuredButton");
 
 const filterToggleBtn = document.getElementById("filterToggleBtn");
 const filterPanel = document.getElementById("filterPanel");
+const filterCountBadge = document.getElementById("filterCountBadge");
 const clearFiltersBtn = document.getElementById("clearFiltersBtn");
 const tagFilters = document.querySelectorAll(".tag-filter");
-// UPGRADE: Select explicit sector layout elements selectors
 const sectorFilters = document.querySelectorAll(".sector-filter");
+const activeFiltersWrapper = document.getElementById("activeFiltersWrapper");
 const activeFilters = document.getElementById("activeFilters");
-
-// UPGRADE: Selection reference hook targeted for autocomplete suggestion panel dropdown
 const suggestionsBox = document.getElementById("searchSuggestions");
 
+// Modal Elements Selection
+const descModalOverlay = document.getElementById("descriptionModalOverlay");
+const descModalClose = document.getElementById("descriptionModalClose");
+const modalBadgeRow = document.getElementById("modalBadgeRow");
+const modalTitle = document.getElementById("modalTitle");
+const modalMetaInfo = document.getElementById("modalMetaInfo");
+const modalDescriptionContent = document.getElementById("modalDescriptionContent");
+const modalActionRow = document.getElementById("modalActionRow");
+
 /* --------------------------------------------------------------------------
-   1. TAG HELPERS
+   1. UTILITY & FORMATTING HELPERS
    -------------------------------------------------------------------------- */
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function normalizeTag(tag) {
   return String(tag || "").trim().toLowerCase();
-}
-
-function getResourceTags(resource) {
-  const tags = Array.isArray(resource.tags) ? resource.tags : [];
-  const category = resource.category ? [resource.category] : [];
-  return [...new Set([...category, ...tags].map(normalizeTag))];
 }
 
 function formatTag(tag) {
@@ -49,16 +64,46 @@ function formatTag(tag) {
     .replace(/\b\w/g, char => char.toUpperCase());
 }
 
-function createTagHTML(resource) {
-  const tags = getResourceTags(resource);
-
-  if (tags.length === 0) {
-    return `<span class="tag">Resource</span>`;
-  }
-
-  return tags
-    .map(tag => `<span class="tag">${formatTag(tag)}</span>`)
+function formatStructuredText(text) {
+  if (!text) return "";
+  const escaped = escapeHTML(text);
+  
+  return escaped
+    .split("\n")
+    .map(line => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
+        return `<div class="formatted-bullet">• ${trimmed.substring(2)}</div>`;
+      }
+      return trimmed ? `<p class="formatted-paragraph">${trimmed}</p>` : `<div class="formatted-spacer"></div>`;
+    })
     .join("");
+}
+
+function formatViews(views) {
+  const num = Number(views || 0);
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+  return num.toString();
+}
+
+function getResourceTags(resource) {
+  const tags = Array.isArray(resource.tags) ? resource.tags : [];
+  const category = resource.category ? [resource.category] : [];
+  return [...new Set([...category, ...tags].map(normalizeTag))];
+}
+
+function renderSkeletons(container, count = 6) {
+  if (!container) return;
+  container.innerHTML = Array(count).fill(`
+    <div class="resource-card skeleton-card">
+      <div class="skeleton skeleton-tag"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text" style="width: 75%;"></div>
+      <div class="skeleton skeleton-btn"></div>
+    </div>
+  `).join("");
 }
 
 /* --------------------------------------------------------------------------
@@ -67,7 +112,6 @@ function createTagHTML(resource) {
 
 async function increaseResourceView(id) {
   const resource = resources.find(item => item.id == id);
-
   if (resource) {
     resource.views = (resource.views || 0) + 1;
   }
@@ -86,121 +130,103 @@ async function increaseResourceView(id) {
 }
 
 /* --------------------------------------------------------------------------
-   3. CARD HTML TEMPLATE (DEEP-LINK UPDATED WITH HACKATHON SUPPORT)
+   3. CARD HTML TEMPLATE (DEEP-LINKED & INTERACTIVE)
    -------------------------------------------------------------------------- */
 
 function createCard(resource) {
   const descriptionText = resource.description || "";
-  const isLongDescription = descriptionText.length > 120;
+  const isLongDescription = descriptionText.length > 115;
   
   const currentCategory = normalizeTag(resource.category);
-  const isJob = currentCategory === "job" || getResourceTags(resource).includes("job");
+  const isJob = currentCategory === "job" || currentCategory === "internship" || getResourceTags(resource).includes("job");
   const isHackathon = currentCategory === "hackathon" || getResourceTags(resource).includes("hackathon");
-  
-  // UPGRADE: Evaluation variable string selector for tracking Scholarships tags models
   const isScholarship = currentCategory === "scholarship" || getResourceTags(resource).includes("scholarship");
 
-  // A. JOB METADATA CARD GENERATOR
+  // Badges
   let jobBadgesHTML = "";
   if (isJob) {
     const jobType = resource.job_type ? formatTag(resource.job_type) : "Remote";
     const isActive = resource.is_active !== false;
-    
     jobBadgesHTML = `
-      <div class="job-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
-        <span class="job-type-badge" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 500;">
-          <i class="fa-solid fa-briefcase" style="font-size: 0.75rem; margin-right: 2px;"></i> ${jobType}
-        </span>
-        <span class="job-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
-          ${isActive ? 'Active' : 'Expired'}
-        </span>
+      <div class="meta-row">
+        <span class="badge-pill primary-pill"><i class="fa-solid fa-briefcase"></i> ${escapeHTML(jobType)}</span>
+        <span class="status-indicator"><span class="status-dot ${isActive ? 'active' : 'inactive'}"></span> ${isActive ? 'Active' : 'Expired'}</span>
       </div>
     `;
   }
 
-  // B. HACKATHON METADATA CARD GENERATOR (NEW VIP ENTRY)
   let hackathonBadgesHTML = "";
   if (isHackathon) {
-    const hackathonMode = resource.job_type ? formatTag(resource.job_type) : "Online";
+    const mode = resource.job_type ? formatTag(resource.job_type) : "Online";
     const isActive = resource.is_active !== false;
-
     hackathonBadgesHTML = `
-      <div class="hackathon-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
-        <span class="hackathon-mode-badge" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; padding: 3px 8px; border-radius: 4px; font-weight: 500;">
-          <i class="fa-solid fa-laptop-code" style="font-size: 0.75rem; margin-right: 2px;"></i> ${hackathonMode}
-        </span>
-        <span class="hackathon-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
-          ${isActive ? 'Active' : 'Closed'}
-        </span>
+      <div class="meta-row">
+        <span class="badge-pill purple-pill"><i class="fa-solid fa-laptop-code"></i> ${escapeHTML(mode)}</span>
+        <span class="status-indicator"><span class="status-dot ${isActive ? 'active' : 'inactive'}"></span> ${isActive ? 'Active' : 'Closed'}</span>
       </div>
     `;
   }
 
-  // UPGRADE: C. SCHOLARSHIP METADATA CARD VIP GENERATOR 
   let scholarshipBadgesHTML = "";
   if (isScholarship) {
     scholarshipBadgesHTML = `
-      <div class="scholarship-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
-        <span class="scholarship-vip-badge" style="background: linear-gradient(135deg, #f59e0b, #e08e0b); color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.22);">
-          <i class="fa-solid fa-graduation-cap"></i> Verified Scholarship
-        </span>
+      <div class="meta-row">
+        <span class="badge-pill gold-pill"><i class="fa-solid fa-award"></i> Verified Scholarship</span>
       </div>
     `;
   }
 
-  // UPGRADE: D. DYNAMIC SECTOR IDENTITY COMPILER (Government vs Private badges inline builder)
   let orgBadgeHTML = "";
   if (resource.org_type && resource.org_type !== "none") {
     const isGov = resource.org_type === "government";
     orgBadgeHTML = `
-      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem;">
+      <span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">
         <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
       </span>
     `;
   }
 
-  // Generates KavyaHub traffic-retaining deep-link instead of direct bypass URLs
+  const primaryCategory = formatTag(resource.category || "Resource");
   const deepShareLink = `${window.location.origin}/resources.html?search=${encodeURIComponent(resource.title)}`;
+  const resourceJSON = encodeURIComponent(JSON.stringify(resource));
 
   return `
-    <div class="resource-card">
-      <div class="tag-row" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
-        ${createTagHTML(resource)}
+    <div class="resource-card" data-resource="${resourceJSON}">
+      <div class="tag-row">
+        <span class="badge-pill neutral-pill">${escapeHTML(primaryCategory)}</span>
         ${orgBadgeHTML}
       </div>
 
-      <h3>${resource.title}</h3>
+      <h3 class="card-title">${escapeHTML(resource.title)}</h3>
 
       ${jobBadgesHTML}
       ${hackathonBadgesHTML}
       ${scholarshipBadgesHTML}
 
-      <p class="resource-description">${descriptionText}</p>
-
-      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
-
-      <div style="margin-bottom: 12px; display: block;">
-        <small style="display:inline-block; margin-right:10px;">${resource.upload_date || ""}</small>
-        <small style="display:inline-block;">👁 ${resource.views || 0} views</small>
+      <div class="resource-description-clamp">
+        ${escapeHTML(descriptionText)}
       </div>
 
-      <div style="display: flex; gap: 8px; margin-top: auto; width: 100%;">
+      ${isLongDescription ? `<button type="button" class="read-more-btn res-modal-trigger">Read More</button>` : ""}
+
+      <div class="card-footer-meta">
+        <small><i class="fa-regular fa-calendar"></i> ${escapeHTML(resource.upload_date || "")}</small>
+        <small><i class="fa-regular fa-eye"></i> ${formatViews(resource.views)} views</small>
+      </div>
+
+      <div class="card-actions">
         <button
           type="button"
-          class="unlock-btn resource-view-btn"
+          class="unlock-btn resource-view-btn open-resource-btn"
           data-id="${resource.id}"
-          data-link="${resource.link}"
-          style="flex: 1; margin: 0;">
-          Open Resource
+          data-link="${resource.link}">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Resource
         </button>
         <button 
           type="button" 
           class="share-btn" 
           data-link="${deepShareLink}" 
-          title="Share via KavyaHub"
-          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+          title="Share Resource">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
       </div>
@@ -209,7 +235,7 @@ function createCard(resource) {
 }
 
 /* --------------------------------------------------------------------------
-   4. RENDER MODULE
+   4. RENDER & FEATURED MODULE
    -------------------------------------------------------------------------- */
 
 function renderResources(data) {
@@ -218,7 +244,7 @@ function renderResources(data) {
 
   if (data.length === 0) {
     resourcesContainer.innerHTML = "";
-    if (emptyState) emptyState.style.display = "block";
+    if (emptyState) emptyState.style.display = "flex";
     if (resourceCount) resourceCount.textContent = "0";
     return;
   }
@@ -231,23 +257,20 @@ function renderResources(data) {
   }
 }
 
-/* --------------------------------------------------------------------------
-   5. FEATURED CONTAINER
-   -------------------------------------------------------------------------- */
-
 function loadFeatured() {
   if (!featuredTitle || !featuredDescription || !featuredButton) return;
 
-  const featured = resources.find(item => item.featured);
+  let featured = resources.find(item => item.featured);
+  if (!featured && resources.length > 0) {
+    featured = resources[0];
+  }
 
   if (!featured) {
-    featuredTitle.textContent = "No Featured Resource";
-    featuredDescription.textContent = "Select a featured resource from the admin panel.";
-    featuredButton.dataset.link = "#";
-    featuredButton.dataset.id = "";
+    if (featuredResourceSection) featuredResourceSection.style.display = "none";
     return;
   }
 
+  if (featuredResourceSection) featuredResourceSection.style.display = "block";
   featuredTitle.textContent = featured.title;
   featuredDescription.textContent = featured.description || "";
   featuredButton.dataset.link = featured.link || "#";
@@ -255,30 +278,58 @@ function loadFeatured() {
 }
 
 /* --------------------------------------------------------------------------
-   6. ACTIVE FILTER CHIPS
+   5. ACTIVE FILTER CHIPS & BADGE COUNTER
    -------------------------------------------------------------------------- */
 
 function renderActiveFilters() {
-  if (!activeFilters) return;
+  const totalCount = selectedTags.length + selectedSectors.length;
 
-  if (selectedTags.length === 0 && selectedSectors.length === 0) {
+  if (filterCountBadge) {
+    if (totalCount > 0) {
+      filterCountBadge.textContent = totalCount;
+      filterCountBadge.style.display = "inline-flex";
+    } else {
+      filterCountBadge.style.display = "none";
+    }
+  }
+
+  if (!activeFilters || !activeFiltersWrapper) return;
+
+  if (totalCount === 0) {
     activeFilters.innerHTML = "";
+    activeFiltersWrapper.style.display = "none";
     return;
   }
 
-  // Merge tag arrays text items formatting for chip preview display matrix
-  const tagsChips = selectedTags.map(tag => `<span class="active-filter-chip">${formatTag(tag)}</span>`);
-  const sectorChips = selectedSectors.map(sec => `<span class="active-filter-chip" style="background:rgba(59, 130, 246, 0.15); border-color:#3b82f6; color:#3b82f6;">${formatTag(sec)} Sector</span>`);
+  activeFiltersWrapper.style.display = "block";
+
+  const tagsChips = selectedTags.map(tag => `
+    <span class="active-filter-chip">
+      ${formatTag(tag)}
+      <button type="button" class="remove-chip-btn" data-type="tag" data-val="${tag}" aria-label="Remove filter">&times;</button>
+    </span>
+  `);
+
+  const sectorChips = selectedSectors.map(sec => `
+    <span class="active-filter-chip sector-chip">
+      <i class="${sec === 'government' ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${formatTag(sec)}
+      <button type="button" class="remove-chip-btn" data-type="sector" data-val="${sec}" aria-label="Remove filter">&times;</button>
+    </span>
+  `);
 
   activeFilters.innerHTML = [...tagsChips, ...sectorChips].join("");
 }
 
 /* --------------------------------------------------------------------------
-   7. SEARCH + MULTI FILTER LOGIC (UPGRADED STAGE PARSER ENGINE)
+   6. FILTER, DEBOUNCED SEARCH & URL SYNC
    -------------------------------------------------------------------------- */
 
 function applyFilters() {
   const term = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+  if (clearResourceSearch) {
+    clearResourceSearch.style.display = term ? "block" : "none";
+  }
 
   const filtered = resources.filter(resource => {
     const tags = getResourceTags(resource);
@@ -288,14 +339,11 @@ function applyFilters() {
       resource.description,
       resource.category,
       ...(resource.tags || [])
-    ]
-      .join(" ")
-      .toLowerCase();
+    ].join(" ").toLowerCase();
 
     const matchSearch = term === "" || searchableText.includes(term);
     const matchTags = selectedTags.length === 0 || selectedTags.some(tag => tags.includes(tag));
     
-    // UPGRADE: Multi-stage organization type filter parsing segment
     const resourceOrg = normalizeTag(resource.org_type || "none");
     const matchSectors = selectedSectors.length === 0 || selectedSectors.includes(resourceOrg);
 
@@ -306,26 +354,34 @@ function applyFilters() {
   renderActiveFilters();
 }
 
+function updateURLState() {
+  const params = new URLSearchParams();
+  if (selectedTags.length > 0) params.set("type", selectedTags.join(","));
+  if (selectedSectors.length > 0) params.set("sector", selectedSectors.join(","));
+  if (searchInput && searchInput.value.trim()) params.set("search", searchInput.value.trim());
+
+  const newURL = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
+  window.history.replaceState({}, "", newURL);
+}
+
 /* --------------------------------------------------------------------------
-   7B. UPGRADE: PREDICTIVE SMART AUTOCOMPLETE SUGGESTIONS CONTROLLER ENGINE
+   7. AUTOCOMPLETE SUGGESTIONS ENGINE
    -------------------------------------------------------------------------- */
 
 function processAutocompleteSuggestions() {
   if (!suggestionsBox || !searchInput) return;
   const rawQuery = searchInput.value.toLowerCase().trim();
 
-  // Trigger dropdown display loop only if character length matches index boundary
   if (rawQuery.length < 2) {
     suggestionsBox.innerHTML = "";
     suggestionsBox.style.display = "none";
     return;
   }
 
-  // Scan current records array lists for string fragments match outputs entries
   const matches = resources.filter(resource => {
     return resource.title.toLowerCase().includes(rawQuery) || 
            (resource.tags && resource.tags.some(t => t.toLowerCase().includes(rawQuery)));
-  }).slice(0, 5); // Limit dropdown output size parameters to keep viewport space optimized
+  }).slice(0, 5);
 
   if (matches.length === 0) {
     suggestionsBox.innerHTML = "";
@@ -333,11 +389,10 @@ function processAutocompleteSuggestions() {
     return;
   }
 
-  // Construct dynamic item containers hooks inside box elements
   suggestionsBox.innerHTML = matches.map(item => `
-    <div class="autocomplete-suggestion-row" data-search-target="${item.title.replace(/"/g, '&quot;')}" style="padding: 11px 16px; cursor: pointer; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;">
-      <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 0.8rem;"></i>
-      <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${item.title}</span>
+    <div class="autocomplete-suggestion-row" data-search-target="${escapeHTML(item.title)}">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>${escapeHTML(item.title)}</span>
     </div>
   `).join("");
 
@@ -345,12 +400,174 @@ function processAutocompleteSuggestions() {
 }
 
 /* --------------------------------------------------------------------------
-   8. EVENT LISTENERS & INITIALIZATION
+   8. MODAL CONTROLLER & CLICK DELEGATIONS
+   -------------------------------------------------------------------------- */
+
+function openResourceDetailsModal(resource) {
+  if (!descModalOverlay) return;
+
+  const isGov = resource.org_type === "government";
+  const orgBadge = (resource.org_type && resource.org_type !== "none")
+    ? `<span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">${isGov ? 'Govt' : 'Private'}</span>`
+    : "";
+
+  modalBadgeRow.innerHTML = `
+    <span class="badge-pill neutral-pill">${formatTag(resource.category || "Resource")}</span>
+    ${orgBadge}
+  `;
+
+  modalTitle.textContent = resource.title || "Resource Details";
+
+  modalMetaInfo.innerHTML = `
+    <span><i class="fa-regular fa-calendar"></i> Uploaded: ${escapeHTML(resource.upload_date || "Recent")}</span>
+    <span><i class="fa-regular fa-eye"></i> ${formatViews(resource.views)} views</span>
+  `;
+
+  modalDescriptionContent.innerHTML = formatStructuredText(resource.description);
+
+  modalActionRow.innerHTML = `
+    <button type="button" class="unlock-btn full-btn resource-view-btn" data-id="${resource.id}" data-link="${resource.link}">
+      <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Resource
+    </button>
+  `;
+
+  descModalOverlay.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeResourceDetailsModal() {
+  if (descModalOverlay) {
+    descModalOverlay.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+}
+
+if (descModalClose) {
+  descModalClose.addEventListener("click", closeResourceDetailsModal);
+}
+
+if (descModalOverlay) {
+  descModalOverlay.addEventListener("click", (e) => {
+    if (e.target === descModalOverlay) closeResourceDetailsModal();
+  });
+}
+
+// Global Delegated Click Events
+document.addEventListener("click", async (e) => {
+  // 1. Read More Modal
+  const modalTrigger = e.target.closest(".res-modal-trigger");
+  if (modalTrigger) {
+    const card = modalTrigger.closest(".resource-card");
+    if (card && card.dataset.resource) {
+      const data = JSON.parse(decodeURIComponent(card.dataset.resource));
+      openResourceDetailsModal(data);
+    }
+    return;
+  }
+
+  // 2. View Counter on Click
+  const viewBtn = e.target.closest(".resource-view-btn");
+  if (viewBtn) {
+    if (viewBtn.dataset.clicked === "true") return;
+    viewBtn.dataset.clicked = "true";
+    const id = viewBtn.dataset.id;
+    if (id) {
+      await increaseResourceView(id);
+    }
+    setTimeout(() => {
+      viewBtn.dataset.clicked = "false";
+    }, 1500);
+  }
+
+  // 3. Autocomplete Suggestion Pick
+  const suggestionRow = e.target.closest(".autocomplete-suggestion-row");
+  if (suggestionRow) {
+    const selectedKeyword = suggestionRow.getAttribute("data-search-target");
+    if (searchInput) {
+      searchInput.value = selectedKeyword;
+      applyFilters();
+      updateURLState();
+    }
+    if (suggestionsBox) {
+      suggestionsBox.style.display = "none";
+      suggestionsBox.innerHTML = "";
+    }
+    return;
+  }
+
+  // 4. Trending Chip Click
+  const trendingChip = e.target.closest(".trending-chip");
+  if (trendingChip) {
+    e.preventDefault();
+    const tagValue = normalizeTag(trendingChip.getAttribute("data-tag"));
+    const targetCheckbox = Array.from(tagFilters).find(item => normalizeTag(item.value) === tagValue);
+    
+    if (targetCheckbox) {
+      targetCheckbox.checked = !targetCheckbox.checked;
+      selectedTags = Array.from(tagFilters)
+        .filter(item => item.checked)
+        .map(item => normalizeTag(item.value));
+      applyFilters();
+      updateURLState();
+    }
+    return;
+  }
+
+  // 5. Remove Chip Button
+  const removeChipBtn = e.target.closest(".remove-chip-btn");
+  if (removeChipBtn) {
+    const type = removeChipBtn.dataset.type;
+    const val = removeChipBtn.dataset.val;
+
+    if (type === "tag") {
+      selectedTags = selectedTags.filter(t => t !== val);
+      tagFilters.forEach(cb => {
+        if (normalizeTag(cb.value) === val) cb.checked = false;
+      });
+    } else if (type === "sector") {
+      selectedSectors = selectedSectors.filter(s => s !== val);
+      sectorFilters.forEach(cb => {
+        if (normalizeTag(cb.value) === val) cb.checked = false;
+      });
+    }
+
+    applyFilters();
+    updateURLState();
+    return;
+  }
+
+  // 6. Share Button
+  const shareBtn = e.target.closest(".share-btn");
+  if (shareBtn) {
+    const shareUrl = shareBtn.getAttribute("data-link");
+    if (navigator.share) {
+      navigator.share({
+        title: "Check this opportunity on KavyaHub",
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert("Link copied to clipboard!");
+      });
+    }
+    return;
+  }
+
+  // Autocomplete backdrop close
+  if (suggestionsBox && suggestionsBox.style.display === "block" && !e.target.closest(".search-section")) {
+    suggestionsBox.style.display = "none";
+  }
+});
+
+/* --------------------------------------------------------------------------
+   9. EVENT LISTENERS & FILTER HOOKS
    -------------------------------------------------------------------------- */
 
 if (filterToggleBtn && filterPanel) {
   filterToggleBtn.addEventListener("click", () => {
-    filterPanel.style.display = filterPanel.style.display === "none" ? "block" : "none";
+    const isHidden = filterPanel.style.display === "none";
+    filterPanel.style.display = isHidden ? "block" : "none";
+    filterToggleBtn.classList.toggle("active", isHidden);
   });
 }
 
@@ -361,10 +578,10 @@ tagFilters.forEach(input => {
       .map(item => normalizeTag(item.value));
 
     applyFilters();
+    updateURLState();
   });
 });
 
-// UPGRADE: Dynamic change registration listeners hooks for Sector Filters checkboxes
 sectorFilters.forEach(input => {
   input.addEventListener("change", () => {
     selectedSectors = Array.from(sectorFilters)
@@ -372,116 +589,45 @@ sectorFilters.forEach(input => {
       .map(item => normalizeTag(item.value));
 
     applyFilters();
+    updateURLState();
   });
 });
 
-if (clearFiltersBtn) {
-  clearFiltersBtn.addEventListener("click", () => {
-    selectedTags = [];
-    selectedSectors = []; // Clean sector array metrics registry
-    tagFilters.forEach(input => { input.checked = false; });
-    sectorFilters.forEach(input => { input.checked = false; }); // Dynamic checkbox states sweep reset
-    applyFilters();
-  });
+function resetAllFilters() {
+  selectedTags = [];
+  selectedSectors = [];
+  tagFilters.forEach(input => (input.checked = false));
+  sectorFilters.forEach(input => (input.checked = false));
+  if (searchInput) searchInput.value = "";
+  if (clearResourceSearch) clearResourceSearch.style.display = "none";
+  if (suggestionsBox) suggestionsBox.style.display = "none";
+
+  applyFilters();
+  updateURLState();
 }
+
+if (clearFiltersBtn) clearFiltersBtn.addEventListener("click", resetAllFilters);
+if (resetFiltersEmptyBtn) resetFiltersEmptyBtn.addEventListener("click", resetAllFilters);
 
 if (searchInput) {
   searchInput.addEventListener("input", () => {
-    applyFilters();
-    processAutocompleteSuggestions(); // Fire auto-suggest processor engine context row inputs
+    processAutocompleteSuggestions();
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      applyFilters();
+      updateURLState();
+    }, 200);
   });
 }
 
-// Main resource initializer from Supabase
-async function loadResources() {
-  const { data, error } = await supabaseClient
-    .from("resources")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error loading resources:", error);
-    return;
-  }
-
-  resources = data || [];
-  renderResources(resources);
-  loadFeatured();
-
-  // FEATURE: Inbound traffic router parser. Auto-scans URL parameters to deploy query state instantly
-  const urlParams = new URLSearchParams(window.location.search);
-  const inboundSearchQuery = urlParams.get("search");
-  if (inboundSearchQuery && searchInput) {
-    searchInput.value = inboundSearchQuery;
+if (clearResourceSearch) {
+  clearResourceSearch.addEventListener("click", () => {
+    searchInput.value = "";
     applyFilters();
-    // Smooth layout adjustment anchor
-    setTimeout(() => searchInput.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
-  }
+    updateURLState();
+    searchInput.focus();
+  });
 }
-
-loadResources();
-
-/* --------------------------------------------------------------------------
-   9. GLOBAL DELEGATED CLICK EVENTS
-   -------------------------------------------------------------------------- */
-
-document.addEventListener("click", async (e) => {
-  // UPGRADE: Autocomplete Click Delegate Listener router payload trigger injector
-  const suggestionRow = e.target.closest(".autocomplete-suggestion-row");
-  if (suggestionRow) {
-    const selectedKeyword = suggestionRow.getAttribute("data-search-target");
-    if (searchInput) {
-      searchInput.value = selectedKeyword;
-      applyFilters();
-    }
-    if (suggestionsBox) {
-      suggestionsBox.style.display = "none";
-      suggestionsBox.innerHTML = "";
-    }
-    return;
-  }
-
-  // UPGRADE: Absolute Backdrop outside listener loop box click framework closer rules selector trigger
-  if (suggestionsBox && suggestionsBox.style.display === "block" && !e.target.closest(".search-section")) {
-    suggestionsBox.style.display = "none";
-  }
-
-  const btn = e.target.closest(".resource-view-btn");
-  if (btn) {
-    if (btn.dataset.clicked === "true") return;
-    btn.dataset.clicked = "true";
-
-    const id = btn.dataset.id;
-    if (id) {
-      await increaseResourceView(id);
-      renderResources(currentFilteredResources);
-      loadFeatured();
-    }
-
-    setTimeout(() => {
-      btn.dataset.clicked = "false";
-    }, 1500);
-    return; 
-  }
-
-  const trendingChip = e.target.closest(".trending-chip");
-  if (trendingChip) {
-    e.preventDefault();
-    const tagValue = normalizeTag(trendingChip.getAttribute("data-tag"));
-    
-    // Check tags checkboxes array list path sequence context rows maps
-    const targetCheckbox = Array.from(tagFilters).find(item => normalizeTag(item.value) === tagValue);
-    
-    if (targetCheckbox) {
-      targetCheckbox.checked = !targetCheckbox.checked;
-      selectedTags = Array.from(tagFilters)
-        .filter(item => item.checked)
-        .map(item => normalizeTag(item.value));
-      applyFilters();
-    }
-    return;
-  }
-});
 
 if (featuredButton) {
   featuredButton.addEventListener("click", async () => {
@@ -493,3 +639,61 @@ if (featuredButton) {
     }
   });
 }
+
+/* --------------------------------------------------------------------------
+   10. DATA INITIALIZER FROM SUPABASE
+   -------------------------------------------------------------------------- */
+
+async function loadResources() {
+  renderSkeletons(resourcesContainer, 6);
+
+  const { data, error } = await supabaseClient
+    .from("resources")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading resources:", error);
+    if (resourcesContainer) resourcesContainer.innerHTML = `<div class="empty-state"><p>Error loading resources. Please refresh.</p></div>`;
+    return;
+  }
+
+  resources = data || [];
+  loadFeatured();
+
+  // Inbound URL parameters auto-sync
+  const urlParams = new URLSearchParams(window.location.search);
+  const inboundSearch = urlParams.get("search");
+  const inboundType = urlParams.get("type");
+  const inboundSector = urlParams.get("sector");
+
+  if (inboundType) {
+    const types = inboundType.split(",").map(normalizeTag);
+    tagFilters.forEach(cb => {
+      if (types.includes(normalizeTag(cb.value))) {
+        cb.checked = true;
+      }
+    });
+    selectedTags = Array.from(tagFilters).filter(cb => cb.checked).map(cb => normalizeTag(cb.value));
+    if (filterPanel && selectedTags.length > 0) filterPanel.style.display = "block";
+  }
+
+  if (inboundSector) {
+    const sectors = inboundSector.split(",").map(normalizeTag);
+    sectorFilters.forEach(cb => {
+      if (sectors.includes(normalizeTag(cb.value))) {
+        cb.checked = true;
+      }
+    });
+    selectedSectors = Array.from(sectorFilters).filter(cb => cb.checked).map(cb => normalizeTag(cb.value));
+    if (filterPanel && selectedSectors.length > 0) filterPanel.style.display = "block";
+  }
+
+  if (inboundSearch && searchInput) {
+    searchInput.value = inboundSearch;
+  }
+
+  applyFilters();
+}
+
+loadResources();

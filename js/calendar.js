@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KAVYAHUB - CALENDAR CONTROLLER (DATE-WISE FILTER SYSTEM)
+   KAVYAHUB - CALENDAR CONTROLLER (TIMELINE & EVENT TYPE PARSER)
    ========================================================================== */
 
 // DOM Elements Selection
@@ -8,17 +8,47 @@ const calendarContainer = document.getElementById("calendarContainer");
 const calendarCount = document.getElementById("calendarCount");
 const calendarEmptyState = document.getElementById("calendarEmptyState");
 const selectedDateTitle = document.getElementById("selectedDateTitle");
+const selectedDateSub = document.getElementById("selectedDateSub");
+const typeFilterButtons = document.querySelectorAll("#calendarTypeFilters .video-filter-btn");
+
+// Presets
+const presetToday = document.getElementById("presetToday");
+const presetYesterday = document.getElementById("presetYesterday");
+const presetWeek = document.getElementById("presetWeek");
+const presetAll = document.getElementById("presetAll");
+const todayPresetBtn = document.getElementById("todayPresetBtn");
+const resetToRecentBtn = document.getElementById("resetToRecentBtn");
+
+// Modal Elements
+const descModalOverlay = document.getElementById("descriptionModalOverlay");
+const descModalClose = document.getElementById("descriptionModalClose");
+const modalBadgeRow = document.getElementById("modalBadgeRow");
+const modalTitle = document.getElementById("modalTitle");
+const modalMetaInfo = document.getElementById("modalMetaInfo");
+const modalDescriptionContent = document.getElementById("modalDescriptionContent");
+const modalActionRow = document.getElementById("modalActionRow");
 
 let allResources = [];
 let allVideos = [];
+let currentTypeFilter = "all"; // 'all' | 'resource' | 'video'
+let activeTimelineMode = "date"; // 'date' | 'week' | 'latest'
 
 /* --------------------------------------------------------------------------
-   1. DATE & UTILITY HELPERS
+   1. UTILITY & FORMATTING HELPERS
    -------------------------------------------------------------------------- */
 
-function formatDate(dateString) {
-  if (!dateString) return "";
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
+function formatDate(dateString) {
+  if (!dateString) return "Recent Date";
   return new Date(dateString).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "long",
@@ -26,26 +56,30 @@ function formatDate(dateString) {
   });
 }
 
+function formatStructuredText(text) {
+  if (!text) return "";
+  const escaped = escapeHTML(text);
+  return escaped
+    .split("\n")
+    .map(line => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
+        return `<div class="formatted-bullet">• ${trimmed.substring(2)}</div>`;
+      }
+      return trimmed ? `<p class="formatted-paragraph">${trimmed}</p>` : `<div class="formatted-spacer"></div>`;
+    })
+    .join("");
+}
+
 function getYouTubeId(url) {
   if (!url) return null;
-
   try {
     const parsedUrl = new URL(url);
-
-    if (parsedUrl.hostname.includes("youtu.be")) {
-      return parsedUrl.pathname.slice(1);
-    }
-
-    if (parsedUrl.pathname.includes("/shorts/")) {
-      return parsedUrl.pathname.split("/shorts/")[1].split("/")[0];
-    }
-
-    if (parsedUrl.searchParams.get("v")) {
-      return parsedUrl.searchParams.get("v");
-    }
-
+    if (parsedUrl.hostname.includes("youtu.be")) return parsedUrl.pathname.slice(1);
+    if (parsedUrl.pathname.includes("/shorts/")) return parsedUrl.pathname.split("/shorts/")[1].split("/")[0];
+    if (parsedUrl.searchParams.get("v")) return parsedUrl.searchParams.get("v");
     return null;
-  } catch (error) {
+  } catch (e) {
     return null;
   }
 }
@@ -55,111 +89,81 @@ function getYouTubeThumbnail(url) {
   return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "assets/images/default-thumbnail.jpg";
 }
 
+function formatViews(views) {
+  const num = Number(views || 0);
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+  return num.toString();
+}
+
+function getLocalYYYYMMDD(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function renderSkeletons(container, count = 4) {
+  if (!container) return;
+  container.innerHTML = Array(count).fill(`
+    <div class="resource-card skeleton-card">
+      <div class="skeleton skeleton-tag"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-btn"></div>
+    </div>
+  `).join("");
+}
+
 /* --------------------------------------------------------------------------
-   2. CARD TEMPLATES (HTML BUILDERS UPGRADED FOR ENGINE PARITY)
+   2. CARD BUILDERS
    -------------------------------------------------------------------------- */
 
 function createResourceCard(resource) {
   const descriptionText = resource.description || "";
-  const isLongDescription = descriptionText.length > 120;
-  
-  // UPGRADE: Normalized category comparison rules mapping parity trackers
+  const isLongDescription = descriptionText.length > 115;
   const currentCategory = String(resource.category || "").trim().toLowerCase();
-  const isJob = currentCategory === "job" || currentCategory === "internship";
-  const isHackathon = currentCategory === "hackathon";
-  const isScholarship = currentCategory === "scholarship";
 
-  // A. JOB / INTERNSHIP METADATA BADGES INTERFACES
-  let jobBadgesHTML = "";
-  if (isJob) {
-    const jobType = resource.job_type ? resource.job_type : "Remote";
-    const isActive = resource.is_active !== false;
-    
-    jobBadgesHTML = `
-      <div class="job-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
-        <span class="job-type-badge" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 500; text-transform: capitalize;">
-          <i class="fa-solid fa-briefcase" style="font-size: 0.75rem; margin-right: 2px;"></i> ${jobType}
-        </span>
-        <span class="job-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
-          ${isActive ? 'Active' : 'Expired'}
-        </span>
-      </div>
-    `;
-  }
-
-  // UPGRADE: B. HACKATHON METADATA CARD PILLS BUILDER
-  let hackathonBadgesHTML = "";
-  if (isHackathon) {
-    const hackathonMode = resource.job_type ? resource.job_type : "Online";
-    const isActive = resource.is_active !== false;
-
-    hackathonBadgesHTML = `
-      <div class="hackathon-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
-        <span class="hackathon-mode-badge" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; padding: 3px 8px; border-radius: 4px; font-weight: 500; text-transform: capitalize;">
-          <i class="fa-solid fa-laptop-code" style="font-size: 0.75rem; margin-right: 2px;"></i> ${hackathonMode}
-        </span>
-        <span class="hackathon-status-indicator" style="display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-main);">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: ${isActive ? '#22c55e' : '#ef4444'}; display: inline-block;"></span>
-          ${isActive ? 'Active' : 'Closed'}
-        </span>
-      </div>
-    `;
-  }
-
-  // UPGRADE: C. SCHOLARSHIP METADATA GOLD BADGE BUILDER
-  let scholarshipBadgesHTML = "";
-  if (isScholarship) {
-    scholarshipBadgesHTML = `
-      <div class="scholarship-meta-row" style="display: flex; gap: 10px; margin: -5px 0 12px 0; font-size: 0.8rem; align-items: center;">
-        <span class="scholarship-vip-badge" style="background: linear-gradient(135deg, #f59e0b, #e08e0b); color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.22);">
-          <i class="fa-solid fa-graduation-cap"></i> Verified Scholarship
-        </span>
-      </div>
-    `;
-  }
-
-  // UPGRADE: D. RESOURCE PROVIDER SECTOR BADGE (Govt vs Private marker tags setup)
   let orgBadgeHTML = "";
   if (resource.org_type && resource.org_type !== "none") {
     const isGov = resource.org_type === "government";
     orgBadgeHTML = `
-      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem; text-transform: capitalize;">
+      <span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">
         <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
       </span>
     `;
   }
 
+  const deepShareLink = `${window.location.origin}/resources.html?search=${encodeURIComponent(resource.title)}`;
+  const resourceJSON = encodeURIComponent(JSON.stringify({ ...resource, itemType: "resource" }));
+
   return `
-    <div class="resource-card">
-      <div class="tag-row" style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
-        <span class="tag" style="text-transform: capitalize; margin: 0;">${resource.category || "Resource"}</span>
+    <div class="resource-card" data-item="${resourceJSON}">
+      <div class="tag-row">
+        <span class="badge-pill neutral-pill"><i class="fa-solid fa-folder-open"></i> ${escapeHTML(resource.category || "Resource")}</span>
         ${orgBadgeHTML}
       </div>
       
-      <h3>${resource.title}</h3>
+      <h3 class="card-title">${escapeHTML(resource.title)}</h3>
 
-      ${jobBadgesHTML}
-      ${hackathonBadgesHTML}
-      ${scholarshipBadgesHTML}
-
-      <p class="resource-description">${descriptionText}</p>
-      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
-      
-      <div style="margin-bottom: 12px; display: block;">
-        <small><i class="fa-solid fa-calendar-days" style="font-size:0.75rem; margin-right:4px;"></i>${formatDate(resource.upload_date)}</small>
+      <div class="resource-description-clamp">
+        ${escapeHTML(descriptionText)}
       </div>
 
-      <div style="display: flex; gap: 8px; width: 100%; margin-top: auto;">
-        <button type="button" class="unlock-btn" data-link="${resource.link}" style="flex: 1; margin: 0;">
-          Open Resource
+      ${isLongDescription ? `<button type="button" class="read-more-btn cal-modal-trigger">Read More</button>` : ""}
+
+      <div class="card-footer-meta">
+        <small><i class="fa-regular fa-calendar"></i> ${formatDate(resource.upload_date)}</small>
+        <small><i class="fa-regular fa-eye"></i> ${formatViews(resource.views)} views</small>
+      </div>
+
+      <div class="card-actions">
+        <button type="button" class="unlock-btn open-resource-btn" data-link="${resource.link}">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Resource
         </button>
-        <button 
-          type="button" 
-          class="share-btn" 
-          data-link="${resource.link}" 
-          title="Copy Link to Share"
-          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+        <button type="button" class="share-btn" data-link="${deepShareLink}" title="Share Opportunity">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
       </div>
@@ -170,52 +174,56 @@ function createResourceCard(resource) {
 function createVideoCard(video) {
   const thumbnail = getYouTubeThumbnail(video.youtube_link);
   const descriptionText = video.description || "";
-  const isLongDescription = descriptionText.length > 120;
+  const isLongDescription = descriptionText.length > 115;
 
-  // UPGRADE: VIDEO OPPORTUNITY PROVIDER SECTOR BADGE SETUP
   let orgBadgeHTML = "";
   if (video.org_type && video.org_type !== "none") {
     const isGov = video.org_type === "government";
     orgBadgeHTML = `
-      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem; text-transform: capitalize; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">
         <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
       </span>
     `;
   }
 
+  const deepShareLink = `${window.location.origin}/videos.html?search=${encodeURIComponent(video.title)}`;
+  const videoJSON = encodeURIComponent(JSON.stringify({ ...video, itemType: "video" }));
+
   return `
-    <div class="resource-card">
-      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
+    <div class="resource-card video-card" data-item="${videoJSON}">
+      <div class="video-thumbnail-wrapper">
+        <img src="${thumbnail}" alt="${escapeHTML(video.title)}" class="video-thumbnail" loading="lazy">
+        <div class="video-play-overlay"><i class="fa-solid fa-play"></i></div>
+      </div>
       
-      <div class="tag-row" style="margin: 12px 0; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-        <span class="tag" style="text-transform: capitalize; margin: 0;">Video / ${video.category || "General"}</span>
+      <div class="tag-row">
+        <span class="badge-pill neutral-pill"><i class="fa-solid fa-video"></i> ${escapeHTML(video.category || "Video")}</span>
         ${orgBadgeHTML}
       </div>
 
-      <h3>${video.title}</h3>
+      <h3 class="card-title">${escapeHTML(video.title)}</h3>
 
-      <p class="resource-description">${descriptionText}</p>
-      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
-      
-      <div style="margin-bottom: 12px; display: block;">
-        <small><i class="fa-solid fa-calendar-days" style="font-size:0.75rem; margin-right:4px;"></i>${formatDate(video.upload_date)}</small>
+      <div class="resource-description-clamp">
+        ${escapeHTML(descriptionText)}
       </div>
 
-      <div style="display:flex; gap:8px; width: 100%; margin-top:auto;">
-        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn" style="flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; margin: 0;">
-          Watch Video
+      ${isLongDescription ? `<button type="button" class="read-more-btn cal-modal-trigger">Read More</button>` : ""}
+      
+      <div class="card-footer-meta">
+        <small><i class="fa-regular fa-calendar"></i> ${formatDate(video.upload_date)}</small>
+        <small><i class="fa-regular fa-eye"></i> ${formatViews(video.views)} views</small>
+      </div>
+
+      <div class="card-actions">
+        <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="small-btn watch-btn">
+          <i class="fa-brands fa-youtube"></i> Watch
         </a>
         ${video.resource_link ? `
-          <button type="button" class="unlock-btn" data-link="${video.resource_link}" style="margin: 0; padding: 0 15px;">
-            Open Resource
+          <button type="button" class="unlock-btn open-resource-btn" data-link="${video.resource_link}">
+            Resource
           </button>
         ` : ""}
-        <button 
-          type="button" 
-          class="share-btn" 
-          data-link="${video.youtube_link}" 
-          title="Copy Video Link to Share"
-          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
+        <button type="button" class="share-btn" data-link="${deepShareLink}" title="Share Video">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
       </div>
@@ -224,84 +232,237 @@ function createVideoCard(video) {
 }
 
 /* --------------------------------------------------------------------------
-   3. CALENDAR RENDER MODULE
+   3. TIMELINE RENDER & FILTER MODULE
    -------------------------------------------------------------------------- */
 
-function renderCalendarItems(selectedDate) {
-  if (!calendarContainer) return; 
+function filterByType(items, type) {
+  if (type === "resource") return items.filter(i => i.link && !i.youtube_link);
+  if (type === "video") return items.filter(i => i.youtube_link);
+  return items;
+}
 
-  if (selectedDateTitle) {
-    selectedDateTitle.textContent = formatDate(selectedDate);
+function renderTimeline() {
+  if (!calendarContainer) return;
+
+  let matchedResources = [];
+  let matchedVideos = [];
+
+  if (activeTimelineMode === "date") {
+    const chosenDate = calendarDate?.value || getLocalYYYYMMDD(0);
+    if (selectedDateTitle) selectedDateTitle.textContent = formatDate(chosenDate);
+    if (selectedDateSub) selectedDateSub.textContent = `All uploads recorded on ${formatDate(chosenDate)}.`;
+
+    matchedResources = allResources.filter(item => item.upload_date === chosenDate);
+    matchedVideos = allVideos.filter(item => item.upload_date === chosenDate);
+  } else if (activeTimelineMode === "week") {
+    if (selectedDateTitle) selectedDateTitle.textContent = "Past 7 Days Timeline";
+    if (selectedDateSub) selectedDateSub.textContent = "All opportunities and tutorials uploaded in the last 7 days.";
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    matchedResources = allResources.filter(item => new Date(item.upload_date) >= sevenDaysAgo);
+    matchedVideos = allVideos.filter(item => new Date(item.upload_date) >= sevenDaysAgo);
+  } else if (activeTimelineMode === "latest") {
+    if (selectedDateTitle) selectedDateTitle.textContent = "Latest Uploads";
+    if (selectedDateSub) selectedDateSub.textContent = "Most recently uploaded content across the platform.";
+
+    matchedResources = allResources.slice(0, 12);
+    matchedVideos = allVideos.slice(0, 12);
   }
 
-  // Filter items matching the chosen exact date
-  const resources = allResources.filter(item => item.upload_date === selectedDate);
-  const videos = allVideos.filter(item => item.upload_date === selectedDate);
-  const total = resources.length + videos.length;
+  // Apply Event Type Switcher
+  let displayList = [];
+  if (currentTypeFilter === "resource") {
+    displayList = matchedResources.map(r => createResourceCard(r));
+  } else if (currentTypeFilter === "video") {
+    displayList = matchedVideos.map(v => createVideoCard(v));
+  } else {
+    displayList = [
+      ...matchedResources.map(r => createResourceCard(r)),
+      ...matchedVideos.map(v => createVideoCard(v))
+    ];
+  }
 
   if (calendarCount) {
-    calendarCount.textContent = total;
+    calendarCount.textContent = displayList.length;
   }
 
-  if (total === 0) {
+  if (displayList.length === 0) {
     calendarContainer.innerHTML = "";
-    if (calendarEmptyState) calendarEmptyState.style.display = "block";
+    if (calendarEmptyState) calendarEmptyState.style.display = "flex";
     return;
   }
 
   if (calendarEmptyState) calendarEmptyState.style.display = "none";
-
-  // Optimization: Map lists to array strings, combine, and perform exactly 1 DOM injection
-  const resourcesHTML = resources.map(resource => createResourceCard(resource)).join("");
-  const videosHTML = videos.map(video => createVideoCard(video)).join("");
-
-  calendarContainer.innerHTML = resourcesHTML + videosHTML;
+  calendarContainer.innerHTML = displayList.join("");
 }
 
 /* --------------------------------------------------------------------------
-   4. DATA INITIALIZER & NETWORK FETCHING
+   4. MODAL HANDLER
+   -------------------------------------------------------------------------- */
+
+function openDetailsModal(item) {
+  if (!descModalOverlay) return;
+
+  const isVideo = item.itemType === "video" || !!item.youtube_link;
+  const isGov = item.org_type === "government";
+  const orgBadge = (item.org_type && item.org_type !== "none")
+    ? `<span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">${isGov ? 'Govt' : 'Private'}</span>`
+    : "";
+
+  modalBadgeRow.innerHTML = `
+    <span class="badge-pill neutral-pill">${escapeHTML(item.category || (isVideo ? "Video" : "Resource"))}</span>
+    ${orgBadge}
+  `;
+
+  modalTitle.textContent = item.title || "Details";
+
+  modalMetaInfo.innerHTML = `
+    <span><i class="fa-regular fa-calendar"></i> Uploaded: ${formatDate(item.upload_date)}</span>
+    <span><i class="fa-regular fa-eye"></i> ${formatViews(item.views)} views</span>
+  `;
+
+  modalDescriptionContent.innerHTML = formatStructuredText(item.description);
+
+  if (isVideo) {
+    modalActionRow.innerHTML = `
+      <a href="${item.youtube_link}" target="_blank" rel="noopener noreferrer" class="btn primary-btn full-btn">
+        <i class="fa-brands fa-youtube"></i> Watch Video
+      </a>
+      ${item.resource_link ? `
+        <button type="button" class="unlock-btn" data-link="${item.resource_link}">
+          <i class="fa-solid fa-file"></i> Attached Material
+        </button>
+      ` : ""}
+    `;
+  } else {
+    modalActionRow.innerHTML = `
+      <button type="button" class="unlock-btn full-btn" data-link="${item.link}">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Resource Link
+      </button>
+    `;
+  }
+
+  descModalOverlay.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeDetailsModal() {
+  if (descModalOverlay) {
+    descModalOverlay.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+}
+
+if (descModalClose) descModalClose.addEventListener("click", closeDetailsModal);
+if (descModalOverlay) {
+  descModalOverlay.addEventListener("click", (e) => {
+    if (e.target === descModalOverlay) closeDetailsModal();
+  });
+}
+
+// Global Delegated Listeners
+document.addEventListener("click", (e) => {
+  const trigger = e.target.closest(".cal-modal-trigger");
+  if (trigger) {
+    const card = trigger.closest(".resource-card");
+    if (card && card.dataset.item) {
+      const data = JSON.parse(decodeURIComponent(card.dataset.item));
+      openDetailsModal(data);
+    }
+  }
+});
+
+/* --------------------------------------------------------------------------
+   5. PRESET BUTTONS & EVENT LISTENERS
+   -------------------------------------------------------------------------- */
+
+typeFilterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    typeFilterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTypeFilter = btn.dataset.filter || "all";
+    renderTimeline();
+  });
+});
+
+if (calendarDate) {
+  calendarDate.addEventListener("change", () => {
+    activeTimelineMode = "date";
+    renderTimeline();
+  });
+}
+
+if (todayPresetBtn) {
+  todayPresetBtn.addEventListener("click", () => {
+    if (calendarDate) calendarDate.value = getLocalYYYYMMDD(0);
+    activeTimelineMode = "date";
+    renderTimeline();
+  });
+}
+
+if (presetToday) {
+  presetToday.addEventListener("click", () => {
+    if (calendarDate) calendarDate.value = getLocalYYYYMMDD(0);
+    activeTimelineMode = "date";
+    renderTimeline();
+  });
+}
+
+if (presetYesterday) {
+  presetYesterday.addEventListener("click", () => {
+    if (calendarDate) calendarDate.value = getLocalYYYYMMDD(-1);
+    activeTimelineMode = "date";
+    renderTimeline();
+  });
+}
+
+if (presetWeek) {
+  presetWeek.addEventListener("click", () => {
+    activeTimelineMode = "week";
+    renderTimeline();
+  });
+}
+
+if (presetAll || resetToRecentBtn) {
+  const handler = () => {
+    activeTimelineMode = "latest";
+    renderTimeline();
+  };
+  if (presetAll) presetAll.addEventListener("click", handler);
+  if (resetToRecentBtn) resetToRecentBtn.addEventListener("click", handler);
+}
+
+/* --------------------------------------------------------------------------
+   6. DATA INITIALIZER
    -------------------------------------------------------------------------- */
 
 async function loadCalendarData() {
+  renderSkeletons(calendarContainer, 4);
+
   try {
-    // Optimization: Parallelizes network queries instead of waiting sequentially
     const [resourcesResult, videosResult] = await Promise.all([
       supabaseClient.from("resources").select("*").order("upload_date", { ascending: false }),
       supabaseClient.from("videos").select("*").order("upload_date", { ascending: false })
     ]);
 
-    if (resourcesResult.error) console.error(resourcesResult.error);
-    if (videosResult.error) console.error(videosResult.error);
+    if (resourcesResult.error) console.error("Resources fetch error:", resourcesResult.error);
+    if (videosResult.error) console.error("Videos fetch error:", videosResult.error);
 
     allResources = resourcesResult.data || [];
     allVideos = videosResult.data || [];
 
-    // Optimization/Fix: Get safe local YYYY-MM-DD instead of forced UTC ISO split
-    const localDate = new Date();
-    const yyyy = localDate.getFullYear();
-    const mm = String(localDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(localDate.getDate()).padStart(2, '0');
-    const today = `${yyyy}-${mm}-${dd}`;
-
+    const todayStr = getLocalYYYYMMDD(0);
     if (calendarDate) {
-      calendarDate.value = today;
+      calendarDate.value = todayStr;
     }
-    
-    renderCalendarItems(today);
+
+    activeTimelineMode = "date";
+    renderTimeline();
   } catch (err) {
-    console.error("Calendar system data processing error:", err);
+    console.error("Calendar load error:", err);
   }
 }
 
-/* --------------------------------------------------------------------------
-   5. EVENT LISTENERS
-   -------------------------------------------------------------------------- */
-
-if (calendarDate) {
-  calendarDate.addEventListener("change", () => {
-    renderCalendarItems(calendarDate.value);
-  });
-}
-
-// Trigger Execution
 loadCalendarData();

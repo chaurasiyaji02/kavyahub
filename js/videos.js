@@ -1,50 +1,81 @@
 /* ==========================================================================
-   KAVYAHUB - VIDEOS CONTROLLER (AUDITED & DEEP-LINK POWERED)
+   KAVYAHUB - VIDEOS CONTROLLER (YOUTUBE HORIZONTAL ARCHITECTURE & DEEP-LINKED)
    ========================================================================== */
 
 let videos = [];
 let currentCategory = "all";
-// UPGRADE: New contextual state register tracking the checked video organization sectors
 let selectedVideoSectors = [];
 let currentFilteredVideos = [];
+let searchDebounceTimer = null;
 
 // DOM Elements Selection
 const videosContainer = document.getElementById("videosContainer");
 const videoSearch = document.getElementById("videoSearch");
+const clearVideoSearch = document.getElementById("clearVideoSearch");
 const videoCount = document.getElementById("videoCount");
 const videoEmptyState = document.getElementById("videoEmptyState");
+const resetVideoFiltersBtn = document.getElementById("resetVideoFiltersBtn");
 const filterButtons = document.querySelectorAll(".video-filter-btn");
-
-// UPGRADE: Select the newly added video checkboxes elements selectors explicitly
 const videoSectorFilters = document.querySelectorAll(".video-sector-filter");
 
+const featuredVideoSection = document.getElementById("featuredVideoSection");
 const featuredVideoTitle = document.getElementById("featuredVideoTitle");
 const featuredVideoDescription = document.getElementById("featuredVideoDescription");
 const featuredVideoButton = document.getElementById("featuredVideoButton");
 const featuredVideoResourceButton = document.getElementById("featuredVideoResourceButton");
 
+// Modal Elements
+const descModalOverlay = document.getElementById("descriptionModalOverlay");
+const descModalClose = document.getElementById("descriptionModalClose");
+const modalBadgeRow = document.getElementById("modalBadgeRow");
+const modalTitle = document.getElementById("modalTitle");
+const modalMetaInfo = document.getElementById("modalMetaInfo");
+const modalDescriptionContent = document.getElementById("modalDescriptionContent");
+const modalActionRow = document.getElementById("modalActionRow");
+
 /* --------------------------------------------------------------------------
-   1. YOUTUBE HELPERS
+   1. UTILITY & FORMATTING HELPERS
    -------------------------------------------------------------------------- */
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatStructuredText(text) {
+  if (!text) return "";
+  const escaped = escapeHTML(text);
+  
+  return escaped
+    .split("\n")
+    .map(line => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
+        return `<div class="formatted-bullet">• ${trimmed.substring(2)}</div>`;
+      }
+      return trimmed ? `<p class="formatted-paragraph">${trimmed}</p>` : `<div class="formatted-spacer"></div>`;
+    })
+    .join("");
+}
 
 function getYouTubeId(url) {
   if (!url) return null;
-
   try {
     const parsedUrl = new URL(url);
-
     if (parsedUrl.hostname.includes("youtu.be")) {
       return parsedUrl.pathname.slice(1);
     }
-
     if (parsedUrl.pathname.includes("/shorts/")) {
       return parsedUrl.pathname.split("/shorts/")[1].split("/")[0];
     }
-
     if (parsedUrl.searchParams.get("v")) {
       return parsedUrl.searchParams.get("v");
     }
-
     return null;
   } catch (error) {
     return null;
@@ -56,13 +87,34 @@ function getYouTubeThumbnail(url) {
   return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "assets/images/default-thumbnail.jpg";
 }
 
+function formatViews(views) {
+  const num = Number(views || 0);
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+  return num.toString();
+}
+
+function renderSkeletons(container, count = 4) {
+  if (!container) return;
+  container.innerHTML = Array(count).fill(`
+    <div class="youtube-video-card skeleton-card">
+      <div class="skeleton yt-skeleton-thumb"></div>
+      <div class="yt-skeleton-details">
+        <div class="skeleton yt-skeleton-badge"></div>
+        <div class="skeleton yt-skeleton-title"></div>
+        <div class="skeleton yt-skeleton-text"></div>
+        <div class="skeleton yt-skeleton-actions"></div>
+      </div>
+    </div>
+  `).join("");
+}
+
 /* --------------------------------------------------------------------------
    2. VIEW COUNTER LOGIC
    -------------------------------------------------------------------------- */
 
 async function increaseVideoView(id) {
   const video = videos.find(item => item.id == id);
-
   if (video) {
     video.views = (video.views || 0) + 1;
   }
@@ -81,7 +133,7 @@ async function increaseVideoView(id) {
 }
 
 /* --------------------------------------------------------------------------
-   3. CARD HTML TEMPLATE (DEEP-LINK UPDATED)
+   3. YOUTUBE HORIZONTAL CARD TEMPLATE
    -------------------------------------------------------------------------- */
 
 function createVideoCard(video) {
@@ -90,70 +142,81 @@ function createVideoCard(video) {
   const descriptionText = video.description || "";
   const isLongDescription = descriptionText.length > 120;
 
-  // UPGRADE: Contextual extraction mapping inline badges for opportunity structural organization models
   let orgBadgeHTML = "";
   if (video.org_type && video.org_type !== "none") {
     const isGov = video.org_type === "government";
     orgBadgeHTML = `
-      <span class="tag org-indicator-chip" style="background: ${isGov ? 'rgba(59, 130, 246, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${isGov ? '#3b82f6' : 'var(--text-main)'}; border: 1px solid ${isGov ? 'rgba(59, 130, 246, 0.25)' : 'var(--border-color)'}; font-weight: 600; font-size: 0.75rem; margin-left: 6px; text-transform: capitalize; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">
         <i class="${isGov ? 'fa-solid fa-building-shield' : 'fa-solid fa-building'}"></i> ${isGov ? 'Govt' : 'Private'}
       </span>
     `;
   }
 
-  // FIXED: Generates platform-locked inbound tracking loops
   const deepShareLink = `${window.location.origin}/videos.html?search=${encodeURIComponent(video.title)}`;
+  const videoJSON = encodeURIComponent(JSON.stringify(video));
 
   return `
-    <div class="resource-card">
-      <img src="${thumbnail}" alt="${video.title}" class="video-thumbnail" loading="lazy">
-      <div class="video-tags-row" style="margin-top: 12px; margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
-        <span class="tag" style="text-transform: capitalize; margin: 0;">${video.category || "Video"}</span>
-        ${orgBadgeHTML}
-      </div>
-
-      <h3>${video.title}</h3>
+    <div class="youtube-video-card" data-video="${videoJSON}">
       
-      <p class="resource-description">${descriptionText}</p>
-      ${isLongDescription ? `<button type="button" class="read-more-btn">Read More</button>` : ""}
-
-      <div style="margin-bottom: 12px; display: block;">
-        <small style="display:inline-block; margin-right:10px;">${videoDate}</small>
-        <small style="display:inline-block;">👁 ${video.views || 0} views</small>
+      <!-- Left 16:9 Thumbnail Column -->
+      <div class="youtube-thumb-wrapper">
+        <img src="${thumbnail}" alt="${escapeHTML(video.title)}" class="youtube-card-thumbnail" loading="lazy">
+        <div class="thumb-play-overlay"><i class="fa-solid fa-play"></i></div>
       </div>
 
-      <div style="display:flex; gap:8px; margin-top:auto; flex-wrap:wrap; width: 100%;">
-        <a
-          href="${video.youtube_link}"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="small-btn video-view-btn"
-          data-id="${video.id}"
-          style="flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; margin: 0;">
-          Watch Video
-        </a>
+      <!-- Right Metadata & Content Column -->
+      <div class="youtube-content-wrapper">
+        
+        <div class="tag-row">
+          <span class="badge-pill neutral-pill">${escapeHTML(video.category || "Video")}</span>
+          ${orgBadgeHTML}
+        </div>
 
-        ${video.resource_link ? `
-          <button type="button" class="unlock-btn" data-link="${video.resource_link}" style="margin: 0; padding: 0 15px;">
-            Open Resource
+        <h3 class="video-card-title">${escapeHTML(video.title)}</h3>
+        
+        <div class="resource-description-clamp">
+          ${escapeHTML(descriptionText)}
+        </div>
+
+        ${isLongDescription ? `<button type="button" class="read-more-btn video-modal-trigger">Read More</button>` : ""}
+
+        <div class="card-footer-meta">
+          <small><i class="fa-regular fa-calendar"></i> ${escapeHTML(videoDate)}</small>
+          <small><i class="fa-regular fa-eye"></i> ${formatViews(video.views)} views</small>
+        </div>
+
+        <div class="card-actions yt-actions">
+          <a
+            href="${video.youtube_link}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="small-btn watch-btn video-view-btn"
+            data-id="${video.id}">
+            <i class="fa-brands fa-youtube"></i> Watch Video
+          </a>
+
+          ${video.resource_link ? `
+            <button type="button" class="unlock-btn open-resource-btn" data-link="${video.resource_link}">
+              <i class="fa-solid fa-file-lines"></i> Resource Link
+            </button>
+          ` : ""}
+
+          <button 
+            type="button" 
+            class="share-btn" 
+            data-link="${deepShareLink}" 
+            title="Share Video">
+            <i class="fa-solid fa-share-nodes"></i>
           </button>
-        ` : ""}
+        </div>
 
-        <button 
-          type="button" 
-          class="share-btn" 
-          data-link="${deepShareLink}" 
-          title="Share via KavyaHub"
-          style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s;">
-          <i class="fa-solid fa-share-nodes"></i>
-        </button>
       </div>
     </div>
   `;
 }
 
 /* --------------------------------------------------------------------------
-   4. RENDER MODULE
+   4. RENDER & FEATURED MODULE
    -------------------------------------------------------------------------- */
 
 function renderVideos(data) {
@@ -162,7 +225,7 @@ function renderVideos(data) {
 
   if (data.length === 0) {
     videosContainer.innerHTML = "";
-    if (videoEmptyState) videoEmptyState.style.display = "block";
+    if (videoEmptyState) videoEmptyState.style.display = "flex";
     if (videoCount) videoCount.textContent = "0";
     return;
   }
@@ -175,68 +238,58 @@ function renderVideos(data) {
   }
 }
 
-/* --------------------------------------------------------------------------
-   5. FEATURED CONTAINER
-   -------------------------------------------------------------------------- */
-
 function loadFeaturedVideo() {
   if (!featuredVideoTitle || !featuredVideoDescription || !featuredVideoButton) return;
 
   let featured = videos.find(video => video.featured);
-
   if (!featured && videos.length > 0) {
     featured = videos[0];
   }
 
   if (!featured) {
-    featuredVideoTitle.textContent = "No Video Added Yet";
-    featuredVideoDescription.textContent = "Add a video from the admin panel.";
-    featuredVideoButton.dataset.link = "#";
-    featuredVideoButton.dataset.id = "";
-    if (featuredVideoResourceButton) featuredVideoResourceButton.dataset.link = "#";
+    if (featuredVideoSection) featuredVideoSection.style.display = "none";
     return;
   }
 
+  if (featuredVideoSection) featuredVideoSection.style.display = "block";
   featuredVideoTitle.textContent = featured.title;
   featuredVideoDescription.textContent = featured.description || "";
-
   featuredVideoButton.dataset.link = featured.youtube_link || "#";
   featuredVideoButton.dataset.id = featured.id;
 
   if (featuredVideoResourceButton) {
     featuredVideoResourceButton.dataset.link = featured.resource_link || "#";
-    featuredVideoResourceButton.classList.add("unlock-btn"); 
-    
     if (!featured.resource_link || featured.resource_link === "#") {
       featuredVideoResourceButton.style.display = "none";
     } else {
-      featuredVideoResourceButton.style.display = "inline-block";
+      featuredVideoResourceButton.style.display = "inline-flex";
     }
   }
 }
 
 /* --------------------------------------------------------------------------
-   6. FILTER & SEARCH LOGIC (UPGRADED WITH MULTI-STAGE SECTOR CHECK)
+   5. FILTER, DEBOUNCED SEARCH & URL SYNC
    -------------------------------------------------------------------------- */
 
 function applyFilters() {
   const term = videoSearch ? videoSearch.value.toLowerCase().trim() : "";
 
+  if (clearVideoSearch) {
+    clearVideoSearch.style.display = term ? "block" : "none";
+  }
+
   const filtered = videos.filter(video => {
-    const matchCategory = currentCategory === "all" || String(video.category).toLowerCase() === currentCategory.toLowerCase();
+    const matchCategory = currentCategory === "all" || String(video.category || "").toLowerCase() === currentCategory.toLowerCase();
 
     const searchableText = [
       video.title,
       video.description,
       video.category,
       ...(video.tags || [])
-    ]
-      .join(" ")
-      .toLowerCase();
+    ].join(" ").toLowerCase();
 
     const matchSearch = term === "" || searchableText.includes(term);
 
-    // UPGRADE: Multi-stage video organization type sector filtering rules parser
     const videoOrg = String(video.org_type || "none").toLowerCase().trim();
     const matchSectors = selectedVideoSectors.length === 0 || selectedVideoSectors.includes(videoOrg);
 
@@ -246,8 +299,121 @@ function applyFilters() {
   renderVideos(filtered);
 }
 
+function updateURLState() {
+  const params = new URLSearchParams();
+  if (currentCategory !== "all") params.set("category", currentCategory);
+  if (videoSearch && videoSearch.value.trim()) params.set("search", videoSearch.value.trim());
+  
+  const newURL = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
+  window.history.replaceState({}, "", newURL);
+}
+
 /* --------------------------------------------------------------------------
-   7. EVENT LISTENERS & INITIALIZATION
+   6. MODAL & CLICK EVENT DELEGATION
+   -------------------------------------------------------------------------- */
+
+function openVideoDetailsModal(video) {
+  if (!descModalOverlay) return;
+
+  const isGov = video.org_type === "government";
+  const orgBadge = (video.org_type && video.org_type !== "none")
+    ? `<span class="badge-pill ${isGov ? 'govt-pill' : 'private-pill'}">${isGov ? 'Govt' : 'Private'}</span>`
+    : "";
+
+  modalBadgeRow.innerHTML = `
+    <span class="badge-pill neutral-pill">${escapeHTML(video.category || "Video")}</span>
+    ${orgBadge}
+  `;
+
+  modalTitle.textContent = video.title || "Video Details";
+
+  const videoDate = video.created_at ? new Date(video.created_at).toLocaleDateString() : "";
+  modalMetaInfo.innerHTML = `
+    <span><i class="fa-regular fa-calendar"></i> Uploaded: ${escapeHTML(videoDate)}</span>
+    <span><i class="fa-regular fa-eye"></i> ${formatViews(video.views)} views</span>
+  `;
+
+  modalDescriptionContent.innerHTML = formatStructuredText(video.description);
+
+  modalActionRow.innerHTML = `
+    <a href="${video.youtube_link}" target="_blank" rel="noopener noreferrer" class="btn primary-btn full-btn video-view-btn" data-id="${video.id}">
+      <i class="fa-brands fa-youtube"></i> Watch on YouTube
+    </a>
+    ${video.resource_link ? `
+      <button type="button" class="unlock-btn" data-link="${video.resource_link}">
+        <i class="fa-solid fa-file-lines"></i> Open Resource
+      </button>
+    ` : ""}
+  `;
+
+  descModalOverlay.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeVideoDetailsModal() {
+  if (descModalOverlay) {
+    descModalOverlay.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+}
+
+if (descModalClose) {
+  descModalClose.addEventListener("click", closeVideoDetailsModal);
+}
+
+if (descModalOverlay) {
+  descModalOverlay.addEventListener("click", (e) => {
+    if (e.target === descModalOverlay) closeVideoDetailsModal();
+  });
+}
+
+// Global Event Delegation
+document.addEventListener("click", async (e) => {
+  // 1. Read More Modal Trigger
+  const modalTrigger = e.target.closest(".video-modal-trigger");
+  if (modalTrigger) {
+    const card = modalTrigger.closest(".youtube-video-card");
+    if (card && card.dataset.video) {
+      const data = JSON.parse(decodeURIComponent(card.dataset.video));
+      openVideoDetailsModal(data);
+    }
+    return;
+  }
+
+  // 2. Video View Counter Tracking
+  const watchBtn = e.target.closest(".video-view-btn");
+  if (watchBtn) {
+    if (watchBtn.dataset.clicked === "true") return;
+    watchBtn.dataset.clicked = "true";
+    const id = watchBtn.dataset.id;
+    if (id) {
+      await increaseVideoView(id);
+    }
+    setTimeout(() => {
+      watchBtn.dataset.clicked = "false";
+    }, 1500);
+    return;
+  }
+
+  // 3. Share Button
+  const shareBtn = e.target.closest(".share-btn");
+  if (shareBtn) {
+    const shareUrl = shareBtn.getAttribute("data-link");
+    if (navigator.share) {
+      navigator.share({
+        title: "Check out this video guide on KavyaHub",
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert("Video link copied to clipboard!");
+      });
+    }
+  }
+});
+
+/* --------------------------------------------------------------------------
+   7. EVENT LISTENERS & FILTER TRIGGERS
    -------------------------------------------------------------------------- */
 
 filterButtons.forEach(button => {
@@ -257,10 +423,10 @@ filterButtons.forEach(button => {
 
     currentCategory = button.dataset.category || "all";
     applyFilters();
+    updateURLState();
   });
 });
 
-// UPGRADE: Dynamic change registration listeners hooks for Video Sector Filter checkboxes
 videoSectorFilters.forEach(input => {
   input.addEventListener("change", () => {
     selectedVideoSectors = Array.from(videoSectorFilters)
@@ -272,7 +438,40 @@ videoSectorFilters.forEach(input => {
 });
 
 if (videoSearch) {
-  videoSearch.addEventListener("input", applyFilters);
+  videoSearch.addEventListener("input", () => {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      applyFilters();
+      updateURLState();
+    }, 200);
+  });
+}
+
+if (clearVideoSearch) {
+  clearVideoSearch.addEventListener("click", () => {
+    videoSearch.value = "";
+    applyFilters();
+    updateURLState();
+    videoSearch.focus();
+  });
+}
+
+if (resetVideoFiltersBtn) {
+  resetVideoFiltersBtn.addEventListener("click", () => {
+    currentCategory = "all";
+    filterButtons.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.category === "all");
+    });
+
+    videoSectorFilters.forEach(cb => (cb.checked = false));
+    selectedVideoSectors = [];
+
+    if (videoSearch) videoSearch.value = "";
+    if (clearVideoSearch) clearVideoSearch.style.display = "none";
+
+    applyFilters();
+    updateURLState();
+  });
 }
 
 if (featuredVideoButton) {
@@ -292,27 +491,13 @@ if (featuredVideoButton) {
   });
 }
 
-document.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".video-view-btn");
-  if (!btn) return;
+/* --------------------------------------------------------------------------
+   8. DATA INITIALIZER FROM SUPABASE
+   -------------------------------------------------------------------------- */
 
-  if (btn.dataset.clicked === "true") return;
-  btn.dataset.clicked = "true";
-
-  const id = btn.dataset.id;
-  if (id) {
-    await increaseVideoView(id);
-    renderVideos(currentFilteredVideos);
-    loadFeaturedVideo();
-  }
-
-  setTimeout(() => {
-    btn.dataset.clicked = "false";
-  }, 1500);
-});
-
-// Main data initializer from Supabase
 async function loadVideos() {
+  renderSkeletons(videosContainer, 4);
+
   const { data, error } = await supabaseClient
     .from("videos")
     .select("*")
@@ -320,21 +505,32 @@ async function loadVideos() {
 
   if (error) {
     console.error("Error loading videos:", error);
+    if (videosContainer) videosContainer.innerHTML = `<div class="empty-state"><p>Error loading videos. Please refresh.</p></div>`;
     return;
   }
 
   videos = data || [];
-  renderVideos(videos);
   loadFeaturedVideo();
 
-  // FEATURE: Inbound traffic deep-link router parser for video cards logs
+  // Inbound query / category check from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const inboundVideoQuery = urlParams.get("search");
-  if (inboundVideoQuery && videoSearch) {
-    videoSearch.value = inboundVideoQuery;
-    applyFilters();
-    setTimeout(() => videoSearch.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+  const inboundSearch = urlParams.get("search");
+  const inboundCategory = urlParams.get("category");
+
+  if (inboundCategory) {
+    const targetBtn = Array.from(filterButtons).find(btn => btn.dataset.category === inboundCategory.toLowerCase());
+    if (targetBtn) {
+      filterButtons.forEach(btn => btn.classList.remove("active"));
+      targetBtn.classList.add("active");
+      currentCategory = inboundCategory.toLowerCase();
+    }
   }
+
+  if (inboundSearch && videoSearch) {
+    videoSearch.value = inboundSearch;
+  }
+
+  applyFilters();
 }
 
 loadVideos();

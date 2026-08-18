@@ -2,32 +2,43 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
 
-     
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <title>Videos | KavyaHub</title>
+  <title>Videos | KavyaHub - Tutorials, Roadmaps & Opportunities</title>
   <meta name="description" content="Watch videos about free courses, certificates, career roadmaps, AI tools, coding, and tech opportunities on KavyaHub." />
+  <meta name="keywords" content="educational videos, coding tutorials, tech roadmaps, scholarships video guide, KavyaHub videos" />
 
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Learning Videos | KavyaHub" />
+  <meta property="og:description" content="Watch step-by-step career guidance, free course tutorials, and tech roadmaps." />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
+
       <div class="logo">
         <a href="index.html">Kavya<span>Hub</span></a>
       </div>
@@ -35,19 +46,19 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
         <li><a href="resources.html">Resources</a></li>
-        <li><a href="videos.html">Videos</a></li>
+        <li><a href="videos.html" class="active">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Theme">
           <i class="fa-solid fa-moon"></i>
         </button>
         
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -56,84 +67,107 @@
 
   <main>
 
+    <!-- Hero Header -->
     <section class="resources-hero">
       <div class="section-heading">
-        <h1>Learning Videos</h1>
-        <p>Watch videos about free courses, certificates, career roadmaps, AI tools, coding, and tech opportunities.</p>
+        <h1>Learning Videos & Guides</h1>
+        <p>Watch step-by-step videos on free certificates, internships, scholarships, and coding roadmaps.</p>
       </div>
     </section>
 
+    <!-- Search & Real-Time Filter -->
     <section class="search-section">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input
           type="text"
           id="videoSearch"
-          placeholder="Search videos..."
+          placeholder="Search tutorials, courses, roadmaps by keyword..."
+          autocomplete="off"
         />
+        <button type="button" id="clearVideoSearch" class="clear-search-btn" style="display: none;" aria-label="Clear Search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
     </section>
 
+    <!-- Category Filter Pills -->
     <section class="filter-section">
-      <div class="filter-container">
+      <div class="filter-container" id="videoCategoryFilters">
         <button class="video-filter-btn active" data-category="all">All</button>
         <button class="video-filter-btn" data-category="certificate">Certificates</button>
         <button class="video-filter-btn" data-category="course">Courses</button>
         <button class="video-filter-btn" data-category="career">Career</button>
-        <button class="video-filter-btn" data-category="ai">AI</button>
+        <button class="video-filter-btn" data-category="ai">AI Tools</button>
         <button class="video-filter-btn" data-category="coding">Coding</button>
         <button class="video-filter-btn" data-category="roadmap">Roadmaps</button>
-        <button class="video-filter-btn" data-category="job">Jobs</button>
+        <button class="video-filter-btn" data-category="job">Jobs & Internships</button>
+        <button class="video-filter-btn" data-category="scholarship">Scholarships</button>
       </div>
     </section>
 
-    <!-- ENHANCEMENT: Secondary Sector Selection Layout Group Specifically Tracking Video Opportunity Sectors (Govt vs Private) -->
-    <div class="video-sector-filters-wrapper" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: -10px; margin-bottom: 25px; font-size: 0.9rem; color: var(--text-main);">
-      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
-        <input type="checkbox" class="video-sector-filter" value="government" style="cursor: pointer;"> Government (Sarkari Opportunities)
+    <!-- Sector Filter Pills (Govt vs Private) -->
+    <div class="sector-filter-container">
+      <span class="sector-filter-label"><i class="fa-solid fa-filter"></i> Sector:</span>
+      <label class="sector-checkbox-pill">
+        <input type="checkbox" class="video-sector-filter" value="government" />
+        <span><i class="fa-solid fa-building-shield"></i> Government (Sarkari)</span>
       </label>
-      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
-        <input type="checkbox" class="video-sector-filter" value="private" style="cursor: pointer;"> Private (Corporate Domain)
+      <label class="sector-checkbox-pill">
+        <input type="checkbox" class="video-sector-filter" value="private" />
+        <span><i class="fa-solid fa-building"></i> Private / Corporate</span>
       </label>
     </div>
 
-    <section class="featured-resource">
-      <div class="featured-card">
-        <div class="featured-badge">⭐ Featured Video</div>
+    <!-- Featured Highlight Video -->
+    <section class="featured-resource" id="featuredVideoSection" style="display: none;">
+      <div class="featured-card video-featured-card">
+        <div class="featured-badge"><i class="fa-solid fa-star"></i> Featured Guide</div>
         <h2 id="featuredVideoTitle">Loading...</h2>
-        <p id="featuredVideoDescription">Discover this featured video.</p>
+        <p id="featuredVideoDescription">Discover this handpicked tutorial guide.</p>
 
         <div class="featured-actions">
-          <button type="button" class="video-watch-btn" id="featuredVideoButton" data-link="#">Watch Video</button>
-          <button type="button" class="unlock-btn" id="featuredVideoResourceButton" data-link="#">Open Resource</button>
+          <button type="button" class="video-watch-btn" id="featuredVideoButton" data-link="#">
+            <i class="fa-brands fa-youtube"></i> Watch Video
+          </button>
+          <button type="button" class="unlock-btn" id="featuredVideoResourceButton" data-link="#" style="display: none;">
+            <i class="fa-solid fa-file-lines"></i> Open Resource
+          </button>
         </div>
       </div>
     </section>
 
+    <!-- Active Count Counter -->
     <section class="resource-count-section">
       <h3>Available Videos: <span id="videoCount">0</span></h3>
     </section>
 
+    <!-- YouTube-Style Video Grid List -->
     <section class="resources-grid-section">
-      <div class="resources-grid" id="videosContainer"></div>
+      <div class="youtube-video-list" id="videosContainer"></div>
 
+      <!-- Zero State Feedback -->
       <div id="videoEmptyState" class="empty-state" style="display: none;">
         <i class="fa-solid fa-video-slash"></i>
         <h3>No Videos Found</h3>
-        <p>Try a different keyword or category.</p>
+        <p>No video matches your active search or filters.</p>
+        <button type="button" id="resetVideoFiltersBtn" class="btn secondary-btn" style="margin-top: 15px;">
+          <i class="fa-solid fa-rotate-left"></i> Reset All Filters
+        </button>
       </div>
     </section>
 
   </main>
 
+  <!-- Social Link Unlock Modal -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup-box">
       <button class="popup-close" id="popupClose" aria-label="Close Popup">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h2>Unlock Resource</h2>
-      <p>Please support by subscribing on YouTube and following on Instagram before accessing this resource.</p>
+      <h2>Unlock Attached Material</h2>
+      <p>Subscribe on YouTube and follow on Instagram before accessing the resource link.</p>
 
       <div class="popup-buttons">
         <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" class="popup-social-btn youtube-btn" target="_blank" rel="noopener noreferrer">
@@ -148,20 +182,21 @@
     </div>
   </div>
 
-  <!-- UPGRADE: Premium Universal Blurred Description Container Modal Hook (Sync with main.js event delegates engine) -->
-  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+  <!-- Video Details & Full Structured Description Modal -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay">
+    <div class="description-modal-box">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
-      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Video Details</h3>
-      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
-      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
-      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
+      <div class="modal-badge-row" id="modalBadgeRow"></div>
+      <h3 id="modalTitle">Video Title</h3>
+      <div class="modal-meta-info" id="modalMetaInfo"></div>
+      <div class="modal-description-content" id="modalDescriptionContent"></div>
+      <div class="modal-action-row" id="modalActionRow"></div>
     </div>
   </div>
 
+  <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
@@ -182,6 +217,7 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase/config.js"></script>
   <script src="js/main.js"></script>

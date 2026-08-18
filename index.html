@@ -2,32 +2,48 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
-     
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
+      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <title>KavyaHub | Free Resources & Videos</title>
+  <title>KavyaHub | Free Resources, Courses, Jobs & Learning Videos</title>
   <meta name="description" content="Find free courses, certificates, internships, notes, videos, and useful tech resources in one place on KavyaHub." />
+  <meta name="keywords" content="free courses, certificates, internships, scholarships, tech resources, developer roadmaps, KavyaHub" />
+  <meta name="author" content="KavyaHub" />
 
+  <!-- Open Graph / Social Media Preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://kavyahub.vercel.app/" />
+  <meta property="og:title" content="KavyaHub | Free Resources, Courses & Tech Opportunities" />
+  <meta property="og:description" content="Find free courses, certificates, internships, hackathons, and curated tech resources." />
+  <meta property="og:image" content="assets/images/profile.jpg" />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
+  <!-- Search Console Verification -->
   <meta name="google-site-verification" content="V012I6QjMBbe9HUwTa3a6tEa7CRTwHXAJgt__shFxTc" />
 
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
 
@@ -36,7 +52,7 @@
       </div>
 
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html" class="active">Home</a></li>
         <li><a href="resources.html">Resources</a></li>
         <li><a href="videos.html">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
@@ -45,12 +61,12 @@
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
         
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -59,6 +75,7 @@
   </header>
 
   <main>
+    <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
 
@@ -78,147 +95,151 @@
         </p>
 
         <div class="hero-buttons">
-          <a href="resources.html" class="btn primary-btn">Explore Resources</a>
-          <a href="videos.html" class="btn secondary-btn">Watch Videos</a>
+          <a href="resources.html" class="btn primary-btn"><i class="fa-solid fa-compass"></i> Explore Resources</a>
+          <a href="videos.html" class="btn secondary-btn"><i class="fa-solid fa-play"></i> Watch Videos</a>
         </div>
 
       </div>
     </section>
 
-    <section class="social-section" id="socialSection" style="display:none;">
+    <!-- Social Links Section (Dynamic) -->
+    <section class="social-section" id="socialSection" style="display: none;">
       <div class="section-heading">
         <h2>Connect With Me</h2>
-        <p>Follow my official social media accounts for updates.</p>
+        <p>Follow my official social media accounts for instant updates.</p>
       </div>
-
       <div class="social-cards" id="socialCardsContainer"></div>
     </section>
 
-    <section class="accounts-section" id="otherAccountsSection" style="display:none;">
+    <!-- Other Accounts Section (Dynamic) -->
+    <section class="accounts-section" id="otherAccountsSection" style="display: none;">
       <div class="section-heading">
         <h2>My Other Accounts</h2>
-        <p>Explore my other active channels and pages.</p>
+        <p>Explore my other active channels, portfolios, and pages.</p>
       </div>
-
       <div class="account-list" id="otherAccountsContainer"></div>
     </section>
 
+    <!-- Categories Grid Section -->
     <section class="category-section">
       <div class="section-heading">
         <h2>Explore Categories</h2>
-        <p>Browse useful resources by category.</p>
+        <p>Quickly browse handpicked opportunities and resources.</p>
       </div>
 
       <div class="category-grid">
-        <a href="resources.html" class="category-card">
+        <a href="resources.html?type=certificate" class="category-card">
           <i class="fa-solid fa-certificate"></i>
           <h3>Free Certificates</h3>
-          <p>Find free certificate opportunities from trusted platforms.</p>
+          <p>Find free certificate opportunities from trusted global platforms.</p>
         </a>
 
-        <a href="resources.html" class="category-card">
+        <a href="resources.html?type=course" class="category-card">
           <i class="fa-solid fa-graduation-cap"></i>
           <h3>Free Courses</h3>
-          <p>Learn new skills with free courses and learning resources.</p>
+          <p>Learn high-income tech and creative skills with zero tuition fees.</p>
         </a>
 
-        <a href="resources.html" class="category-card">
+        <a href="resources.html?type=notes" class="category-card">
           <i class="fa-solid fa-file-lines"></i>
-          <h3>Free Notes</h3>
-          <p>Access useful notes for college, coding, and career learning.</p>
+          <h3>Free Notes & Cheat-sheets</h3>
+          <p>Access concise notes for semester exams, coding, and interviews.</p>
         </a>
 
-        <a href="resources.html" class="category-card">
+        <a href="resources.html?type=internship" class="category-card">
           <i class="fa-solid fa-briefcase"></i>
           <h3>Internships</h3>
-          <p>Explore internship opportunities and student programs.</p>
+          <p>Explore verified summer internships and student programs.</p>
         </a>
 
-        <a href="resources.html" class="category-card">
+        <a href="resources.html?type=job" class="category-card">
           <i class="fa-solid fa-user-tie"></i>
           <h3>Job Updates</h3>
-          <p>Find recent job openings, remote roles, and entry-level tech opportunities.</p>
+          <p>Find entry-level roles, off-campus drives, and remote jobs.</p>
         </a>
 
-        <!-- UPGRADE: New Premium Connected Category Deep-Link Cards -->
-        <a href="resources.html?search=hackathon" class="category-card">
+        <a href="resources.html?type=hackathon" class="category-card">
           <i class="fa-solid fa-laptop-code" style="color: #a855f7;"></i>
           <h3>Hackathons</h3>
-          <p>Explore coding hackathons, team challenges, and developer competitions.</p>
+          <p>Compete in developer hackathons, challenges, and win prizes.</p>
         </a>
 
-        <a href="resources.html?search=scholarship" class="category-card">
-          <i class="fa-solid fa-graduation-cap" style="color: #f59e0b;"></i>
+        <a href="resources.html?type=scholarship" class="category-card">
+          <i class="fa-solid fa-award" style="color: #f59e0b;"></i>
           <h3>Scholarships</h3>
-          <p>Find financial aid, college scholarships, and student fellowship programs.</p>
+          <p>Find government and private financial aid and fellowships.</p>
         </a>
 
         <a href="videos.html" class="category-card">
-          <i class="fa-solid fa-video"></i>
+          <i class="fa-solid fa-video" style="color: #ef4444;"></i>
           <h3>YouTube Videos</h3>
-          <p>Watch tutorials, updates, roadmaps, and learning videos.</p>
+          <p>Watch step-by-step application tutorials and career roadmaps.</p>
         </a>
 
         <a href="calendar.html" class="category-card">
-          <i class="fa-solid fa-calendar-days"></i>
-          <h3>Date Wise Uploads</h3>
-          <p>View resources and videos based on upload dates.</p>
+          <i class="fa-solid fa-calendar-days" style="color: #06b6d4;"></i>
+          <h3>Timeline & Deadlines</h3>
+          <p>Track uploads, application deadlines, and exam schedules.</p>
         </a>
       </div>
     </section>
 
+    <!-- Trending Resources Section -->
     <section class="latest-section">
       <div class="section-heading">
         <h2>🔥 Trending Resources</h2>
-        <p>Most viewed resources on KavyaHub.</p>
+        <p>Most viewed and recommended opportunities this week.</p>
       </div>
-      <div class="latest-grid" id="trendingResources"></div>
+      <div class="resources-grid home-resources-grid" id="trendingResources"></div>
     </section>
 
+    <!-- Latest Uploaded Resources Section -->
     <section class="latest-section">
       <div class="section-heading">
         <h2>Latest Resources</h2>
-        <p>Recently added courses, certificates, internships, and useful links.</p>
+        <p>Recently added courses, certificates, internships, and tools.</p>
       </div>
 
-      <div class="latest-grid" id="homeLatestResources"></div>
+      <div class="resources-grid home-resources-grid" id="homeLatestResources"></div>
 
       <div class="center-btn">
-        <a href="resources.html" class="btn primary-btn">View All Resources</a>
+        <a href="resources.html" class="btn primary-btn">View All Resources <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </section>
 
+    <!-- Trending Videos Section (Horizontal List) -->
     <section class="latest-section">
       <div class="section-heading">
         <h2>🎥 Trending Videos</h2>
-        <p>Most viewed videos on KavyaHub.</p>
+        <p>Top tutorial and guidance videos on KavyaHub.</p>
       </div>
-      <div class="latest-grid" id="trendingVideos"></div>
+      <div class="youtube-video-list home-video-horizontal-list" id="trendingVideos"></div>
     </section>
 
+    <!-- Latest Videos Section (Horizontal List) -->
     <section class="latest-section">
       <div class="section-heading">
         <h2>Latest Videos</h2>
-        <p>Recently added YouTube videos and learning updates.</p>
+        <p>Fresh uploads with direct application procedures.</p>
       </div>
 
-      <div class="latest-grid" id="homeLatestVideos"></div>
+      <div class="youtube-video-list home-video-horizontal-list" id="homeLatestVideos"></div>
 
       <div class="center-btn">
-        <a href="videos.html" class="btn primary-btn">View All Videos</a>
+        <a href="videos.html" class="btn primary-btn">View All Videos <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </section>
   </main>
 
+  <!-- Social Link Unlock Modal -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup-box">
-
       <button class="popup-close" id="popupClose" aria-label="Close Popup">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h2>Unlock This Link</h2>
-      <p>Please subscribe on YouTube and follow on Instagram before opening the resource link.</p>
+      <h2>Unlock This Resource Link</h2>
+      <p>Subscribe on YouTube and follow on Instagram to support us before opening the link.</p>
 
       <div class="popup-buttons">
         <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" class="popup-social-btn youtube-btn" target="_blank" rel="noopener noreferrer">
@@ -231,24 +252,24 @@
       </div>
 
       <button class="continue-btn" id="continueBtn">I Followed, Continue</button>
-
     </div>
   </div>
 
-  <!-- UPGRADE: Global Premium Detail Modal Popup Layout (For clean formatting and preventing grid stretching) -->
-  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+  <!-- Resource Detail Read More Modal -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay">
+    <div class="description-modal-box">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Details Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
-      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Resource Title</h3>
-      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
-      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
-      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
+      <div class="modal-badge-row" id="modalBadgeRow"></div>
+      <h3 id="modalTitle">Resource Title</h3>
+      <div class="modal-meta-info" id="modalMetaInfo"></div>
+      <div class="modal-description-content" id="modalDescriptionContent"></div>
+      <div class="modal-action-row" id="modalActionRow"></div>
     </div>
   </div>
 
+  <!-- Main Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
@@ -269,6 +290,7 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase/config.js"></script>
   <script src="js/main.js"></script>

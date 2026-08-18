@@ -2,61 +2,117 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Disabled on Auth Pages) -->
      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
   <title>Admin Login | KavyaHub</title>
+  <meta name="description" content="Secure administrative gateway for KavyaHub portal management." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-</head>
-<body>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
-  <main style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div class="resource-card" style="width: 100%; max-width: 420px; padding: 35px; background: var(--card-solid); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 24px;">
+  <!-- Theme flash protector -->
+  <script>
+    (function initAuthTheme() {
+      const savedTheme = localStorage.getItem("kavyahub-theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add("dark-mode");
+      } else {
+        document.documentElement.classList.remove("dark-mode");
+      }
+    })();
+  </script>
+</head>
+
+<body style="background: var(--bg-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 20px; font-family: 'Poppins', sans-serif;">
+
+  <main style="width: 100%; max-width: 440px;">
+    
+    <div class="resource-card" style="padding: 35px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.08);">
       
+      <!-- Logo & Branding -->
       <div style="text-align: center; margin-bottom: 25px;">
-        <h2 style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">Kavya<span>Hub</span> Control</h2>
-        <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 5px;">Secure Administrator Gateway</p>
+        <div style="width: 55px; height: 55px; background: rgba(var(--primary-rgb), 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--primary); font-size: 1.4rem;">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Kavya<span>Hub</span> Portal</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Secure Administrator Access</p>
       </div>
 
-      <form id="loginForm" style="display: flex; flex-direction: column; gap: 18px;">
+      <!-- Dynamic Inline Error Alert Banner -->
+      <div id="authAlert" style="display: none; padding: 12px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 18px; line-height: 1.4; align-items: center; gap: 8px;"></div>
+
+      <!-- Authentication Form -->
+      <form id="loginForm" style="display: flex; flex-direction: column; gap: 16px;">
+        
         <div style="display: flex; flex-direction: column; gap: 6px;">
-          <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Admin Email</label>
-          <div class="search-box" style="padding: 12px 16px; border-radius: 12px;">
-            <i class="fa-solid fa-envelope" style="color: var(--primary);"></i>
-            <input type="email" id="loginEmail" placeholder="Enter admin email" required autocomplete="username" />
+          <label for="loginEmail" style="font-weight: 600; font-size: 0.85rem; color: var(--text-main);">Admin Email</label>
+          <div class="search-box" style="padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-main); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-envelope" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <input type="email" id="loginEmail" placeholder="Enter admin email address" required autocomplete="username" style="border: none; background: transparent; outline: none; width: 100%; color: var(--text-main); font-family: inherit; font-size: 0.9rem;" />
           </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 6px;">
-          <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Password</label>
-          <div class="search-box" style="padding: 12px 16px; border-radius: 12px;">
-            <i class="fa-solid fa-lock" style="color: var(--primary);"></i>
-            <input type="password" id="loginPassword" placeholder="Enter secure key" required autocomplete="current-password" />
+          <label for="loginPassword" style="font-weight: 600; font-size: 0.85rem; color: var(--text-main);">Password</label>
+          <div class="search-box" style="padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-main); display: flex; align-items: center; gap: 10px; position: relative;">
+            <i class="fa-solid fa-lock" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <input type="password" id="loginPassword" placeholder="Enter secret master password" required autocomplete="current-password" style="border: none; background: transparent; outline: none; width: 100%; color: var(--text-main); font-family: inherit; font-size: 0.9rem;" />
+            <button type="button" id="togglePasswordBtn" aria-label="Toggle password visibility" style="background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0;">
+              <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+            </button>
           </div>
         </div>
 
-        <button type="submit" class="unlock-btn" style="margin-top: 10px; font-weight: 700;">
-          Verify & Authenticate
+        <button type="submit" id="loginSubmitBtn" class="btn primary-btn" style="width: 100%; padding: 12px; margin-top: 8px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In to Dashboard
         </button>
+
       </form>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="index.html" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-arrow-left"></i> Return to Homepage
+        </a>
+      </div>
 
     </div>
   </main>
 
- <!-- 1. Supabase SDK Core Library (CDN) -->
+  <!-- 1. Supabase SDK Core Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- 2. Tumhari Database Configuration Credentials -->
+  <!-- 2. Database Credentials -->
   <script src="supabase/config.js"></script> 
   
-  <!-- 3. Tumhara Login functionality interface script -->
+  <!-- 3. Login Controller Logic -->
   <script src="js/login.js"></script>
+
+  <!-- Eye toggle helper script -->
+  <script>
+    const toggleBtn = document.getElementById("togglePasswordBtn");
+    const pwdInput = document.getElementById("loginPassword");
+    const pwdIcon = document.getElementById("togglePasswordIcon");
+    if (toggleBtn && pwdInput && pwdIcon) {
+      toggleBtn.addEventListener("click", () => {
+        const isPassword = pwdInput.type === "password";
+        pwdInput.type = isPassword ? "text" : "password";
+        pwdIcon.className = isPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+      });
+    }
+  </script>
 </body>
 </html>

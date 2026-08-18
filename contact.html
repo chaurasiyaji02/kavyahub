@@ -2,30 +2,43 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <title>Contact | KavyaHub</title>
-  <meta name="description" content="Have a question, suggestion, or resource recommendation? Reach out and connect with Kavya on YouTube, Instagram, or via Email." />
+  <title>Contact Us & Support | KavyaHub</title>
+  <meta name="description" content="Have a question, feedback, or resource suggestion? Reach out to KavyaHub support team via Email, YouTube, or direct inquiry form." />
+  <meta name="keywords" content="contact KavyaHub, support, submit a resource, report broken link, career query" />
 
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Contact KavyaHub | Support & Partnerships" />
+  <meta property="og:description" content="Reach out for support, collaborations, or suggesting new student learning resources." />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
 
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
+
       <div class="logo">
         <a href="index.html">Kavya<span>Hub</span></a>
       </div>
@@ -36,16 +49,16 @@
         <li><a href="videos.html">Videos</a></li>
         <li><a href="calendar.html">Calendar</a></li>
         <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li><a href="contact.html" class="active">Contact</a></li>
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
 
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
         
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -54,63 +67,129 @@
 
   <main>
 
+    <!-- Hero Header -->
     <section class="resources-hero">
       <div class="section-heading">
-        <h1>Contact</h1>
-        <p>Have a question, suggestion, or resource recommendation? Feel free to connect with me.</p>
+        <h1>Get in Touch</h1>
+        <p>Have a question, feedback, or a student resource to recommend? Connect with us directly or send a message below.</p>
       </div>
     </section>
 
+    <!-- Direct Communication Channels -->
     <section class="social-section">
       <div class="section-heading">
-        <h2>Get In Touch</h2>
-        <p>You can connect with me through the platforms below.</p>
+        <h2>Official Channels</h2>
+        <p>Select the most convenient channel to reach out to our team.</p>
       </div>
 
       <div class="social-cards">
+        <a href="mailto:btaokyahuahai@gmail.com?subject=KavyaHub%20Inquiry" class="social-card">
+          <i class="fa-solid fa-envelope" style="color: #3b82f6;"></i>
+          <h3>Email Support</h3>
+          <p>btaokyahuahai@gmail.com</p>
+        </a>
+
         <a href="https://youtube.com/@kavyachaurasiya02?si=dYvcTb6afUdeQWhQ" target="_blank" rel="noopener noreferrer" class="social-card">
-          <i class="fa-brands fa-youtube"></i>
-          <h3>YouTube</h3>
-          <p>Watch videos and updates.</p>
+          <i class="fa-brands fa-youtube" style="color: #ef4444;"></i>
+          <h3>YouTube Channel</h3>
+          <p>Tutorials & Discussions</p>
         </a>
 
         <a href="https://www.instagram.com/kavyachaurasiya02?igsh=dWg2NndobDJuejJx" target="_blank" rel="noopener noreferrer" class="social-card">
-          <i class="fa-brands fa-instagram"></i>
-          <h3>Instagram</h3>
-          <p>Daily updates and announcements.</p>
-        </a>
-
-        <a href="mailto:btaokyahuahai@gmail.com?subject=KavyaHub%20Inquiry" class="social-card">
-          <i class="fa-solid fa-envelope"></i>
-          <h3>Email</h3>
-          <p>Business inquiries and suggestions.</p>
+          <i class="fa-brands fa-instagram" style="color: #ec4899;"></i>
+          <h3>Instagram Direct</h3>
+          <p>Daily Updates & DMs</p>
         </a>
       </div>
     </section>
 
-    <section class="latest-section">
+    <!-- Direct Inquiry & Feedback Form -->
+    <section class="contact-form-section" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+      <div class="resource-card" style="padding: 35px; border-radius: 16px;">
+        <div class="tag-row" style="margin-bottom: 8px;">
+          <span class="badge-pill primary-pill"><i class="fa-solid fa-paper-plane"></i> Quick Message</span>
+        </div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 8px; color: var(--text-main);">Send a Direct Inquiry</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">Fill in your details below and our team will get back to you as soon as possible.</p>
+
+        <form id="contactInquiryForm" onsubmit="handleContactSubmit(event)">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 15px;">
+            <div class="form-group">
+              <label for="contactName" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main);">Your Full Name *</label>
+              <input type="text" id="contactName" required placeholder="e.g. Rahul Sharma" style="width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;" />
+            </div>
+
+            <div class="form-group">
+              <label for="contactEmail" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main);">Your Email Address *</label>
+              <input type="email" id="contactEmail" required placeholder="e.g. rahul@example.com" style="width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label for="contactSubject" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main);">Inquiry Type *</label>
+            <select id="contactSubject" required style="width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+              <option value="General Inquiry">General Query</option>
+              <option value="Suggest a Resource">Suggest a Resource / Course</option>
+              <option value="Report Broken Link">Report a Broken Link or Expired Opportunity</option>
+              <option value="Partnership & Sponsorship">Partnership & Collaboration</option>
+              <option value="Feedback & Feature Request">Website Feedback & Feature Request</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label for="contactMessage" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main);">Your Message / Details *</label>
+            <textarea id="contactMessage" rows="5" required placeholder="Write your message or paste the relevant resource URL here..." style="width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem; line-height: 1.5; resize: vertical;"></textarea>
+          </div>
+
+          <button type="submit" class="btn primary-btn" style="width: 100%; padding: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; cursor: pointer; border: none; border-radius: 8px;">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Frequently Asked Questions (FAQ) Accordion -->
+    <section class="latest-section" style="max-width: 800px; margin: 50px auto 30px; padding: 0 20px;">
       <div class="section-heading">
-        <h2>Support & Suggestions</h2>
-        <p>Found an issue or want to suggest a useful resource? Feel free to reach out.</p>
+        <h2>Frequently Asked Questions</h2>
+        <p>Quick answers to common questions about KavyaHub.</p>
+      </div>
+
+      <div class="faq-container" style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="resource-card" style="padding: 18px 22px;">
+          <h3 style="font-size: 1rem; color: var(--text-main); margin-bottom: 6px;"><i class="fa-solid fa-circle-question" style="color: var(--primary); margin-right: 8px;"></i> Are all resources and certificates on KavyaHub free?</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Yes. We prioritize 100% free courses, government-supported certifications, and open-source learning paths. Whenever an opportunity has optional paid tracks, it is explicitly labeled.</p>
+        </div>
+
+        <div class="resource-card" style="padding: 18px 22px;">
+          <h3 style="font-size: 1rem; color: var(--text-main); margin-bottom: 6px;"><i class="fa-solid fa-circle-question" style="color: var(--primary); margin-right: 8px;"></i> How often is the platform updated with new internships and jobs?</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Our team updates the portal continuously. Check the <a href="calendar.html" style="color: var(--primary); text-decoration: underline;">Timeline Calendar</a> to review opportunities published on any given date.</p>
+        </div>
+
+        <div class="resource-card" style="padding: 18px 22px;">
+          <h3 style="font-size: 1rem; color: var(--text-main); margin-bottom: 6px;"><i class="fa-solid fa-circle-question" style="color: var(--primary); margin-right: 8px;"></i> What should I do if a link is broken or expired?</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">Use the inquiry form above with the subject "Report Broken Link" and provide the title or link. Our moderation team will update or archive the record promptly.</p>
+        </div>
       </div>
     </section>
 
   </main>
 
-  <!-- UPGRADE: Premium Universal Blurred Description Container Modal Hook (Sync with main.js event handlers for dynamic execution parity) -->
-  <div class="description-modal-overlay" id="descriptionModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-    <div class="description-modal-box" style="background: var(--bg-card); border: 1px solid var(--border-color); width: 100%; max-width: 650px; border-radius: 16px; padding: 25px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
-      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">
+  <!-- Universal Modal for Details -->
+  <div class="description-modal-overlay" id="descriptionModalOverlay">
+    <div class="description-modal-box">
+      <button class="modal-close-btn" id="descriptionModalClose" aria-label="Close Details Modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div class="modal-badge-row" id="modalBadgeRow" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
-      <h3 id="modalTitle" style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; padding-right: 25px;">Inquiry Details</h3>
-      <div class="modal-meta-info" id="modalMetaInfo" style="margin-bottom: 15px;"></div>
-      <div class="modal-description-content" id="modalDescriptionContent" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-line; margin-bottom: 20px;"></div>
-      <div class="modal-action-row" id="modalActionRow" style="display: flex; gap: 10px; width: 100%;"></div>
+      <div class="modal-badge-row" id="modalBadgeRow"></div>
+      <h3 id="modalTitle">Inquiry Notice</h3>
+      <div class="modal-meta-info" id="modalMetaInfo"></div>
+      <div class="modal-description-content" id="modalDescriptionContent"></div>
+      <div class="modal-action-row" id="modalActionRow"></div>
     </div>
   </div>
 
+  <!-- Main Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
@@ -131,7 +210,21 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="js/main.js"></script>
+  <script>
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("contactName").value.trim();
+      const email = document.getElementById("contactEmail").value.trim();
+      const subject = document.getElementById("contactSubject").value;
+      const message = document.getElementById("contactMessage").value.trim();
+
+      const mailtoUrl = `mailto:btaokyahuahai@gmail.com?subject=${encodeURIComponent(`[KavyaHub ${subject}] from ${name}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\nType: ${subject}\n\nMessage:\n${message}`)}`;
+
+      window.location.href = mailtoUrl;
+    }
+  </script>
 
 </body>
 </html>

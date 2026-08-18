@@ -1,6 +1,5 @@
 /* ==========================================================================
    KAVYAHUB - ADMIN DASHBOARD COMPONENT STYLES (AUDITED & POLISHED)
-   Description: Scope constraints for metrics grid, management panels & forms.
    ========================================================================== */
 
 /* Core Component Wrapper Matrix */
@@ -13,7 +12,6 @@
 /* --------------------------------------------------------------------------
    1. CONTROL SIDEBAR PANEL
    -------------------------------------------------------------------------- */
-
 .admin-sidebar {
   width: 280px;
   background: rgba(2, 6, 23, 0.96);
@@ -24,6 +22,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  z-index: 100;
 }
 
 .admin-logo {
@@ -31,66 +30,79 @@
 }
 
 .admin-logo h2 {
-  color: white;
+  color: #ffffff;
   font-size: 1.8rem;
+  font-weight: 800;
 }
 
 .admin-logo span {
   color: #3b82f6;
 }
 
-/* Native Control Action Handles */
 .logout-btn {
   width: 100%;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   background: rgba(239, 68, 68, 0.14);
   color: #fecaca;
   border: 1px solid rgba(239, 68, 68, 0.25);
   padding: 12px;
   border-radius: 12px;
   cursor: pointer;
-  font-weight: 700;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+  font-weight: 600;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .admin-menu {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 15px;
-  border-radius: 14px;
+  padding: 13px 16px;
+  border-radius: 12px;
   cursor: pointer;
   color: #cbd5e1;
-  font-weight: 600;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
 .menu-item:hover {
   background: rgba(30, 41, 59, 0.85);
-  color: white;
+  color: #ffffff;
 }
 
 .menu-item.active {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  color: white;
-  box-shadow: 0 12px 28px rgba(59, 130, 246, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.25);
 }
 
 /* --------------------------------------------------------------------------
    2. CORE CONTAINER WORKSPACE
    -------------------------------------------------------------------------- */
-
 .admin-main {
   flex: 1;
   padding: 40px;
   min-width: 0;
+  overflow-y: auto;
 }
 
 .admin-section {
@@ -99,63 +111,68 @@
 
 .admin-section.active-section {
   display: block;
+  animation: fadeInAdmin 0.25s ease forwards;
+}
+
+@keyframes fadeInAdmin {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .admin-section h1 {
-  margin-bottom: 28px;
-  color: white;
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  margin-bottom: 26px;
+  color: #ffffff;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
 }
 
 /* --------------------------------------------------------------------------
    3. METRICS BOARD (DASHBOARD ANALYTICS)
    -------------------------------------------------------------------------- */
-
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  gap: 18px;
 }
 
 .dashboard-card {
   background: rgba(30, 41, 59, 0.86);
   border: 1px solid rgba(148, 163, 184, 0.16);
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  padding: 24px;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
   min-width: 0;
-  overflow: hidden;
 }
 
 .dashboard-card h3 {
-  color: #cbd5e1;
-  margin-bottom: 12px;
-  font-size: 0.95rem;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .dashboard-card p {
-  color: white;
-  font-size: 1.5rem;
-  font-weight: 800;
+  color: #ffffff;
+  font-size: 1.45rem;
+  font-weight: 700;
   line-height: 1.35;
   word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
 /* --------------------------------------------------------------------------
-   4. DATA INPUT FORM LAYOUTS
+   4. DATA INPUT FORM LAYOUTS & PREVIEWS
    -------------------------------------------------------------------------- */
-
 .admin-section form,
 .login-form {
   background: rgba(30, 41, 59, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 26px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  gap: 14px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  max-width: 860px;
 }
 
 .admin-section input,
@@ -163,24 +180,26 @@
 .admin-section select,
 .login-form input {
   width: 100%;
-  padding: 14px 15px;
-  border-radius: 12px;
+  padding: 13px 15px;
+  border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.18);
   background: #0f172a;
-  color: white;
-  font-family: "Poppins", sans-serif;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
 }
 
 .admin-section input::placeholder,
 .admin-section textarea::placeholder,
 .login-form input::placeholder {
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .admin-section textarea {
-  min-height: 120px;
+  min-height: 110px;
   resize: vertical;
+  line-height: 1.55;
 }
 
 .admin-section input:focus,
@@ -189,33 +208,41 @@
 .login-form input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .admin-section label {
   color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 0.9rem;
 }
 
-/* Global Actions Base Interaction Matrix */
-.admin-section button,
-.login-form button {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  color: white;
-  border: none;
+.preview-helper-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px dashed rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
   padding: 14px;
-  border-radius: 13px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, opacity 0.2s ease;
+  font-size: 0.88rem;
+  line-height: 1.6;
 }
 
-.admin-section button:hover,
-.login-form button:hover,
-.logout-btn:hover {
+.admin-section button[type="submit"],
+.login-form button[type="submit"] {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #ffffff;
+  border: none;
+  padding: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.admin-section button[type="submit"]:hover,
+.login-form button[type="submit"]:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
 }
 
 .admin-section button:disabled,
@@ -225,116 +252,99 @@
   transform: none;
 }
 
-/* FEATURE: Form Grid Wrapper Rules for Job Meta Parameters */
-.job-meta-inputs-row {
+.job-meta-inputs-row,
+.hackathon-meta-inputs-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
   width: 100%;
 }
 
-/* Interactive Checkbox Pill Multi-Tags Management Engine */
+.org-meta-inputs-row,
+.video-org-meta-inputs-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  width: 100%;
+}
+
 .tag-select-box {
   background: #0f172a;
   border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 14px;
-  padding: 15px;
+  border-radius: 12px;
+  padding: 14px;
 }
 
 .tag-select-box p {
-  color: white;
-  font-weight: 700;
-  margin-bottom: 12px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 10px;
 }
 
 .tag-select-box label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin: 6px 10px 6px 0;
+  gap: 6px;
+  margin: 4px 8px 4px 0;
   background: rgba(30, 41, 59, 0.9);
-  padding: 8px 12px;
-  border-radius: 999px;
+  padding: 6px 12px;
+  border-radius: 20px;
   cursor: pointer;
+  font-size: 0.8rem;
   transition: background-color 0.2s ease;
 }
 
 .tag-select-box label:hover {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(59, 130, 246, 0.2);
 }
 
 /* --------------------------------------------------------------------------
-   5. DATA TABLES REFERENCE TERMINAL
+   5. USER OUTPUT CARDS / ENTRIES LIST RENDERING
    -------------------------------------------------------------------------- */
-
-.admin-table {
-  width: 100%;
-  margin-top: 25px;
-  border-collapse: collapse;
-  overflow: hidden;
-  border-radius: 14px;
-}
-
-.admin-table th,
-.admin-table td {
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  padding: 13px;
-  text-align: left;
-  color: white;
-}
-
-.admin-table th {
-  background: rgba(30, 41, 59, 0.9);
-  color: #cbd5e1;
-}
-
-/* --------------------------------------------------------------------------
-   6. USER OUTPUT CARDS / ENTRIES LIST RENDERING ENGINE
-   -------------------------------------------------------------------------- */
-
 .admin-list {
   margin-top: 25px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  max-width: 860px;
 }
 
 .admin-list-card {
   background: rgba(30, 41, 59, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 16px;
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   min-width: 0;
-  overflow: hidden;
 }
 
 .admin-list-card h3 {
-  color: white;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 600;
   margin-bottom: 4px;
   word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
 .admin-list-card p,
 .admin-empty {
   color: #cbd5e1;
   word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
-/* FEATURE: Admin Description Clamping Architecture rules override */
 .admin-list-card .resource-description {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: #cbd5e1;
+  color: #94a3b8;
   margin-bottom: 6px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .admin-list-card .resource-description.expanded {
@@ -347,91 +357,64 @@
   background: rgba(59, 130, 246, 0.12) !important;
   border: none;
   color: #3b82f6 !important;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  padding: 4px 10px !important;
+  padding: 3px 8px !important;
   margin-top: 4px;
-  margin-bottom: 12px;
-  text-align: left;
-  font-size: 0.8rem !important;
+  margin-bottom: 8px;
+  font-size: 0.78rem !important;
   border-radius: 6px !important;
   display: inline-block;
 }
 
 .admin-list-card .read-more-btn:hover {
   background: rgba(59, 130, 246, 0.22) !important;
-  transform: translateY(-1px);
 }
 
-.admin-list-card small {
-  color: #94a3b8;
-  display: block;
-  margin-top: 4px;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-/* Specific Action Controls */
 .admin-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .admin-actions button {
-  padding: 10px 14px;
-  font-size: 0.9rem;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
 .admin-actions button.delete-btn {
-  background: rgba(239, 68, 68, 0.18);
-  color: #fecaca;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .admin-actions button.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.3);
+  background: #ef4444;
+  color: #ffffff;
 }
 
 .admin-actions button.toggle-btn {
-  background: rgba(59, 130, 246, 0.18);
-  color: #bfdbfe;
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .admin-actions button.toggle-btn:hover {
-  background: rgba(59, 130, 246, 0.3);
+  background: #3b82f6;
+  color: #ffffff;
 }
 
 /* --------------------------------------------------------------------------
-   7. SECURITY GATEWAY LOGIN INTERFACE
+   6. RESPONSIVE BREAKPOINTS
    -------------------------------------------------------------------------- */
-
-.login-box {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 35%), #0f172a;
-  padding: 20px;
-}
-
-.login-form {
-  width: 100%;
-  max-width: 420px;
-}
-
-.login-form h2 {
-  text-align: center;
-  color: white;
-  margin-bottom: 8px;
-}
-
-/* --------------------------------------------------------------------------
-   8. RESPONSIVE BREAKPOINT OVERRIDES (CROSS-DEVICE MEDIA TARGETS)
-   ========================================================================== */
-
 @media (max-width: 900px) {
   .admin-container {
     flex-direction: column;
@@ -441,7 +424,7 @@
     width: 100%;
     height: auto;
     position: relative;
-    padding: 18px;
+    padding: 16px;
   }
 
   .admin-menu {
@@ -450,18 +433,20 @@
   }
 
   .menu-item {
-    flex: 1 1 140px;
+    flex: 1 1 120px;
     justify-content: center;
+    padding: 10px;
+    font-size: 0.85rem;
   }
 
   .admin-main {
-    padding: 24px;
+    padding: 20px;
   }
 }
 
 @media (max-width: 600px) {
   .admin-main {
-    padding: 16px;
+    padding: 14px;
   }
 
   .dashboard-cards {
@@ -470,26 +455,13 @@
 
   .admin-section form,
   .login-form {
-    padding: 20px;
+    padding: 18px;
   }
 
-  /* Stack Job parameters column on mobile */
-  .job-meta-inputs-row {
+  .job-meta-inputs-row,
+  .hackathon-meta-inputs-row {
     grid-template-columns: 1fr;
     gap: 10px;
-  }
-
-  .menu-item {
-    font-size: 0.9rem;
-    padding: 12px;
-  }
-
-  .admin-section h1 {
-    font-size: 1.6rem;
-  }
-
-  .dashboard-card p {
-    font-size: 1.3rem;
   }
 
   .admin-list-card {
@@ -498,42 +470,18 @@
   }
 
   .admin-actions {
-    flex-direction: column;
+    flex-direction: row;
+    width: 100%;
   }
-}
 
-/* ==========================================================================
-   UPGRADE ADDITIONS: INTEGRATION PATCH (ZERO DELETION COMPLIANT)
-   ========================================================================== */
-
-/* UPGRADE: Naye Explicit Provider Sector Rows Optimization Engine */
-.org-meta-inputs-row,
-.video-org-meta-inputs-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .org-meta-inputs-row,
-  .video-org-meta-inputs-row {
-    gap: 10px;
+  .admin-actions button {
+    flex: 1;
+    justify-content: center;
   }
-}
-
-/* UPGRADE: Sidebar Theme Wrapper & Interactive Action Toggles UI */
-.sidebar-theme-wrapper .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.14) !important;
-}
-
-.sidebar-theme-wrapper .theme-toggle-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
 }
 
 /* --------------------------------------------------------------------------
-   9. GLOBAL DYNAMIC LIGHT MODE ADAPTATION OVERRIDES
+   7. LIGHT MODE ADAPTATION
    -------------------------------------------------------------------------- */
 html:not(.dark-mode) .admin-container {
   background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 35%), #f8fafc;
@@ -554,10 +502,6 @@ html:not(.dark-mode) .sidebar-theme-wrapper button {
   color: #0f172a !important;
 }
 
-html:not(.dark-mode) .sidebar-theme-wrapper button:hover {
-  background: rgba(15, 23, 42, 0.1) !important;
-}
-
 html:not(.dark-mode) .menu-item {
   color: #475569;
 }
@@ -568,9 +512,7 @@ html:not(.dark-mode) .menu-item:hover {
 }
 
 html:not(.dark-mode) .menu-item.active {
-  color: white;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  box-shadow: 0 12px 28px rgba(59, 130, 246, 0.15);
+  color: #ffffff;
 }
 
 html:not(.dark-mode) .admin-section h1 {
@@ -584,7 +526,7 @@ html:not(.dark-mode) .dashboard-card {
 }
 
 html:not(.dark-mode) .dashboard-card h3 {
-  color: #475569;
+  color: #64748b;
 }
 
 html:not(.dark-mode) .dashboard-card p {
@@ -595,7 +537,7 @@ html:not(.dark-mode) .admin-section form,
 html:not(.dark-mode) .login-form {
   background: #ffffff;
   border: 1px solid rgba(148, 163, 184, 0.18);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
 }
 
 html:not(.dark-mode) .admin-section input,
@@ -607,27 +549,14 @@ html:not(.dark-mode) .login-form input {
   border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-html:not(.dark-mode) .admin-section input:focus,
-html:not(.dark-mode) .admin-section textarea:focus,
-html:not(.dark-mode) .admin-section select:focus,
-html:not(.dark-mode) .login-form input:focus {
-  border-color: #3b82f6;
-  background: #ffffff;
-}
-
-html:not(.dark-mode) .admin-section input::placeholder,
-html:not(.dark-mode) .admin-section textarea::placeholder,
-html:not(.dark-mode) .login-form input::placeholder {
-  color: #64748b;
-}
-
-html:not(.dark-mode) .admin-section label {
-  color: #334155;
+html:not(.dark-mode) .preview-helper-box {
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 html:not(.dark-mode) .tag-select-box {
   background: #f1f5f9;
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-color: #cbd5e1;
 }
 
 html:not(.dark-mode) .tag-select-box p {
@@ -636,7 +565,6 @@ html:not(.dark-mode) .tag-select-box p {
 
 html:not(.dark-mode) .tag-select-box label {
   background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.15);
   color: #334155;
 }
 
@@ -649,19 +577,6 @@ html:not(.dark-mode) .admin-list-card h3 {
   color: #0f172a;
 }
 
-html:not(.dark-mode) .admin-list-card p,
-html:not(.dark-mode) .admin-empty {
-  color: #334155;
-}
-
 html:not(.dark-mode) .admin-list-card .resource-description {
-  color: #475569;
-}
-
-html:not(.dark-mode) .login-box {
-  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.1), transparent 35%), #f8fafc;
-}
-
-html:not(.dark-mode) .login-form h2 {
-  color: #0f172a;
+  color: #64748b;
 }

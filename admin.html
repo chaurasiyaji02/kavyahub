@@ -2,37 +2,38 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
-     
+  <!-- Google AdSense (Disabled in Admin Portal) -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Admin Dashboard | KavyaHub</title>
 
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="css/responsive.css">
 
+  <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
   <!-- ==========================================================================
-     🔒 AUTHENTICATION SECURE PIPELINE: CRITICAL LOADING PRIORITY 
-     ========================================================================== -->
+      🔒 AUTHENTICATION SECURE PIPELINE: CRITICAL LOADING PRIORITY 
+      ========================================================================== -->
   <!-- 1. Supabase SDK Core Library (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- 2. Tumhari Database Configuration Credentials -->
+  <!-- 2. Database Configuration Credentials -->
   <script src="supabase/config.js"></script> 
   
   <!-- 3. Admin dashboard core execution file (Gatekeeper check executes immediately) -->
   <script src="js/admin.js" defer></script>
 
-  <!-- DYNAMIC CORE FLASH PROTECTOR: Automatically tracks theme preference on window instance launch -->
+  <!-- DYNAMIC CORE FLASH PROTECTOR: Automatically tracks theme preference on launch -->
   <script>
     (function initAdminTheme() {
       const savedTheme = localStorage.getItem("kavyahub-theme");
@@ -48,32 +49,23 @@
 
 <body>
 
-  <!-- ENHANCEMENT: DEACTIVATED LOCAL INLINE LOGIN IN FAVOR OF AIRTIGHT ROUTING GATEKEEPER -->
-  <!-- <div class="login-box" id="loginBox" style="display:none;">
-    <form id="loginForm" class="login-form">
-      <h2>Admin Login</h2>
-      <input type="email" id="adminEmail" placeholder="Admin Email" required>
-      <input type="password" id="adminPassword" placeholder="Password" required>
-      <button type="submit">Login</button>
-    </form>
-  </div> -->
-
-  <!-- Note: This dynamic dashboard layer container wrapper is controlled directly via js/admin.js post-auth checks -->
+  <!-- Admin Dashboard Container -->
   <div class="admin-container">
 
+    <!-- Admin Sidebar -->
     <aside class="admin-sidebar">
       <div class="admin-logo">
         <h2>Kavya<span>Hub</span></h2>
       </div>
       
-      <!-- ENHANCEMENT: Perfectly integrated Theme Toggle Switch matching sidebar parameters -->
+      <!-- Theme Toggle Switch -->
       <div class="sidebar-theme-wrapper" style="padding: 0 20px; margin-bottom: 12px;">
         <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); font-size: 0.9rem; cursor: pointer; color: #fff; width: 100%; padding: 10px; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-weight: 500; transition: background 0.2s;">
           <i class="fa-solid fa-moon"></i> <span>Toggle Dashboard View</span>
         </button>
       </div>
 
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+      <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 
       <ul class="admin-menu">
         <li class="menu-item active" data-section="dashboard">
@@ -97,10 +89,12 @@
       </ul>
     </aside>
 
+    <!-- Admin Main Body -->
     <main class="admin-main">
 
+      <!-- SECTION 1: DASHBOARD STATS -->
       <section class="admin-section active-section" id="dashboard">
-        <h1>Dashboard</h1>
+        <h1>Dashboard Overview</h1>
         
         <div class="dashboard-cards">
           <div class="dashboard-card">
@@ -133,12 +127,20 @@
         </div>
       </section>
 
+      <!-- SECTION 2: RESOURCES CRUD -->
       <section class="admin-section" id="resources">
-        <h1>Add Resource / Opportunity</h1>
+        <h1>Add / Edit Resource Opportunity</h1>
         
         <form id="resourceForm">
-          <input type="text" id="resourceTitle" placeholder="Resource / Title Name" required>
-          <textarea id="resourceDescription" placeholder="Description" required></textarea>
+          <input type="text" id="resourceTitle" placeholder="Resource Title Name" required>
+          
+          <textarea id="resourceDescription" placeholder="Description (Press Enter for paragraphs, use '- ' for bullet points)" rows="5" required></textarea>
+          
+          <!-- Real-time Live Description Preview -->
+          <div class="preview-helper-box" style="background: rgba(0,0,0,0.03); border: 1px dashed var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 0.85rem;">
+            <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 4px;"><i class="fa-regular fa-eye"></i> Formatted Description Preview:</div>
+            <div id="resourceDescPreview" style="color: var(--text-main); white-space: pre-line; min-height: 20px;">Your description preview will appear here in real-time...</div>
+          </div>
           
           <select id="resourceCategory">
             <option value="certificate">Certificate</option>
@@ -149,13 +151,13 @@
             <option value="ai-tool">AI Tool</option>
             <option value="job">Job</option>
             <option value="hackathon">Hackathon</option>
-            <!-- ENHANCEMENT: Dynamic Category Entry Node -->
             <option value="scholarship">Scholarship</option>
           </select>
 
-          <div class="job-meta-inputs-row" id="jobMetaRow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+          <!-- Job/Internship Metadata Inputs -->
+          <div class="job-meta-inputs-row" id="jobMetaRow" style="display: none; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
             <div>
-              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Type</p>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job / Internship Type</p>
               <select id="resourceJobType" style="margin-bottom: 0;">
                 <option value="remote">Remote</option>
                 <option value="on-site">On-Site</option>
@@ -163,7 +165,7 @@
               </select>
             </div>
             <div>
-              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Job Status</p>
+              <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Opportunity Status</p>
               <select id="resourceJobStatus" style="margin-bottom: 0;">
                 <option value="active">Active</option>
                 <option value="expired">Expired</option>
@@ -171,7 +173,8 @@
             </div>
           </div>
 
-          <div class="hackathon-meta-inputs-row" id="hackathonMetaRow" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+          <!-- Hackathon Metadata Inputs -->
+          <div class="hackathon-meta-inputs-row" id="hackathonMetaRow" style="display: none; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
             <div>
               <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Hackathon Mode</p>
               <select id="resourceHackathonMode" style="margin-bottom: 0;">
@@ -189,7 +192,7 @@
             </div>
           </div>
 
-          <!-- ENHANCEMENT: Restored Sector Filter Options Structure For Resources Input Segment -->
+          <!-- Organization Sector Type -->
           <div class="org-meta-inputs-row" id="orgMetaRow" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;">
             <div>
               <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Provider Sector Type (Govt / Private)</p>
@@ -211,32 +214,41 @@
             <label><input type="checkbox" class="resource-tag-check" value="roadmap"> Roadmap</label>
             <label><input type="checkbox" class="resource-tag-check" value="job"> Job</label>
             <label><input type="checkbox" class="resource-tag-check" value="hackathon"> Hackathon</label>
-            <!-- ENHANCEMENT: Clean explicit Tag Selector node insertion -->
             <label><input type="checkbox" class="resource-tag-check" value="scholarship"> Scholarship</label>
             <label><input type="checkbox" class="resource-tag-check" value="free"> Free</label>
             <label><input type="checkbox" class="resource-tag-check" value="beginner"> Beginner</label>
           </div>
 
-          <input type="url" id="resourceLink" placeholder="Resource Link">
-          <input type="date" id="resourceDate">
+          <input type="url" id="resourceLink" placeholder="Resource Destination Link (https://...)" required>
+          <input type="date" id="resourceDate" required>
           
-          <label class="checkbox-label">
-            <input type="checkbox" id="resourceFeatured"> Featured Resource
+          <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px; cursor: pointer;">
+            <input type="checkbox" id="resourceFeatured"> ⭐ Mark as Featured Resource
           </label>
           
-          <button type="submit">Save Resource</button>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" style="flex: 1;">Save Resource</button>
+            <button type="button" onclick="cancelResourceEdit()" style="background: var(--text-muted); color: #fff; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+          </div>
         </form>
 
         <div class="admin-list" id="resourcesList"></div>
       </section>
 
+      <!-- SECTION 3: VIDEOS CRUD -->
       <section class="admin-section" id="videos">
-        <h1>Add Video</h1>
+        <h1>Add / Edit Video Guide</h1>
         
         <form id="videoForm">
           <input type="text" id="videoTitle" placeholder="Video Title" required>
-          <textarea id="videoDescription" placeholder="Description" required></textarea>
+          <textarea id="videoDescription" placeholder="Description (Press Enter for paragraphs, use '- ' for bullet points)" rows="5" required></textarea>
           
+          <!-- Real-time Live Video Description Preview -->
+          <div class="preview-helper-box" style="background: rgba(0,0,0,0.03); border: 1px dashed var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 0.85rem;">
+            <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 4px;"><i class="fa-regular fa-eye"></i> Formatted Description Preview:</div>
+            <div id="videoDescPreview" style="color: var(--text-main); white-space: pre-line; min-height: 20px;">Your video description preview will appear here in real-time...</div>
+          </div>
+
           <select id="videoCategory">
             <option value="certificate">Certificate</option>
             <option value="course">Course</option>
@@ -244,10 +256,11 @@
             <option value="ai">AI</option>
             <option value="coding">Coding</option>
             <option value="roadmap">Roadmap</option>
-            <option value="job">Job</option>
+            <option value="job">Job & Internship</option>
+            <option value="scholarship">Scholarship</option>
           </select>
 
-          <!-- ENHANCEMENT: Explicit Sector Filter Selection Group For Videos Section Forms -->
+          <!-- Video Sector Type Selection -->
           <div class="video-org-meta-inputs-row" id="videoOrgMetaRow" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;">
             <div>
               <p style="font-size: 0.9rem; margin-bottom: 5px; font-weight: 500;">Opportunity Provider Sector (Govt / Private)</p>
@@ -268,49 +281,56 @@
             <label><input type="checkbox" class="video-tag-check" value="coding"> Coding</label>
             <label><input type="checkbox" class="video-tag-check" value="roadmap"> Roadmap</label>
             <label><input type="checkbox" class="video-tag-check" value="job"> Job</label>
+            <label><input type="checkbox" class="video-tag-check" value="scholarship"> Scholarship</label>
             <label><input type="checkbox" class="video-tag-check" value="free"> Free</label>
             <label><input type="checkbox" class="video-tag-check" value="beginner"> Beginner</label>
           </div>
 
-          <input type="url" id="youtubeLink" placeholder="YouTube Link">
-          <input type="date" id="videoDate">
-          <input type="url" id="videoResourceLink" placeholder="Resource Link">
+          <input type="url" id="youtubeLink" placeholder="YouTube Video Link (https://...)" required>
+          <input type="date" id="videoDate" required>
+          <input type="url" id="videoResourceLink" placeholder="Attached Resource / Download Link (Optional)">
           
-          <label class="checkbox-label">
-            <input type="checkbox" id="videoFeatured"> Featured Video
+          <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px; cursor: pointer;">
+            <input type="checkbox" id="videoFeatured"> ⭐ Mark as Featured Video
           </label>
           
-          <button type="submit">Save Video</button>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" style="flex: 1;">Save Video</button>
+            <button type="button" onclick="cancelVideoEdit()" style="background: var(--text-muted); color: #fff; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+          </div>
         </form>
 
         <div class="admin-list" id="videosList"></div>
       </section>
 
+      <!-- SECTION 4: PROFILE & SOCIALS -->
       <section class="admin-section" id="profile">
         <h1>Profile & Social Links</h1>
         
         <form id="profileForm">
-          <input type="text" id="profileName" placeholder="Your Name">
-          <textarea id="profileBio" placeholder="Your Bio / Description"></textarea>
+          <input type="text" id="profileName" placeholder="Your Name" required>
+          <textarea id="profileBio" placeholder="Your Bio / Summary" rows="4"></textarea>
           
+          <label style="display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 5px;">Profile Picture Upload</label>
           <input type="file" id="profileImageFile" accept="image/*">
           <input type="hidden" id="profileImage">
           
-          <input type="url" id="youtubeUrl" placeholder="YouTube URL">
-          <input type="url" id="instagramUrl" placeholder="Instagram URL">
-          <input type="url" id="telegramUrl" placeholder="Telegram URL">
-          <input type="url" id="linkedinUrl" placeholder="LinkedIn URL">
-          <input type="url" id="whatsappUrl" placeholder="WhatsApp URL">
+          <input type="url" id="youtubeUrl" placeholder="YouTube Channel Link">
+          <input type="url" id="instagramUrl" placeholder="Instagram Profile Link">
+          <input type="url" id="telegramUrl" placeholder="Telegram Channel Link">
+          <input type="url" id="linkedinUrl" placeholder="LinkedIn Profile Link">
+          <input type="url" id="whatsappUrl" placeholder="WhatsApp Group / Community Link">
           
           <button type="submit">Save Profile</button>
         </form>
       </section>
 
+      <!-- SECTION 5: OTHER ACCOUNTS -->
       <section class="admin-section" id="accounts">
-        <h1>Other Accounts</h1>
+        <h1>Other Portfolios & Channels</h1>
         
         <form id="accountForm">
-          <input type="text" id="accountName" placeholder="Account Name" required>
+          <input type="text" id="accountName" placeholder="Account / Channel Name" required>
           
           <select id="accountPlatform">
             <option value="youtube">YouTube</option>
@@ -321,26 +341,27 @@
             <option value="website">Website</option>
           </select>
 
-          <textarea id="accountDescription" placeholder="Account Description"></textarea>
-          <input type="url" id="accountUrl" placeholder="Account URL" required>
+          <textarea id="accountDescription" placeholder="Account Description" rows="3"></textarea>
+          <input type="url" id="accountUrl" placeholder="Direct Link / URL" required>
           
-          <label class="checkbox-label">
-            <input type="checkbox" id="accountActive" checked> Show this account
+          <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px; cursor: pointer;">
+            <input type="checkbox" id="accountActive" checked> Show this account on website
           </label>
           
-          <button type="submit">Save Account</button>
+          <button type="submit">Add Account</button>
         </form>
 
         <div class="admin-list" id="accountsList"></div>
       </section>
 
+      <!-- SECTION 6: SETTINGS -->
       <section class="admin-section" id="settings">
         <h1>Website Settings</h1>
         
         <form id="settingsForm">
-          <input type="text" id="websiteName" placeholder="Website Name">
-          <textarea id="popupMessage" placeholder="Popup Message"></textarea>
-          <textarea id="footerText" placeholder="Footer Text"></textarea>
+          <input type="text" id="websiteName" placeholder="Website Name (e.g. KavyaHub)">
+          <textarea id="popupMessage" placeholder="Unlock Modal Custom Message" rows="3"></textarea>
+          <textarea id="footerText" placeholder="Footer Description Text" rows="3"></textarea>
           
           <button type="submit">Save Settings</button>
         </form>
@@ -348,6 +369,25 @@
 
     </main>
   </div>
+
+  <!-- Real-time Description Preview Script -->
+  <script>
+    const resDesc = document.getElementById("resourceDescription");
+    const resPrev = document.getElementById("resourceDescPreview");
+    if (resDesc && resPrev) {
+      resDesc.addEventListener("input", () => {
+        resPrev.textContent = resDesc.value.trim() || "Your description preview will appear here in real-time...";
+      });
+    }
+
+    const vidDesc = document.getElementById("videoDescription");
+    const vidPrev = document.getElementById("videoDescPreview");
+    if (vidDesc && vidPrev) {
+      vidDesc.addEventListener("input", () => {
+        vidPrev.textContent = vidDesc.value.trim() || "Your video description preview will appear here in real-time...";
+      });
+    }
+  </script>
 
 </body>
 </html>

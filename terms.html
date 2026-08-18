@@ -2,36 +2,59 @@
 <html lang="en">
 <head>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense (Temporarily commented until custom domain setup) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8222208732348820" crossorigin="anonymous"></script> -->
      
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms & Conditions | KavyaHub</title>
-  <meta name="description" content="Terms and Conditions for KavyaHub. Please read our guidelines regarding site usage, content accuracy, and external links." />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
+  <title>Terms & Conditions | KavyaHub - Terms of Service & User Agreement</title>
+  <meta name="description" content="Read the official Terms and Conditions for KavyaHub. Understand site usage guidelines, external opportunity disclaimers, and user responsibilities." />
+  <meta name="keywords" content="terms of service, terms and conditions, legal agreement, KavyaHub disclaimer" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Terms & Conditions | KavyaHub" />
+  <meta property="og:description" content="User terms of service, educational usage guidelines, and external resource disclaimers." />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
   <style>
-    .policy-card-container { line-height: 1.8; color: var(--text-main); padding: 20px; }
-    .policy-card-container h3 { margin-top: 25px; margin-bottom: 10px; color: var(--primary-color); }
-    .policy-card-container a { color: var(--primary-color); text-decoration: underline; }
-    .back-nav { margin-bottom: 20px; display: inline-block; font-weight: 600; color: var(--text-main); }
+    .policy-container { max-width: 850px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: var(--text-main); }
+    .policy-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+    .policy-card h2 { font-size: 1.3rem; margin-top: 30px; margin-bottom: 12px; color: var(--text-main); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .policy-card h2:first-of-type { margin-top: 0; }
+    .policy-card p, .policy-card li { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 12px; }
+    .policy-card ul { padding-left: 20px; margin-bottom: 16px; }
+    .policy-card a { color: var(--primary); text-decoration: underline; font-weight: 500; }
+    .policy-note { background: rgba(245, 158, 11, 0.08); border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 4px; margin: 20px 0; font-size: 0.9rem; color: var(--text-main); }
+    .back-nav-btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--primary); text-decoration: none; margin-bottom: 25px; transition: transform 0.2s; }
+    .back-nav-btn:hover { transform: translateX(-4px); }
   </style>
 </head>
 
 <body>
 
+  <!-- Top Header Navigation -->
   <header class="main-header">
     <nav class="navbar">
+
       <div class="logo">
         <a href="index.html">Kavya<span>Hub</span></a>
       </div>
+
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
         <li><a href="resources.html">Resources</a></li>
@@ -41,11 +64,13 @@
         <li><a href="contact.html">Contact</a></li>
         <li><a href="privacy.html">Privacy</a></li>
       </ul>
-      <div class="header-controls" style="display: flex; align-items: center; gap: 15px;">
-        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main); transition: transform 0.2s;">
+
+      <div class="header-controls">
+        <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
-        <div class="menu-icon" id="menuIcon" style="margin: 0;">
+        
+        <div class="menu-icon" id="menuIcon" aria-label="Open Navigation Menu">
           <i class="fa-solid fa-bars"></i>
         </div>
       </div>
@@ -53,44 +78,70 @@
   </header>
 
   <main>
+
+    <!-- Hero Header -->
     <section class="resources-hero">
       <div class="section-heading">
         <h1>Terms & Conditions</h1>
-        <p>Please read these terms carefully before using our site.</p>
+        <p>Last Revised: August 2026</p>
       </div>
     </section>
 
-    <section class="policy-section" style="padding: 40px 20px;">
-      <article class="policy-card-container" style="max-width: 800px; margin: auto;">
+    <!-- Legal Terms Content -->
+    <div class="policy-container">
+      <a href="index.html" class="back-nav-btn"><i class="fa-solid fa-arrow-left"></i> Back to Homepage</a>
+
+      <article class="policy-card">
         
-        <a href="index.html" class="back-nav"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+        <div class="policy-note">
+          <i class="fa-solid fa-scale-balanced" style="color: #f59e0b; margin-right: 6px;"></i>
+          <strong>Important Disclaimer:</strong> KavyaHub is an independent educational curation and resource discovery platform. We are not an employer, recruiter, or official government body.
+        </div>
 
-        <h3>1. Acceptance of Terms</h3>
-        <p>By accessing and using KavyaHub, you agree to comply with these terms and conditions. If you do not agree, please discontinue use of this website immediately.</p>
+        <h2><i class="fa-solid fa-handshake" style="font-size: 1.1rem; color: var(--primary);"></i> 1. Acceptance of Terms</h2>
+        <p>By accessing or interacting with <strong>KavyaHub</strong> (<code>kavyahub.vercel.app</code>), you acknowledge that you have read, understood, and agreed to be bound by these Terms and Conditions. If you disagree with any part of these terms, you must cease using the platform immediately.</p>
 
-        <h3>2. Educational Purpose Only</h3>
-        <p>All resources, internship links, and certificates shared on KavyaHub are strictly for educational purposes. We do not guarantee employment or specific academic outcomes.</p>
+        <h2><i class="fa-solid fa-graduation-cap" style="font-size: 1.1rem; color: var(--primary);"></i> 2. Educational Curation & Non-Guarantee</h2>
+        <p>All listings including free courses, certification vouchers, hackathon alerts, internships, and financial scholarships are curated strictly for non-commercial educational and informational purposes:</p>
+        <ul>
+          <li><strong>No Guarantee of Selection:</strong> Listing an internship, fellowship, or scholarship does not guarantee candidate selection, interview scheduling, or financial disbursement.</li>
+          <li><strong>Third-Party Policy Changes:</strong> Course providers (e.g., Coursera, NPTEL, Udemy) and companies reserve the right to alter pricing, eligibility requirements, and enrollment deadlines without notice.</li>
+        </ul>
 
-        <h3>3. External Links & Liability</h3>
-        <p>We provide links to third-party platforms (like YouTube, LinkedIn, or internship portals) for your convenience. KavyaHub does not control these external sites and is not liable for their content, privacy policies, or any data security issues you may encounter there.</p>
+        <h2><i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 1.1rem; color: var(--primary);"></i> 3. External Third-Party Links & Disclaimers</h2>
+        <p>Our platform provides deep links to external portals (such as official application websites, YouTube guides, and Google Forms). KavyaHub does not control or assume responsibility for the content, privacy guidelines, or security standards of third-party platforms.</p>
 
-        <h3>4. Intellectual Property</h3>
-        <p>The content provided on KavyaHub is curated to assist students. While you are free to use our resources for personal learning, you may not republish or sell our content commercially without prior consent.</p>
+        <h2><i class="fa-solid fa-copyright" style="font-size: 1.1rem; color: var(--primary);"></i> 4. Intellectual Property & Fair Use</h2>
+        <p>The layout, custom JavaScript engines, branding, and aggregated summaries on KavyaHub are protected under intellectual property laws. Third-party brand logos (e.g., Google, Microsoft, TCS) remain the trademarks of their respective organizations and are used solely for descriptive reference under fair use doctrine.</p>
 
-        <h3>5. Updates to Terms</h3>
-        <p>We may modify these terms occasionally to reflect changes in our services or legal requirements. Your continued use of the site implies your acceptance of the updated terms.</p>
+        <h2><i class="fa-solid fa-user-xmark" style="font-size: 1.1rem; color: var(--primary);"></i> 5. Prohibited Platform Conduct</h2>
+        <p>Users agree not to engage in malicious activities against the platform, including:</p>
+        <ul>
+          <li>Deploying automated scrapers, bots, or brute-force scripts against our Supabase backend infrastructure.</li>
+          <li>Attempting to bypass administrative authentication barriers or alter public database indices.</li>
+        </ul>
 
-        <h3>6. Contact Us</h3>
-        <p>If you have any questions regarding these Terms & Conditions, please reach out to us at: <strong>btaokyahuahai@gmail.com</strong></p>
+        <h2><i class="fa-solid fa-triangle-exclamation" style="font-size: 1.1rem; color: var(--primary);"></i> 6. Limitation of Liability</h2>
+        <p>Under no circumstances shall KavyaHub or its creators be held liable for any direct, incidental, or consequential loss arising from the use of external materials, expired job postings, or server downtimes.</p>
+
+        <h2><i class="fa-solid fa-circle-question" style="font-size: 1.1rem; color: var(--primary);"></i> 7. Contact & Legal Inquiries</h2>
+        <p>For questions, DMCA notifications, or formal queries regarding these Terms, contact us at:</p>
+        <p>
+          <strong>Official Contact:</strong> <a href="mailto:btaokyahuahai@gmail.com">btaokyahuahai@gmail.com</a><br />
+          <strong>Platform:</strong> KavyaHub (Career & Education Platform)
+        </p>
 
       </article>
-    </section>
+    </div>
+
   </main>
 
+  <!-- Main Footer -->
   <footer class="footer">
     <div class="footer-content">
       <h2>Kavya<span>Hub</span></h2>
       <p>A simple hub for free resources, certificates, internships, and learning opportunities.</p>
+
       <div class="footer-links">
         <a href="index.html">Home</a>
         <a href="resources.html">Resources</a>
@@ -101,10 +152,13 @@
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>
       </div>
+
       <p class="copyright">© 2026 KavyaHub. All Rights Reserved.</p>
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="js/main.js"></script>
+
 </body>
 </html>
