@@ -235,7 +235,7 @@ function createCard(resource) {
 }
 
 /* --------------------------------------------------------------------------
-   4. RENDER & FEATURED MODULE
+   4. RENDER & FEATURED MODULE (WITH CLAMPING & READ MORE TRIGGER)
    -------------------------------------------------------------------------- */
 
 function renderResources(data) {
@@ -270,9 +270,24 @@ function loadFeatured() {
     return;
   }
 
-  if (featuredResourceSection) featuredResourceSection.style.display = "block";
+  if (featuredResourceSection) {
+    featuredResourceSection.style.display = "block";
+    const resourceJSON = encodeURIComponent(JSON.stringify(featured));
+    featuredResourceSection.setAttribute("data-resource", resourceJSON);
+  }
+
   featuredTitle.textContent = featured.title;
-  featuredDescription.textContent = featured.description || "";
+  
+  const descText = featured.description || "";
+  const isLongDescription = descText.length > 130;
+
+  featuredDescription.innerHTML = `
+    <div class="featured-description-clamp">
+      ${escapeHTML(descText)}
+    </div>
+    ${isLongDescription ? `<button type="button" class="read-more-btn res-modal-trigger featured-read-more">Read More</button>` : ""}
+  `;
+
   featuredButton.dataset.link = featured.link || "#";
   featuredButton.dataset.id = featured.id;
 }
@@ -454,10 +469,10 @@ if (descModalOverlay) {
 
 // Global Delegated Click Events
 document.addEventListener("click", async (e) => {
-  // 1. Read More Modal
+  // 1. Read More Modal (Resource Card + Featured Card)
   const modalTrigger = e.target.closest(".res-modal-trigger");
   if (modalTrigger) {
-    const card = modalTrigger.closest(".resource-card");
+    const card = modalTrigger.closest(".resource-card") || modalTrigger.closest("#featuredResourceSection") || modalTrigger.closest(".featured-resource");
     if (card && card.dataset.resource) {
       const data = JSON.parse(decodeURIComponent(card.dataset.resource));
       openResourceDetailsModal(data);

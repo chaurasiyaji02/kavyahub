@@ -157,18 +157,14 @@ function createVideoCard(video) {
 
   return `
     <div class="youtube-video-card" data-video="${videoJSON}">
-      
-      <!-- Left 16:9 Thumbnail Column -->
       <div class="youtube-thumb-wrapper">
         <img src="${thumbnail}" alt="${escapeHTML(video.title)}" class="youtube-card-thumbnail" loading="lazy">
         <div class="thumb-play-overlay"><i class="fa-solid fa-play"></i></div>
       </div>
-
-      <!-- Right Metadata & Content Column -->
+      
       <div class="youtube-content-wrapper">
-        
         <div class="tag-row">
-          <span class="badge-pill neutral-pill">${escapeHTML(video.category || "Video")}</span>
+          <span class="badge-pill neutral-pill"><i class="fa-solid fa-video"></i> ${escapeHTML(video.category || "Video")}</span>
           ${orgBadgeHTML}
         </div>
 
@@ -209,7 +205,6 @@ function createVideoCard(video) {
             <i class="fa-solid fa-share-nodes"></i>
           </button>
         </div>
-
       </div>
     </div>
   `;
@@ -251,19 +246,30 @@ function loadFeaturedVideo() {
     return;
   }
 
-  if (featuredVideoSection) featuredVideoSection.style.display = "block";
+  if (featuredVideoSection) {
+    featuredVideoSection.style.display = "block";
+    const videoJSON = encodeURIComponent(JSON.stringify(featured));
+    featuredVideoSection.setAttribute("data-video", videoJSON);
+  }
+
   featuredVideoTitle.textContent = featured.title;
-  featuredVideoDescription.textContent = featured.description || "";
+  
+  const descText = featured.description || "";
+  const isLongDescription = descText.length > 130;
+
+  featuredVideoDescription.innerHTML = `
+    <div class="featured-description-clamp">
+      ${escapeHTML(descText)}
+    </div>
+    ${isLongDescription ? `<button type="button" class="read-more-btn video-modal-trigger featured-read-more">Read More</button>` : ""}
+  `;
+
   featuredVideoButton.dataset.link = featured.youtube_link || "#";
   featuredVideoButton.dataset.id = featured.id;
 
   if (featuredVideoResourceButton) {
     featuredVideoResourceButton.dataset.link = featured.resource_link || "#";
-    if (!featured.resource_link || featured.resource_link === "#") {
-      featuredVideoResourceButton.style.display = "none";
-    } else {
-      featuredVideoResourceButton.style.display = "inline-flex";
-    }
+    featuredVideoResourceButton.style.display = featured.resource_link ? "inline-flex" : "none";
   }
 }
 
@@ -369,10 +375,10 @@ if (descModalOverlay) {
 
 // Global Event Delegation
 document.addEventListener("click", async (e) => {
-  // 1. Read More Modal Trigger
+  // 1. Read More Modal Trigger (Cards + Featured)
   const modalTrigger = e.target.closest(".video-modal-trigger");
   if (modalTrigger) {
-    const card = modalTrigger.closest(".youtube-video-card");
+    const card = modalTrigger.closest(".youtube-video-card") || modalTrigger.closest("#featuredVideoSection") || modalTrigger.closest(".featured-resource");
     if (card && card.dataset.video) {
       const data = JSON.parse(decodeURIComponent(card.dataset.video));
       openVideoDetailsModal(data);
@@ -512,7 +518,6 @@ async function loadVideos() {
   videos = data || [];
   loadFeaturedVideo();
 
-  // Inbound query / category check from URL
   const urlParams = new URLSearchParams(window.location.search);
   const inboundSearch = urlParams.get("search");
   const inboundCategory = urlParams.get("category");

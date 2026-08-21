@@ -1246,3 +1246,17 @@ section {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
+/* Featured Card Clamping Fix */
+.featured-description-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.featured-read-more {
+  display: block;
+  margin: 0 auto 15px auto;
+}
